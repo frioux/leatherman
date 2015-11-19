@@ -17,6 +17,12 @@ my $user_id = get_userid($pal);
 
 warn "User ID for $pal is $user_id\n";
 
+$SIG{INT} = sub {
+   warn "Resetting!\n";
+   say 'g0';
+   exit 1;
+};
+
 while (1) {
    sleep 2;
 
@@ -27,10 +33,6 @@ while (1) {
    }
 
 }
-
-$SIG{INT} = sub { exit(1) };
-END { say 'g0' }
-
 
 sub get_userid ($pal) {
    my $req = $ua->get(
