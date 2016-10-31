@@ -10,23 +10,50 @@ while (1) {
    sleep 1;
 
    if (playing_sounds()) {
-      warn "red\n";
       print "r255\n";
       $off_count = 0;
    } elsif ($off_count++ >= 2) {
-      warn "black\n";
       print "r0\n";
    }
 }
 
+sub _parse_plsi {
+   my @lines = `pacmd list-sink-inputs`;
+
+   my @data;
+   my $current;
+
+   for my $line (@lines) {
+      chomp $line;
+
+      if ($line =~ m/index:\s/) {
+         push @data, $current if $current;
+         $current = {};
+      }
+      my $re = qr/\s*[:=]\s*/;
+      if ($line =~ $re) {
+         my ($l, $r) = split $re, $line, 2;
+         $l =~ s/^\s*//;
+         $r =~ s/^"//;
+         $r =~ s/"$//;
+         $current->{$l} = $r
+      }
+   }
+   push @data, $current;
+
+   return @data;
+}
+
 sub playing_sounds {
-   my @lines =
-      grep m/RUNNING/,
-      split /\n/,
-      `pacmd list-sink-inputs`;
+   my @sinks = _parse_plsi();
 
-   warn "sound is playing\n" if @lines;
-   warn "silence\n" if !@lines;
+   my $chrome = 0;
+   for (grep { $_->{state} eq 'RUNNING' } @sinks) {
+      return 1 if $_->{'application.name'} ne 'Chrome';
+      $chrome ++;
+   }
 
-   scalar @lines
+   return 1 if $chrome > 1;
+
+   return 0
 }
