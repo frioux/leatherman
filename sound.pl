@@ -49,7 +49,7 @@ sub playing_sounds {
 
    my $chrome = 0;
    for (grep { $_->{state} eq 'RUNNING' } @sinks) {
-      return 1 if $_->{'application.name'} ne 'Chrome';
+      return 1 if $_->{'application.name'} !~ m/chrome/i;
       $chrome ++;
    }
 
