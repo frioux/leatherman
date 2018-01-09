@@ -1,0 +1,34 @@
+# Leatherman - fREW's favorite multitool
+
+This is a little project simply to make trivial tools in Go effortless for my
+personal usage.  These tools are almost surely of low utility to most people,
+but may be instructive nonetheless.
+
+Currently code quality is of low importance, and getting the tools ported from
+Perl and Python is higher priority.  Anything that uses non-core modules is a
+higher priority.  Anything that needs concurency is also of higher priority.
+
+The intended flow for this is that tools will be functions that get added to the
+`dispatch` table in `main`.  Eventually I will factor things into separate
+packages, but not yet.  I will set up some kind of CI to build this into a
+single binary and add a `symlink` tool that builds symlinks for each tool in the
+busybox style.
+
+I will add automation to my dotfiles to pull the latest binary at install time
+and run the `symlink` tool.
+
+## Current tools
+
+### `addrspec-to-tabs`
+
+Converts email addresses from the standard format (`"Hello Friend" <foo@bar>`)
+to the mutt (?) address book format, ie tab separated fields.
+
+Note that this new version ignores the comment because, after actually auditing
+my addressbook, most comments are incorrectly recognized by all tools. (for
+example: `<5555555555@vzw.com> (555) 555-5555` should not have a comment of
+`(555)`.)
+
+### `clocks`
+
+My personal, digital, wall of clocks.
