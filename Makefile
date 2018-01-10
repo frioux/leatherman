@@ -1,0 +1,2 @@
+leatherman:
+	go build
