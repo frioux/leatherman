@@ -14,6 +14,7 @@ func main() {
 	Dispatch = map[string]func([]string){
 		"addrspec-to-tabs": AddrspecToTabs,
 		"clocks":           Clocks,
+		"debounce":         Debounce,
 		"help":             Help,
 	}
 
