@@ -16,6 +16,7 @@ func main() {
 		"clocks":           Clocks,
 		"debounce":         Debounce,
 		"help":             Help,
+		"explode":          Explode,
 	}
 
 	if which == "leatherman" && len(args) > 1 {
