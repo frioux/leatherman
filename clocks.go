@@ -56,7 +56,12 @@ func t(l string) string {
 	return day + " \t" + relativeThere.Format("15:04\t03:04 PM") + "\t" + offsetStr
 }
 
-func Clocks() {
+// Clocks shows my personal, digital, wall of clocks.
+func Clocks(args []string) {
+	if len(args) > 1 && args[1] == "-h" {
+		fmt.Println("my personal, digital, wall of clocks")
+		return
+	}
 	fmt.Println("here : " + t("Local"))
 	fmt.Println("L.A. : " + t("America/Los_Angeles"))
 	fmt.Println("MS/TX: " + t("America/Chicago"))

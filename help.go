@@ -2,14 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
 )
 
-func Help() {
+// Help prints tool listing
+func Help(args []string) {
 	str := "Tools:\n"
 	for k := range Dispatch {
 		str += " * " + k + "\n"
 	}
 	fmt.Println(str)
-	os.Exit(1)
 }
