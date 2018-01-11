@@ -36,3 +36,8 @@ My personal, digital, wall of clocks.
 ### `debounce`
 
 Powerful tool for debouncing lines of input.
+
+### `render-mail`
+
+Ghetto tool to render email with a Local-Date included, if Date is not already
+in local time.

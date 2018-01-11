@@ -15,6 +15,7 @@ func main() {
 		"addrspec-to-tabs": AddrspecToTabs,
 		"clocks":           Clocks,
 		"debounce":         Debounce,
+		"render-mail":      RenderMail,
 		"help":             Help,
 		"explode":          Explode,
 	}
