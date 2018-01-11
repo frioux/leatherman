@@ -33,6 +33,11 @@ example: `<5555555555@vzw.com> (555) 555-5555` should not have a comment of
 
 My personal, digital, wall of clocks.
 
+### `csv2json`
+
+Reads CSV on stdin and writes JSON on stdout; first line of input is the header,
+and thus the keys of the JSON.
+
 ### `debounce`
 
 Powerful tool for debouncing lines of input.

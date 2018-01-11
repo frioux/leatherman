@@ -18,6 +18,7 @@ func main() {
 		"render-mail":      RenderMail,
 		"help":             Help,
 		"explode":          Explode,
+		"csv2json":         CsvToJson,
 	}
 
 	if which == "leatherman" && len(args) > 1 {
