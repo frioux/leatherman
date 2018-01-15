@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - stable
+  - 1.9.2
 deploy:
   provider: releases
   api_key:
