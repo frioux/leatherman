@@ -19,6 +19,15 @@ and run the `symlink` tool.
 
 ## Current tools
 
+### `addrs`
+
+``` bash
+$ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
+```
+
+Reads emails (in the mutt addrbook format, see below) on stdin and sorts them
+based on when they were most recently sent to.
+
 ### `addrspec-to-tabs`
 
 Converts email addresses from the standard format (`"Hello Friend" <foo@bar>`)

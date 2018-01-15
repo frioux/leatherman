@@ -12,6 +12,7 @@ func main() {
 	args := os.Args
 
 	Dispatch = map[string]func([]string){
+		"addrs":            Addrs,
 		"addrspec-to-tabs": AddrspecToTabs,
 		"clocks":           Clocks,
 		"debounce":         Debounce,
