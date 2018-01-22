@@ -61,9 +61,10 @@ func buildFrecencyMapFromGlob(glob string) map[string]float64 {
 }
 
 // buildFrecencyMap returns a map of addresses, scored based on how recently
-// they were mailed to.
+// they were mailed to.  See
+// https://wiki.mozilla.org/User:Jesse/NewFrecency#Proposed_new_definition
 func buildFrecencyMap(emails chan *mail.Message, now time.Time) map[string]float64 {
-	lambda := math.Exp(2) / 30
+	lambda := math.Log(2) / 30
 
 	score := map[string]float64{}
 
@@ -78,9 +79,9 @@ func buildFrecencyMap(emails chan *mail.Message, now time.Time) map[string]float
 
 			normalizedAddr := strings.ToLower(addr.Address)
 			if _, ok := score[normalizedAddr]; ok {
-				score[normalizedAddr] += math.Exp(lambda * age)
+				score[normalizedAddr] += math.Exp(-lambda * age)
 			} else {
-				score[normalizedAddr] = math.Exp(lambda * age)
+				score[normalizedAddr] = math.Exp(-lambda * age)
 			}
 		}
 	}
