@@ -5,7 +5,6 @@ import (
 	"net/mail"
 	"strings"
 	"testing"
-	"time"
 )
 
 var eml1 = `MIME-Version: 1.0
@@ -37,32 +36,6 @@ func TestAllAddrs(t *testing.T) {
 			`"vaz" <vaz@gmail.com>, "buff" <buff@gmail.com>, "bog" <bog@gmail.com>`)
 
 	got := allAddrs(email)
-
-	if diff := deep.Equal(expected, got); diff != nil {
-		t.Error(diff)
-	}
-}
-
-func TestBuildFrecencyMap(t *testing.T) {
-	testChan := make(chan *mail.Message)
-	go func() {
-		emls := []string{eml1, eml2}
-		for _, eml := range emls {
-			email, _ := mail.ReadMessage(strings.NewReader(eml))
-			testChan <- email
-		}
-		close(testChan)
-	}()
-	got := buildFrecencyMap(testChan, time.Date(2018, 01, 18, 0, 0, 0, 0, time.UTC))
-
-	expected := map[string]float64{
-		"yyz@gmail.com":  8.458955564670706,
-		"a@gmail.com":    4.747724633876302,
-		"foo@gmail.com":  3.7112309307944047,
-		"bar@gmail.com":  3.7112309307944047,
-		"vaz@gmail.com":  3.7112309307944047,
-		"buff@gmail.com": 3.7112309307944047,
-		"bog@gmail.com":  3.7112309307944047}
 
 	if diff := deep.Equal(expected, got); diff != nil {
 		t.Error(diff)
