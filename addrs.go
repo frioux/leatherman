@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"math"
 	"net/mail"
@@ -14,7 +15,7 @@ import (
 )
 
 // allAddrs returns all email addresses an email was sent to (To, Cc, and Bcc)
-func allAddrs(email *mail.Message, path string) []*mail.Address {
+func allAddrs(email *mail.Message) []*mail.Address {
 	addrs := []*mail.Address{}
 	headers := []string{"To", "Cc", "Bcc"}
 	for _, x := range headers {
@@ -31,49 +32,64 @@ func allAddrs(email *mail.Message, path string) []*mail.Address {
 	return addrs
 }
 
-// buildFrecencyMap parses all emails found in the passed glob and returns a map
-// of addresses, scored based on how recently they were mailed to.
-func buildFrecencyMap(glob string) map[string]float64 {
+// buildFrecencyMapFromGlob calls buildFrecencyMap passing emails found from the
+// passed glob
+func buildFrecencyMapFromGlob(glob string) map[string]float64 {
 	matches, err := filepath.Glob(glob)
 	if err != nil {
 		log.Fatal("couldn't get glob", err)
 	}
-	sort.Sort(sort.Reverse(sort.StringSlice(matches)))
-	now := time.Now()
+
+	emailChan := make(chan *mail.Message)
+	go func() {
+		for _, path := range matches {
+			file, err := os.Open(path)
+			if err != nil {
+				log.Println("Coudln't open email", path, err)
+			}
+			email, err := mail.ReadMessage(file)
+			if err != nil {
+				log.Println("Coudln't parse email", path, err)
+				continue
+			}
+			emailChan <- email
+		}
+		close(emailChan)
+	}()
+
+	return buildFrecencyMap(emailChan, time.Now())
+}
+
+// buildFrecencyMap returns a map of addresses, scored based on how recently
+// they were mailed to.
+func buildFrecencyMap(emails chan *mail.Message, now time.Time) map[string]float64 {
 	lambda := math.Exp(2) / 30
 
 	score := map[string]float64{}
 
-	for _, path := range matches {
-		file, err := os.Open(path)
-		if err != nil {
-			log.Println("Coudln't open email", path, err)
-		}
-		email, err := mail.ReadMessage(file)
-		if err != nil {
-			log.Println("Coudln't parse email", path, err)
-			continue
-		}
-		for _, addr := range allAddrs(email, path) {
-			if _, ok := score[addr.Address]; ok {
-				continue
-			}
+	for email := range emails {
+		for _, addr := range allAddrs(email) {
 			time, err := email.Header.Date()
 			if err != nil {
-				log.Println("Couldn't read date for", file, err)
+				log.Println("Couldn't read date", err)
 				continue
 			}
 			age := now.Sub(time).Hours() / 24
 
-			score[addr.Address] = math.Exp(lambda * age)
+			normalizedAddr := strings.ToLower(addr.Address)
+			if _, ok := score[normalizedAddr]; ok {
+				score[normalizedAddr] += math.Exp(lambda * age)
+			} else {
+				score[normalizedAddr] = math.Exp(lambda * age)
+			}
 		}
 	}
 	return score
 }
 
 // buildAddrMap returns a map of address and content, based on os.Stdin
-func buildAddrMap() map[string]string {
-	scanner := bufio.NewScanner(os.Stdin)
+func buildAddrMap(reader io.Reader) map[string]string {
+	scanner := bufio.NewScanner(reader)
 
 	ret := map[string]string{}
 	for scanner.Scan() {
@@ -90,35 +106,32 @@ func buildAddrMap() map[string]string {
 	return ret
 }
 
-// Addrs sorts the addresses passed on stdin based on how recently they were
-// used, based on the glob passed on the arguments.
-func Addrs(args []string) {
-	if len(args) != 2 {
-		log.Fatal("Please pass a glob")
-	}
-	score := buildFrecencyMap(args[1])
-	addrs := buildAddrMap()
-
+// sortAddrMap sorts the addrs arg based on the values in the score arg;
+// leftover values are printed in alphabetical order.
+func sortAddrMap(score map[string]float64, addrs map[string]string) []string {
 	// map of addresses that have been scored
 	scored := map[string]string{}
 	// keys list, for sorting based on score later
 	scoredKeys := []string{}
 	for key := range score {
-		scored[key] = addrs[key]
-		delete(addrs, key)
-		scoredKeys = append(scoredKeys, key)
+		var ok bool
+		scored[key], ok = addrs[key]
+		if ok {
+			delete(addrs, key)
+			scoredKeys = append(scoredKeys, key)
+		}
 	}
 
 	// sort keys based on score
 	sort.Slice(
 		sort.StringSlice(scoredKeys),
-		func(i, j int) bool { return score[scoredKeys[i]] < score[scoredKeys[j]] },
+		func(i, j int) bool { return score[scoredKeys[i]] > score[scoredKeys[j]] },
 	)
 
-	// first line is blank
-	fmt.Println()
+	ret := []string{}
+
 	for _, key := range scoredKeys {
-		fmt.Println(key + "\t" + scored[key])
+		ret = append(ret, key+"\t"+scored[key])
 	}
 
 	// sort remaining addrs based on keys
@@ -128,6 +141,24 @@ func Addrs(args []string) {
 	}
 	sort.Sort(sort.StringSlice(addrKeys))
 	for _, key := range addrKeys {
-		fmt.Println(key + "\t" + addrs[key])
+		ret = append(ret, key+"\t"+addrs[key])
+	}
+	return ret
+}
+
+// Addrs sorts the addresses passed on stdin based on how recently they were
+// used, based on the glob passed on the arguments.
+func Addrs(args []string) {
+	if len(args) != 2 {
+		log.Fatal("Please pass a glob")
+	}
+
+	addrs := sortAddrMap(
+		buildFrecencyMapFromGlob(args[1]), buildAddrMap(os.Stdin))
+
+	// first line is blank
+	fmt.Println()
+	for _, line := range addrs {
+		fmt.Println(line)
 	}
 }
