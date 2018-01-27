@@ -12,14 +12,16 @@ func main() {
 	args := os.Args
 
 	Dispatch = map[string]func([]string){
-		"addrs":            Addrs,
-		"addrspec-to-tabs": AddrspecToTabs,
-		"clocks":           Clocks,
-		"debounce":         Debounce,
-		"render-mail":      RenderMail,
-		"help":             Help,
-		"explode":          Explode,
-		"csv2json":         CsvToJson,
+		"addrs":               Addrs,
+		"addrspec-to-tabs":    AddrspecToTabs,
+		"clocks":              Clocks,
+		"csv2json":            CsvToJson,
+		"debounce":            Debounce,
+		"ec2-resource-for-ip": Ec2ResourceForIp,
+		"render-mail":         RenderMail,
+
+		"help":    Help,
+		"explode": Explode,
 	}
 
 	if which == "leatherman" && len(args) > 1 {
