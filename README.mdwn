@@ -10,12 +10,15 @@ higher priority.  Anything that needs concurency is also of higher priority.
 
 The intended flow for this is that tools will be functions that get added to the
 `dispatch` table in `main`.  Eventually I will factor things into separate
-packages, but not yet.  I will set up some kind of CI to build this into a
-single binary and add a `symlink` tool that builds symlinks for each tool in the
-busybox style.
+packages, but not yet.  [I have CI/CD to build this into a single
+binary](https://github.com/frioux/leatherman/blob/master/.travis.yml) and [an
+`explode` tool that builds
+symlinks](https://github.com/frioux/leatherman/blob/master/explode.go) for each
+tool in the busybox style.
 
-I will add automation to my dotfiles to pull the latest binary at install time
-and run the `symlink` tool.
+[I have add automation in my
+dotfiles](https://github.com/frioux/dotfiles/blob/bef8303c19e2cefac7dfbec420ad8d45b95415b8/install.sh#L133-L141)
+to pull the latest binary at install time and run the `explode` tool.
 
 ## Current tools
 
