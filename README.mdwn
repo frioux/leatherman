@@ -62,6 +62,25 @@ Pass IPs as arguments and this will find them in EC2 (and other places in AWS.)
 
 Pass hostname and login and this will print the password for the account.
 
+### `pomotimer`
+
+```
+pomotimer 2.5m
+```
+
+or
+
+```
+pomotimer 3m12s
+```
+
+Originally a timer for use with [the pomodoro][1] [technique][2].  Handy timer in any case
+since you can pass it arbitrary durations, pause it, reset it, and see it's
+progress.
+
+[1]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique/
+[2]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique-three-years-later/
+
 ### `render-mail`
 
 Ghetto tool to render email with a Local-Date included, if Date is not already

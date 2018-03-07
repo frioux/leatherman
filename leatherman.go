@@ -19,6 +19,7 @@ func main() {
 		"debounce":            Debounce,
 		"ec2-resource-for-ip": Ec2ResourceForIp,
 		"netrc-password":      NetrcPassword,
+		"pomotimer":           Pomotimer,
 		"render-mail":         RenderMail,
 
 		"help":    Help,
