@@ -45,7 +45,7 @@ LOOP:
 	for {
 		select {
 		case <-c:
-			if secondsRemaining >= 1 {
+			if secondsRemaining > 1 {
 				if !running {
 					continue
 				}
