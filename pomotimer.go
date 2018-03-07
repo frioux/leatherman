@@ -56,6 +56,7 @@ LOOP:
 				secondsRemaining--
 			} else {
 				fmt.Println(clear + "Take a break!\a")
+				break LOOP
 			}
 		case key := <-kb:
 			if key == "p" {
