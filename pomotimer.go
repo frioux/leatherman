@@ -4,10 +4,24 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 )
 
 const clear = "\r\x1b[J"
+
+var tmuxWindow string
+
+func init() {
+	cmd := exec.Command("sh", "-c", "tmux list-windows | grep active | cut -d: -f1")
+	out, err := cmd.Output()
+	if err != nil {
+		fmt.Fprintf(os.Stderr,
+			"pomotimer: couldn't get current tmux window: %s\n", err)
+	}
+
+	tmuxWindow = strings.Trim(string(out), "\n")
+}
 
 func Pomotimer(args []string) {
 	setProcessName("pomotimer")
@@ -81,7 +95,7 @@ func kbChan(keys chan string) {
 }
 
 func setProcessName(name string) {
-	exec.Command("tmux", "rename-window", name).Run()
+	exec.Command("tmux", "rename-window", "-t", tmuxWindow, name).Run()
 }
 
 func formatTime(s int) string {
