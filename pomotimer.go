@@ -10,8 +10,6 @@ import (
 const clear = "\r\x1b[J"
 
 func Pomotimer(args []string) {
-	setProcessName("pomotimer")
-
 	timer, _ := time.ParseDuration("25m")
 	if len(args) > 1 {
 		var err error
@@ -24,6 +22,7 @@ func Pomotimer(args []string) {
 
 	initialSeconds := int(timer.Seconds())
 
+	setProcessName("PT" + formatTime(initialSeconds))
 	fmt.Print("[p]ause [r]eset abort[!]\n\n")
 
 	// disable input buffering
