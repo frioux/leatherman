@@ -77,12 +77,7 @@ func buildFrecencyMap(emails chan *mail.Message, now time.Time) map[string]float
 			}
 			age := now.Sub(time).Hours() / 24
 
-			normalizedAddr := strings.ToLower(addr.Address)
-			if _, ok := score[normalizedAddr]; ok {
-				score[normalizedAddr] += math.Exp(-lambda * age)
-			} else {
-				score[normalizedAddr] = math.Exp(-lambda * age)
-			}
+			score[strings.ToLower(addr.Address)] += math.Exp(-lambda * age)
 		}
 	}
 	return score
