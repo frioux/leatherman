@@ -18,6 +18,7 @@ func main() {
 		"csv2json":            CsvToJson,
 		"debounce":            Debounce,
 		"ec2-resource-for-ip": Ec2ResourceForIp,
+		"gen-pass":            GenPass,
 		"netrc-password":      NetrcPassword,
 		"pomotimer":           Pomotimer,
 		"render-mail":         RenderMail,
