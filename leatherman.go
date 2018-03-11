@@ -19,6 +19,7 @@ func main() {
 		"debounce":            Debounce,
 		"ec2-resource-for-ip": Ec2ResourceForIp,
 		"gen-pass":            GenPass,
+		"group-by-date":       GroupByDate,
 		"netrc-password":      NetrcPassword,
 		"pomotimer":           Pomotimer,
 		"render-mail":         RenderMail,

@@ -62,6 +62,11 @@ Pass IPs as arguments and this will find them in EC2 (and other places in AWS.)
 
 Little tool for generating bcrypt hashes.
 
+### `group-by-date`
+
+Creates time series data by counting lines and grouping them by a given date
+format.
+
 ## `netrc-password`
 
 Pass hostname and login and this will print the password for the account.
