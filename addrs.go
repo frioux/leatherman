@@ -34,55 +34,51 @@ func allAddrs(email *mail.Message) []*mail.Address {
 
 // buildFrecencyMapFromGlob calls buildFrecencyMap passing emails found from the
 // passed glob
-func buildFrecencyMapFromGlob(glob string) map[string]float64 {
+func buildFrecencyMapFromGlob(glob string) frecencyMap {
 	matches, err := filepath.Glob(glob)
 	if err != nil {
 		log.Fatal("couldn't get glob", err)
 	}
 
-	emailChan := make(chan *mail.Message)
-	go func() {
-		for _, path := range matches {
-			file, err := os.Open(path)
-			if err != nil {
-				log.Println("Coudln't open email", path, err)
-			}
-			email, err := mail.ReadMessage(file)
-			file.Close()
-			if err != nil {
-				log.Println("Coudln't parse email", path, err)
-				continue
-			}
-			emailChan <- email
+	score := newFrecencyMap()
+	for _, path := range matches {
+		file, err := os.Open(path)
+		if err != nil {
+			log.Println("Coudln't open email", path, err)
 		}
-		close(emailChan)
-	}()
+		email, err := mail.ReadMessage(file)
+		file.Close()
+		if err != nil {
+			log.Println("Coudln't parse email", path, err)
+			continue
+		}
+		score.addEmail(email, time.Now())
+	}
 
-	return buildFrecencyMap(emailChan, time.Now())
+	return score
 }
+
+type frecencyMap map[string]float64
 
 // math.Log(2) / 30
 const lambda = 0.02310490601866484364
 
+func newFrecencyMap() frecencyMap { return map[string]float64{} }
+
 // buildFrecencyMap returns a map of addresses, scored based on how recently
 // they were mailed to.  See
 // https://wiki.mozilla.org/User:Jesse/NewFrecency#Proposed_new_definition
-func buildFrecencyMap(emails chan *mail.Message, now time.Time) map[string]float64 {
-	score := map[string]float64{}
-
-	for email := range emails {
-		for _, addr := range allAddrs(email) {
-			time, err := email.Header.Date()
-			if err != nil {
-				log.Println("Couldn't read date", err)
-				continue
-			}
-			age := now.Sub(time).Hours() / 24
-
-			score[strings.ToLower(addr.Address)] += math.Exp(-lambda * age)
+func (score frecencyMap) addEmail(email *mail.Message, now time.Time) {
+	for _, addr := range allAddrs(email) {
+		time, err := email.Header.Date()
+		if err != nil {
+			log.Println("Couldn't read date", err)
+			continue
 		}
+		age := now.Sub(time).Hours() / 24
+
+		score[strings.ToLower(addr.Address)] += math.Exp(-lambda * age)
 	}
-	return score
 }
 
 // buildAddrMap returns a map of address and content, based on os.Stdin
@@ -106,7 +102,7 @@ func buildAddrMap(reader io.Reader) map[string]string {
 
 // sortAddrMap sorts the addrs arg based on the values in the score arg;
 // leftover values are printed in alphabetical order.
-func sortAddrMap(score map[string]float64, addrs map[string]string) []string {
+func sortAddrMap(score frecencyMap, addrs map[string]string) []string {
 	// map of addresses that have been scored
 	scored := map[string]string{}
 	// keys list, for sorting based on score later
@@ -125,7 +121,6 @@ func sortAddrMap(score map[string]float64, addrs map[string]string) []string {
 		sort.StringSlice(scoredKeys),
 		func(i, j int) bool { return score[scoredKeys[i]] > score[scoredKeys[j]] },
 	)
-
 	ret := []string{}
 
 	for _, key := range scoredKeys {
