@@ -48,6 +48,7 @@ func buildFrecencyMapFromGlob(glob string) map[string]float64 {
 				log.Println("Coudln't open email", path, err)
 			}
 			email, err := mail.ReadMessage(file)
+			file.Close()
 			if err != nil {
 				log.Println("Coudln't parse email", path, err)
 				continue
