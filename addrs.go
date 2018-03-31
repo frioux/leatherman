@@ -27,11 +27,8 @@ func allAddrs(email *mail.Message) []*mail.Address {
 	headers := []string{"To", "Cc", "Bcc"}
 	for _, x := range headers {
 		if email.Header.Get(x) != "" {
-			iAddrs, err := email.Header.AddressList(x)
-			// Emails tend to be messy, just move on.
-			if err != nil {
-				continue
-			}
+			// Emails tend to be messy, ignore error
+			iAddrs, _ := email.Header.AddressList(x)
 			addrs = append(addrs, iAddrs...)
 		}
 	}
