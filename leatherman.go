@@ -18,6 +18,7 @@ func main() {
 		"csv2json":             CsvToJson,
 		"debounce":             Debounce,
 		"ec2-resource-for-ip":  Ec2ResourceForIp,
+		"expand-url":           ExpandURL,
 		"export-bamboohr":      ExportBambooHR,
 		"export-bamboohr-tree": ExportBambooHRTree,
 		"gen-pass":             GenPass,

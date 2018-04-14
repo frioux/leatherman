@@ -58,6 +58,13 @@ Powerful tool for debouncing lines of input.
 
 Pass IPs as arguments and this will find them in EC2 (and other places in AWS.)
 
+### `expand-url`
+
+Reads text on STDIN and writes the same text back, converting any links to
+Markdown links, with the title of the page as the title of the link.  If you set
+`MOZ_COOKIEJAR` to the path of your `cookies.sqlite` it will use those cookies
+when loading the page.
+
 ### `export-bamboohr`
 
 Exports entire company directory as JSON.
