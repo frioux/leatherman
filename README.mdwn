@@ -58,6 +58,14 @@ Powerful tool for debouncing lines of input.
 
 Pass IPs as arguments and this will find them in EC2 (and other places in AWS.)
 
+### `export-bamboohr`
+
+Exports entire company directory as JSON.
+
+### `export-bamboohr-tree`
+
+Exports company org chart as JSON.
+
 #### `gen-pass`
 
 Little tool for generating bcrypt hashes.
