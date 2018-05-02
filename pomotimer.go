@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"time"
+
+	"github.com/erikdubbelboer/gspt"
 )
 
 const clear = "\r\x1b[J"
@@ -80,7 +82,7 @@ func kbChan(keys chan string) {
 }
 
 func setProcessName(name string) {
-	fmt.Print("\033k" + name + "\033\\")
+	gspt.SetProcTitle(name)
 }
 
 func formatTime(s int) string {
