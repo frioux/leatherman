@@ -14,7 +14,10 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
+var jar *cookiejar.Jar
+
 func ExpandURL(args []string) {
+	jar = cj()
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for scanner.Scan() {
@@ -63,11 +66,9 @@ func urlToLink(url string) (string, error) {
 }
 
 var urlFinder *regexp.Regexp
-var jar *cookiejar.Jar
 
 func init() {
 	urlFinder = regexp.MustCompile(`^(|.*\s)(https?://\S+)(\s.*|)$`)
-	jar = cj()
 }
 
 func replaceLink(line string) string {
