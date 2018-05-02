@@ -37,7 +37,7 @@ func cj() *cookiejar.Jar {
 
 	path := os.Getenv("MOZ_COOKIEJAR")
 	if path == "" {
-		fmt.Fprintln(os.Stderr, "MOZ_COOKIEJAR should be set for expand-url to work", err)
+		fmt.Fprintln(os.Stderr, "MOZ_COOKIEJAR should be set for expand-url to work")
 		return jar
 	}
 	db, err := sql.Open("sqlite3", path)
