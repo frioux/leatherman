@@ -109,3 +109,8 @@ progress.
 
 Ghetto tool to render email with a Local-Date included, if Date is not already
 in local time.
+
+### `yaml2json`
+
+Reads YAML on stdin and writes JSON on stdout.
+

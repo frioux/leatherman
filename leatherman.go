@@ -26,6 +26,7 @@ func main() {
 		"netrc-password":       NetrcPassword,
 		"pomotimer":            Pomotimer,
 		"render-mail":          RenderMail,
+		"yaml2json":            YAMLToJSON,
 
 		"help":    Help,
 		"explode": Explode,
