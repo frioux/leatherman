@@ -2,4 +2,5 @@ leatherman: *.go
 	go get -t ./...
 	go test
 	go build
-	bzip2 leatherman
+	strip leatherman
+	xz leatherman
