@@ -2,13 +2,13 @@ package main
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 )
 
 var Dispatch map[string]func([]string)
 
 func main() {
-	which := path.Base(os.Args[0])
+	which := filepath.Base(os.Args[0])
 	args := os.Args
 
 	Dispatch = map[string]func([]string){
