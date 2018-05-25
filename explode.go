@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 func Explode(args []string) {
@@ -12,7 +12,7 @@ func Explode(args []string) {
 		fmt.Println("couldn't get Executable to explode", err)
 		os.Exit(1)
 	}
-	dir := path.Dir(exe)
+	dir := filepath.Dir(exe)
 	for k := range Dispatch {
 		if k == "help" {
 			continue
