@@ -73,7 +73,7 @@ Exports entire company directory as JSON.
 
 Exports company org chart as JSON.
 
-#### `gen-pass`
+### `gen-pass`
 
 Little tool for generating bcrypt hashes.
 
@@ -82,7 +82,7 @@ Little tool for generating bcrypt hashes.
 Creates time series data by counting lines and grouping them by a given date
 format.
 
-## `netrc-password`
+### `netrc-password`
 
 Pass hostname and login and this will print the password for the account.
 
