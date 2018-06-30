@@ -110,6 +110,12 @@ progress.
 Ghetto tool to render email with a Local-Date included, if Date is not already
 in local time.
 
+### `replace-unzip`
+
+Extracts zipfiles, but does not extract `.DS_Store` or `__MACOSX/`.
+Automatically extracts into a directory named after the zipfile if there is not
+a single root for all files in the zipfile.
+
 ### `yaml2json`
 
 Reads YAML on stdin and writes JSON on stdout.
