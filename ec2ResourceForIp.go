@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/elb"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/endpoints"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/elb"
 	"net"
 	"os"
 	"strings"
@@ -21,12 +22,12 @@ type ipLookup struct {
 
 var verbose bool
 
-func allRegions(sess *session.Session) ([]string, error) {
-	svc := ec2.New(sess, &aws.Config{Region: aws.String("us-west-1")})
+func allRegions(cfg aws.Config) ([]string, error) {
+	svc := ec2.New(cfg)
 
 	ret := []string{}
 
-	resp, err := svc.DescribeRegions(nil)
+	resp, err := svc.DescribeRegionsRequest(nil).Send()
 	if err != nil {
 		return []string{"us-west-1", "us-east-1", "us-west-2"}, err
 	}
@@ -47,12 +48,13 @@ func Ec2ResourceForIp(args []string) {
 		os.Exit(1)
 	}
 
-	sess, err := session.NewSession()
+	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
-		panic(err)
+		panic("unable to load SDK config, " + err.Error())
 	}
+	cfg.Region = endpoints.UsWest2RegionID
 
-	regions, err := allRegions(sess)
+	regions, err := allRegions(cfg)
 	if verbose {
 		fmt.Println("Checking", regions)
 	}
@@ -120,22 +122,22 @@ func Ec2ResourceForIp(args []string) {
 
 		go func() {
 			workerWg.Add(1)
-			errC <- ec2_instance_public(region, sess, ips, out)
+			errC <- ec2_instance_public(region, cfg, ips, out)
 			workerWg.Done()
 		}()
 		go func() {
 			workerWg.Add(1)
-			errC <- ec2_instance_private(region, sess, ips, out)
+			errC <- ec2_instance_private(region, cfg, ips, out)
 			workerWg.Done()
 		}()
 		go func() {
 			workerWg.Add(1)
-			errC <- eip(region, sess, ips, out)
+			errC <- eip(region, cfg, ips, out)
 			workerWg.Done()
 		}()
 		go func() {
 			workerWg.Add(1)
-			errC <- find_elb(region, sess, ips, errC, out)
+			errC <- find_elb(region, cfg, ips, errC, out)
 			workerWg.Done()
 		}()
 	}
@@ -169,13 +171,14 @@ func Ec2ResourceForIp(args []string) {
 	}
 }
 
-func find_elb(region string, sess *session.Session, ips []string, errC chan error, out chan ipLookup) error {
-	svc := elb.New(sess, &aws.Config{Region: aws.String(region)})
+func find_elb(region string, cfg aws.Config, ips []string, errC chan error, out chan ipLookup) error {
+	cfg.Region = region
+	svc := elb.New(cfg)
 
 	// map of ip to elb-id
 	lookup := make(map[string]string)
 
-	resp, err := svc.DescribeLoadBalancers(nil)
+	resp, err := svc.DescribeLoadBalancersRequest(nil).Send()
 
 	if err != nil {
 		return err
@@ -211,24 +214,20 @@ func find_elb(region string, sess *session.Session, ips []string, errC chan erro
 	return nil
 }
 
-func eip(region string, sess *session.Session, ips []string, out chan ipLookup) error {
-	svc := ec2.New(sess, &aws.Config{Region: aws.String(region)})
-
-	awsIps := []*string{}
-	for _, ip := range ips {
-		awsIps = append(awsIps, aws.String(ip))
-	}
+func eip(region string, cfg aws.Config, ips []string, out chan ipLookup) error {
+	cfg.Region = region
+	svc := ec2.New(cfg)
 
 	params := &ec2.DescribeAddressesInput{
-		Filters: []*ec2.Filter{
+		Filters: []ec2.Filter{
 			{
 				Name:   aws.String("public-ip"),
-				Values: awsIps,
+				Values: ips,
 			},
 		},
 	}
 
-	resp, err := svc.DescribeAddresses(params)
+	resp, err := svc.DescribeAddressesRequest(params).Send()
 	if err != nil {
 		return err
 	}
@@ -278,7 +277,7 @@ func unknown(ips []string) (map[string]string, error) {
 	return ret, nil
 }
 
-func getEC2Name(i *ec2.Instance) string {
+func getEC2Name(i ec2.Instance) string {
 	for _, tag := range i.Tags {
 		if *tag.Key == "Name" {
 			return *tag.Value
@@ -287,23 +286,19 @@ func getEC2Name(i *ec2.Instance) string {
 	return ""
 }
 
-func ec2_instance_public(region string, sess *session.Session, ips []string, out chan ipLookup) error {
-	svc := ec2.New(sess, &aws.Config{Region: aws.String(region)})
-
-	awsIps := []*string{}
-	for _, ip := range ips {
-		awsIps = append(awsIps, aws.String(ip))
-	}
+func ec2_instance_public(region string, cfg aws.Config, ips []string, out chan ipLookup) error {
+	cfg.Region = region
+	svc := ec2.New(cfg)
 
 	params := &ec2.DescribeInstancesInput{
-		Filters: []*ec2.Filter{
+		Filters: []ec2.Filter{
 			{
 				Name:   aws.String("ip-address"),
-				Values: awsIps,
+				Values: ips,
 			},
 		},
 	}
-	resp, err := svc.DescribeInstances(params)
+	resp, err := svc.DescribeInstancesRequest(params).Send()
 
 	if err != nil {
 		return err
@@ -325,23 +320,19 @@ func ec2_instance_public(region string, sess *session.Session, ips []string, out
 	return nil
 }
 
-func ec2_instance_private(region string, sess *session.Session, ips []string, out chan ipLookup) error {
-	svc := ec2.New(sess, &aws.Config{Region: aws.String(region)})
-
-	awsIps := []*string{}
-	for _, ip := range ips {
-		awsIps = append(awsIps, aws.String(ip))
-	}
+func ec2_instance_private(region string, cfg aws.Config, ips []string, out chan ipLookup) error {
+	cfg.Region = region
+	svc := ec2.New(cfg)
 
 	params := &ec2.DescribeInstancesInput{
-		Filters: []*ec2.Filter{
+		Filters: []ec2.Filter{
 			{
 				Name:   aws.String("private-ip-address"),
-				Values: awsIps,
+				Values: ips,
 			},
 		},
 	}
-	resp, err := svc.DescribeInstances(params)
+	resp, err := svc.DescribeInstancesRequest(params).Send()
 
 	if err != nil {
 		return err
