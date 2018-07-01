@@ -122,22 +122,22 @@ func Ec2ResourceForIp(args []string) {
 
 		go func() {
 			workerWg.Add(1)
-			errC <- ec2_instance_public(region, cfg, ips, out)
+			errC <- ec2InstancePublic(region, cfg, ips, out)
 			workerWg.Done()
 		}()
 		go func() {
 			workerWg.Add(1)
-			errC <- ec2_instance_private(region, cfg, ips, out)
+			errC <- ec2InstancePrivate(region, cfg, ips, out)
 			workerWg.Done()
 		}()
 		go func() {
 			workerWg.Add(1)
-			errC <- eip(region, cfg, ips, out)
+			errC <- findEIP(region, cfg, ips, out)
 			workerWg.Done()
 		}()
 		go func() {
 			workerWg.Add(1)
-			errC <- find_elb(region, cfg, ips, errC, out)
+			errC <- findELB(region, cfg, ips, errC, out)
 			workerWg.Done()
 		}()
 	}
@@ -171,7 +171,7 @@ func Ec2ResourceForIp(args []string) {
 	}
 }
 
-func find_elb(region string, cfg aws.Config, ips []string, errC chan error, out chan ipLookup) error {
+func findELB(region string, cfg aws.Config, ips []string, errC chan error, out chan ipLookup) error {
 	cfg.Region = region
 	svc := elb.New(cfg)
 
@@ -214,7 +214,7 @@ func find_elb(region string, cfg aws.Config, ips []string, errC chan error, out 
 	return nil
 }
 
-func eip(region string, cfg aws.Config, ips []string, out chan ipLookup) error {
+func findEIP(region string, cfg aws.Config, ips []string, out chan ipLookup) error {
 	cfg.Region = region
 	svc := ec2.New(cfg)
 
@@ -286,7 +286,7 @@ func getEC2Name(i ec2.Instance) string {
 	return ""
 }
 
-func ec2_instance_public(region string, cfg aws.Config, ips []string, out chan ipLookup) error {
+func ec2InstancePublic(region string, cfg aws.Config, ips []string, out chan ipLookup) error {
 	cfg.Region = region
 	svc := ec2.New(cfg)
 
@@ -320,7 +320,7 @@ func ec2_instance_public(region string, cfg aws.Config, ips []string, out chan i
 	return nil
 }
 
-func ec2_instance_private(region string, cfg aws.Config, ips []string, out chan ipLookup) error {
+func ec2InstancePrivate(region string, cfg aws.Config, ips []string, out chan ipLookup) error {
 	cfg.Region = region
 	svc := ec2.New(cfg)
 
