@@ -120,23 +120,26 @@ func Ec2ResourceForIp(args []string) {
 	for _, region := range regions {
 		region := region
 
+		workerWg.Add(1)
 		go func() {
-			workerWg.Add(1)
 			errC <- ec2InstancePublic(region, cfg, ips, out)
 			workerWg.Done()
 		}()
+
+		workerWg.Add(1)
 		go func() {
-			workerWg.Add(1)
 			errC <- ec2InstancePrivate(region, cfg, ips, out)
 			workerWg.Done()
 		}()
+
+		workerWg.Add(1)
 		go func() {
-			workerWg.Add(1)
 			errC <- findEIP(region, cfg, ips, out)
 			workerWg.Done()
 		}()
+
+		workerWg.Add(1)
 		go func() {
-			workerWg.Add(1)
 			errC <- findELB(region, cfg, ips, errC, out)
 			workerWg.Done()
 		}()
