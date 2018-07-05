@@ -27,6 +27,7 @@ func main() {
 		"pomotimer":            Pomotimer,
 		"render-mail":          RenderMail,
 		"replace-unzip":        ReplaceUnzip,
+		"ssh-quote":            SSHQuote,
 		"yaml2json":            YAMLToJSON,
 
 		"help":    Help,
