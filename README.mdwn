@@ -108,6 +108,14 @@ Exports entire company directory as JSON.
 
 Exports company org chart as JSON.
 
+### `fn`
+
+Create persistent functions by actually writing scripts.  Example usage:
+
+```
+fn count-users 'wc -l < /etc/passwd'
+```
+
 ### `gen-pass`
 
 Little tool for generating bcrypt hashes.
