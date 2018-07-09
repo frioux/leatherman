@@ -148,6 +148,17 @@ progress.
 [1]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique/
 [2]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique-three-years-later/
 
+### `prepend-emoji-hist`
+
+```
+alluni.pl | prefix-emoji-hist ~/.uni_history
+```
+
+Prints out the deduplicated lines from the passed file, converting characters to
+unicode names, and then printing out the lines from STDIN, filtering out what's
+already been printed.  Note that `alluni.pl` is in [my
+dotfiles](https://github.com/frioux/dotfiles.)
+
 ### `render-mail`
 
 Ghetto tool to render email with a Local-Date included, if Date is not already
