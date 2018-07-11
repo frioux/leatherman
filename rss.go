@@ -30,6 +30,7 @@ func RSS(args []string) {
 		fmt.Fprintf(os.Stderr, "Couldn't fetch feed: %s\n", err)
 		os.Exit(1)
 	}
+	fixItems(feedURL, f.Items)
 
 	seen, err := syncRead(statePath, f.Items)
 	if err != nil {
@@ -39,7 +40,6 @@ func RSS(args []string) {
 
 	items := newItems(seen, f.Items)
 
-	fixLinks(feedURL, items)
 	renderItems(os.Stdout, items)
 
 	err = os.Rename(statePath+".tmp", statePath)
@@ -49,9 +49,14 @@ func RSS(args []string) {
 	}
 }
 
-// fixLinks adds hostname and schema from feed link to item links
-func fixLinks(feedURL *url.URL, items []*gofeed.Item) {
+// fixItems ensures GUID is set and adds hostname and schema from feed link to
+// item links
+func fixItems(feedURL *url.URL, items []*gofeed.Item) {
 	for _, i := range items {
+		if i.GUID == "" {
+			i.GUID = i.Link
+		}
+
 		itemURL, _ := url.Parse(i.Link)
 		if itemURL.Hostname() == "" {
 			itemURL.Host = feedURL.Hostname()
