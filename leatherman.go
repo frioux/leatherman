@@ -29,6 +29,7 @@ func main() {
 		"prepend-emoji-hist": PrependEmojiHist,
 		"render-mail":        RenderMail,
 		"replace-unzip":      ReplaceUnzip,
+		"rss":                RSS,
 		"ssh-quote":          SSHQuote,
 		"yaml2json":          YAMLToJSON,
 

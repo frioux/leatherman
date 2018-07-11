@@ -170,6 +170,20 @@ Extracts zipfiles, but does not extract `.DS_Store` or `__MACOSX/`.
 Automatically extracts into a directory named after the zipfile if there is not
 a single root for all files in the zipfile.
 
+### `rss`
+
+Minimalist rss client.  Outputs links as markdown on STDOUT.  Takes url to feed
+and path to state file. Example usage:
+
+```bash
+$ rss https://blog.afoolishmanifesto.com/index.xml afm.json
+[Announcing shellquote](https://blog.afoolishmanifesto.com/posts/announcing-shellquote/)
+[Detecting who used the EC2 metadata server with BCC](https://blog.afoolishmanifesto.com/posts/detecting-who-used-ec2-metadata-server-bcc/)
+[Centralized known_hosts for ssh](https://blog.afoolishmanifesto.com/posts/centralized-known-hosts-for-ssh/)
+[Buffered Channels in Golang](https://blog.afoolishmanifesto.com/posts/buffered-channels-in-golang/)
+[C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
+```
+
 ### `ssh-quote`
 
 Prepares the arguments such that they can be pasted into an ssh command safely.
