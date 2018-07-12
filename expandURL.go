@@ -8,9 +8,9 @@ import (
 	"os"
 	"regexp"
 
+	_ "github.com/frioux/go-sqlite3" // sqlite3 required
 	"github.com/frioux/mozcookiejar"
 	"github.com/headzoo/surf"
-	_ "github.com/mattn/go-sqlite3" // sqlite3 required
 	"golang.org/x/net/publicsuffix"
 )
 
