@@ -40,11 +40,12 @@ func cj() *cookiejar.Jar {
 		fmt.Fprintln(os.Stderr, "MOZ_COOKIEJAR should be set for expand-url to work")
 		return jar
 	}
-	db, err := sql.Open("sqlite3", path)
+	db, err := sql.Open("sqlite3", "file:"+path+"?cache=shared")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to open db: %s\n", err)
 		os.Exit(1)
 	}
+	db.SetMaxOpenConns(1)
 	defer db.Close()
 
 	err = mozcookiejar.LoadIntoJar(db, jar)
