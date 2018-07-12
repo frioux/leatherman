@@ -34,6 +34,7 @@ func main() {
 		"yaml2json":          YAMLToJSON,
 
 		"help":    Help,
+		"version": Version,
 		"explode": Explode,
 	}
 
