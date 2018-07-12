@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"database/sql"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http/cookiejar"
 	"os"
 	"regexp"
@@ -17,6 +19,9 @@ import (
 var jar *cookiejar.Jar
 
 func ExpandURL(args []string) {
+	// some cookies cause go to log warnings to stderr
+	log.SetOutput(ioutil.Discard)
+
 	jar = cj()
 	scanner := bufio.NewScanner(os.Stdin)
 
