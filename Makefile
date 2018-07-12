@@ -1,6 +1,8 @@
+leatherman.xz: leatherman
+	xz leatherman
+
 leatherman: *.go
 	go get -t ./...
 	go test
-	go build -ldflags "-X main.version=`git log -1 HEAD --pretty=%H`"
+	go build -ldflags "-X main.version=$(TRAVIS_COMMIT)"
 	strip leatherman
-	xz leatherman
