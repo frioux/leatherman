@@ -89,6 +89,11 @@ and thus the keys of the JSON.
 
 Powerful tool for debouncing lines of input.
 
+### `dump-mozlz4`
+
+Dump the contents of a `mozlz4` (aka `jsonlz4`) file commonly used by Firefox.
+Just takes the name of the file to dump and writes to standard out.
+
 ### `ec2-resource-for-ip`
 
 Pass IPs as arguments and this will find them in EC2 (and other places in AWS.)

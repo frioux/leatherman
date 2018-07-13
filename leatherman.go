@@ -17,6 +17,7 @@ func main() {
 		"clocks":               Clocks,
 		"csv2json":             CsvToJson,
 		"debounce":             Debounce,
+		"dump-mozlz4":          DumpMozLZ4,
 		"ec2-resource-for-ip":  Ec2ResourceForIp,
 		"expand-url":           ExpandURL,
 		"export-bamboohr":      ExportBambooHR,
