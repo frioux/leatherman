@@ -10,9 +10,9 @@ import (
 	"os"
 	"regexp"
 
-	_ "github.com/frioux/go-sqlite3" // sqlite3 required
 	"github.com/frioux/mozcookiejar"
 	"github.com/headzoo/surf"
+	_ "github.com/mattn/go-sqlite3" // sqlite3 required
 	"golang.org/x/net/publicsuffix"
 )
 
@@ -45,7 +45,7 @@ func cj() *cookiejar.Jar {
 		fmt.Fprintln(os.Stderr, "MOZ_COOKIEJAR should be set for expand-url to work")
 		return jar
 	}
-	db, err := sql.Open("sqlite3", "file:"+path+"?cache=shared")
+	db, err := sql.Open("sqlite3", "file:"+path+"?cache=shared&_journal_mode=WAL")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to open db: %s\n", err)
 		os.Exit(1)
