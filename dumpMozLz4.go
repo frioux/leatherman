@@ -1,13 +1,11 @@
 package main
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
-	"github.com/pierrec/lz4"
+	"github.com/frioux/mozlz4"
 )
 
 const magicHeader = "mozLz40\x00"
@@ -23,38 +21,10 @@ func DumpMozLZ4(args []string) {
 		os.Exit(1)
 	}
 
-	header := make([]byte, len(magicHeader))
-	_, err = file.Read(header)
+	r, err := mozlz4.NewReader(file)
+	_, err = io.Copy(os.Stdout, r)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't read header: %s\n", err)
+		fmt.Fprintf(os.Stderr, "Couldn't copy: %s\n", err)
 		os.Exit(1)
 	}
-	if string(header) != magicHeader {
-		fmt.Fprintf(os.Stderr, "Incorrect header: %s\n", err)
-		os.Exit(1)
-	}
-	b := make([]byte, 4)
-	file.Read(b)
-
-	var size uint32
-	buf := bytes.NewReader(b)
-	err = binary.Read(buf, binary.LittleEndian, &size)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't read size: %s\n", err)
-		os.Exit(1)
-	}
-
-	src, err := ioutil.ReadAll(file)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't read compressed data: %s\n", err)
-		os.Exit(1)
-	}
-
-	out := make([]byte, size)
-	_, err = lz4.UncompressBlock(src, out)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't decompress data: %s\n", err)
-		os.Exit(1)
-	}
-	fmt.Print(string(out))
 }
