@@ -11,6 +11,10 @@ import (
 	"golang.org/x/text/unicode/runenames"
 )
 
+// PrependEmojiHist reads a history file from the first argument and reproduces
+// it on standard out, but with the names of the characters per line instead of
+// the characters themselves.  Reproduces stdin on stdout, leaving out anything
+// already printed.
 func PrependEmojiHist(args []string) {
 	if len(args) != 2 {
 		fmt.Fprintln(os.Stderr, "you must pass a history file!")

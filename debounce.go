@@ -19,6 +19,7 @@ func cat(c chan string, e chan error, quit chan struct{}) {
 	quit <- struct{}{}
 }
 
+// Debounce input from stdin to stdout
 func Debounce(args []string) {
 	var timeoutSeconds float64
 	var begin, end, h, help bool

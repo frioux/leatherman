@@ -11,6 +11,8 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
+// RSS takes a feed url and a file to store state.  Then it prints links of
+// any links it hasn't already printed before.
 func RSS(args []string) {
 	if len(args) != 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s feedURL statefile\n", args[0])

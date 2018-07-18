@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 )
 
+// Explode all the tools as symlinks
 func Explode(args []string) {
 	exe, err := os.Executable()
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 
 const magicHeader = "mozLz40\x00"
 
+// DumpMozLZ4 writes the uncompressed mozlz4 file from the first argument to stdout
 func DumpMozLZ4(args []string) {
 	if len(args) != 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s session.jsonlz4\n", args[0])

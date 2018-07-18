@@ -38,7 +38,8 @@ func allRegions(cfg aws.Config) ([]string, error) {
 	return ret, nil
 }
 
-func Ec2ResourceForIp(args []string) {
+// EC2ResourceForIP searches all regions and much of AWS for a given IP.
+func EC2ResourceForIP(args []string) {
 	flags := flag.NewFlagSet("ec2-resource-for-ip", flag.ExitOnError)
 
 	flags.BoolVar(&verbose, "verbose", false, "Never stop talking")

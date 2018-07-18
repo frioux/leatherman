@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 )
 
+// Dispatch is the dispatch table that maps command names to functions.
 var Dispatch map[string]func([]string)
 
 func main() {
@@ -14,11 +15,12 @@ func main() {
 	Dispatch = map[string]func([]string){
 		"addrs":                Addrs,
 		"addrspec-to-tabs":     AddrspecToTabs,
+		"backlight":            Backlight,
 		"clocks":               Clocks,
-		"csv2json":             CsvToJson,
+		"csv2json":             CSVToJSON,
 		"debounce":             Debounce,
 		"dump-mozlz4":          DumpMozLZ4,
-		"ec2-resource-for-ip":  Ec2ResourceForIp,
+		"ec2-resource-for-ip":  EC2ResourceForIP,
 		"expand-url":           ExpandURL,
 		"export-bamboohr":      ExportBambooHR,
 		"export-bamboohr-tree": ExportBambooHRTree,

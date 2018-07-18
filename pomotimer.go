@@ -11,6 +11,8 @@ import (
 
 const clear = "\r\x1b[J"
 
+// Pomotimer starts a timer for 25m or the duration expressed in the first
+// argument.
 func Pomotimer(args []string) {
 	timer, _ := time.ParseDuration("25m")
 	if len(args) > 1 {

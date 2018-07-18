@@ -8,6 +8,7 @@ import (
 	"github.com/frioux/yaml"
 )
 
+// YAMLToJSON reads YAML on stdin and writes JSON on stdout.
 func YAMLToJSON(args []string) {
 	d := yaml.NewDecoder(os.Stdin)
 	e := json.NewEncoder(os.Stdout)

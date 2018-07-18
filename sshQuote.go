@@ -7,6 +7,8 @@ import (
 	"github.com/frioux/shellquote"
 )
 
+// SSHQuote takes a command and prints how you would need to quote it for ssh to
+// execute it for you.
 func SSHQuote(args []string) {
 	if len(args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s [some tokens to quote]\n", args[0])

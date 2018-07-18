@@ -8,7 +8,8 @@ import (
 	"os"
 )
 
-func CsvToJson(args []string) {
+// CSVToJSON converts input of CSV to JSON.
+func CSVToJSON(args []string) {
 	reader := csv.NewReader(os.Stdin)
 	writer := json.NewEncoder(os.Stdout)
 

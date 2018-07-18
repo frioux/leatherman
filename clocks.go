@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var now time.Time = time.Now().In(time.Local)
+var now = time.Now().In(time.Local)
 
 func cmpDates(there, here time.Time) int8 {
 	tDate := there.Truncate(time.Duration(24) * time.Hour)

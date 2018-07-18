@@ -37,6 +37,7 @@ func authBabmoo() (*browser.Browser, error) {
 
 const dir = "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info"
 
+// ExportBambooHR will write the JSON extracted from bamboohr to stdout.
 func ExportBambooHR([]string) {
 	ua, err := authBabmoo()
 	if err != nil {
@@ -58,6 +59,8 @@ func ExportBambooHR([]string) {
 
 const tree = "https://ziprecruiter1.bamboohr.com/employees/orgchart.php?pin"
 
+// ExportBambooHRTree will write the JSON extracted from the bamboohr org chart
+// to stdout.
 func ExportBambooHRTree([]string) {
 	ua, err := authBabmoo()
 	if err != nil {

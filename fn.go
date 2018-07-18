@@ -8,6 +8,7 @@ import (
 	"github.com/frioux/shellquote"
 )
 
+// Fn generates shell scripts based on the args
 func Fn(args []string) {
 	if len(args) < 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s $scriptname [-f] $command $tokens\n", args[0])

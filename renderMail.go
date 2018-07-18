@@ -11,6 +11,9 @@ import (
 
 var dateRe = regexp.MustCompile(`^Date:\s+(.*)\s*$`)
 
+// RenderMail reads email on stdin and reproduces it on stdout, with the Date
+// header parsed and duplicated as Local-Date containing the date in the local
+// timezone.
 func RenderMail(args []string) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {

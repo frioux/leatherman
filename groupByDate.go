@@ -40,6 +40,8 @@ func parseArgs(args []string) error {
 	return nil
 }
 
+// GroupByDate takes dates on stdin in format -i, will group them by format -g,
+// and write them in format -o.
 func GroupByDate(args []string) {
 	err := parseArgs(args[1:])
 	if err != nil {

@@ -18,6 +18,9 @@ import (
 
 var jar *cookiejar.Jar
 
+// ExpandURL replaces URLs from stdin with their markdown version, using a
+// title from the actual page, loaded using cookies discovered via the
+// MOZ_COOKIEJAR env var.
 func ExpandURL(args []string) {
 	// some cookies cause go to log warnings to stderr
 	log.SetOutput(ioutil.Discard)
