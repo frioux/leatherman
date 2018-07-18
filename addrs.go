@@ -128,12 +128,12 @@ func sortAddrMap(score frecencyMap) []addr {
 
 // Addrs sorts the addresses passed on stdin based on how recently they were
 // used, based on the glob passed on the arguments.
-func Addrs(args []string) {
+func Addrs(args []string, stdin io.Reader) {
 	if len(args) != 2 {
 		log.Fatal("Please pass a glob")
 	}
 
-	addrMap := buildAddrMap(os.Stdin)
+	addrMap := buildAddrMap(stdin)
 	addrMap.scoreFromGlob(args[1])
 
 	addrs := sortAddrMap(addrMap)

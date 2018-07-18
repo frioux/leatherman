@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/frioux/shellquote"
@@ -9,7 +10,7 @@ import (
 
 // SSHQuote takes a command and prints how you would need to quote it for ssh to
 // execute it for you.
-func SSHQuote(args []string) {
+func SSHQuote(args []string, _ io.Reader) {
 	if len(args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s [some tokens to quote]\n", args[0])
 		os.Exit(1)

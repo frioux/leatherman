@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"database/sql"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http/cookiejar"
@@ -21,12 +22,12 @@ var jar *cookiejar.Jar
 // ExpandURL replaces URLs from stdin with their markdown version, using a
 // title from the actual page, loaded using cookies discovered via the
 // MOZ_COOKIEJAR env var.
-func ExpandURL(args []string) {
+func ExpandURL(args []string, stdin io.Reader) {
 	// some cookies cause go to log warnings to stderr
 	log.SetOutput(ioutil.Discard)
 
 	jar = cj()
-	scanner := bufio.NewScanner(os.Stdin)
+	scanner := bufio.NewScanner(stdin)
 
 	for scanner.Scan() {
 		fmt.Println(replaceLink(scanner.Text()))

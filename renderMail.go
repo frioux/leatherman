@@ -3,8 +3,8 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"net/mail"
-	"os"
 	"regexp"
 	"time"
 )
@@ -14,8 +14,8 @@ var dateRe = regexp.MustCompile(`^Date:\s+(.*)\s*$`)
 // RenderMail reads email on stdin and reproduces it on stdout, with the Date
 // header parsed and duplicated as Local-Date containing the date in the local
 // timezone.
-func RenderMail(args []string) {
-	scanner := bufio.NewScanner(os.Stdin)
+func RenderMail(args []string, stdin io.Reader) {
+	scanner := bufio.NewScanner(stdin)
 	for scanner.Scan() {
 		line := scanner.Text()
 

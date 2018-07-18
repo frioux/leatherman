@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 )
 
 // Explode all the tools as symlinks
-func Explode(args []string) {
+func Explode(args []string, _ io.Reader) {
 	exe, err := os.Executable()
 	if err != nil {
 		fmt.Println("couldn't get Executable to explode", err)

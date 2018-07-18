@@ -15,7 +15,7 @@ import (
 // it on standard out, but with the names of the characters per line instead of
 // the characters themselves.  Reproduces stdin on stdout, leaving out anything
 // already printed.
-func PrependEmojiHist(args []string) {
+func PrependEmojiHist(args []string, stdin io.Reader) {
 	if len(args) != 2 {
 		fmt.Fprintln(os.Stderr, "you must pass a history file!")
 		os.Exit(1)
@@ -62,9 +62,9 @@ func PrependEmojiHist(args []string) {
 		}
 	}
 
-	stdin := bufio.NewScanner(os.Stdin)
-	for stdin.Scan() {
-		line := stdin.Text()
+	r := bufio.NewScanner(stdin)
+	for r.Scan() {
+		line := r.Text()
 		if seen[line] {
 			continue
 		}

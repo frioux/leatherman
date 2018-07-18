@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"strconv"
 	"time"
@@ -57,7 +58,7 @@ func t(l string) string {
 }
 
 // Clocks shows my personal, digital, wall of clocks.
-func Clocks(args []string) {
+func Clocks(args []string, _ io.Reader) {
 	if len(args) > 1 && args[1] == "-h" {
 		fmt.Println("my personal, digital, wall of clocks")
 		return

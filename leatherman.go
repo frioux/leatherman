@@ -1,18 +1,19 @@
 package main
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 )
 
 // Dispatch is the dispatch table that maps command names to functions.
-var Dispatch map[string]func([]string)
+var Dispatch map[string]func([]string, io.Reader)
 
 func main() {
 	which := filepath.Base(os.Args[0])
 	args := os.Args
 
-	Dispatch = map[string]func([]string){
+	Dispatch = map[string]func([]string, io.Reader){
 		"addrs":                Addrs,
 		"addrspec-to-tabs":     AddrspecToTabs,
 		"backlight":            Backlight,
@@ -48,8 +49,8 @@ func main() {
 
 	fn, ok := Dispatch[which]
 	if !ok {
-		Help(os.Args)
+		Help(os.Args, os.Stdin)
 		os.Exit(1)
 	}
-	fn(args)
+	fn(args, os.Stdin)
 }

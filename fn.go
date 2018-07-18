@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/frioux/shellquote"
 )
 
 // Fn generates shell scripts based on the args
-func Fn(args []string) {
+func Fn(args []string, _ io.Reader) {
 	if len(args) < 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s $scriptname [-f] $command $tokens\n", args[0])
 		os.Exit(1)

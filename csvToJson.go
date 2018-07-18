@@ -9,8 +9,8 @@ import (
 )
 
 // CSVToJSON converts input of CSV to JSON.
-func CSVToJSON(args []string) {
-	reader := csv.NewReader(os.Stdin)
+func CSVToJSON(args []string, stdin io.Reader) {
+	reader := csv.NewReader(stdin)
 	writer := json.NewEncoder(os.Stdout)
 
 	header, err := reader.Read()

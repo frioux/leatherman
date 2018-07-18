@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 )
@@ -10,7 +11,7 @@ import (
 const path = "/sys/class/backlight/intel_backlight"
 
 // Backlight modifies backlight brightness, assuming first arg is a percent.
-func Backlight(args []string) {
+func Backlight(args []string, _ io.Reader) {
 	err := os.Chdir(path)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't chdir into %s: %s\n", path, err)

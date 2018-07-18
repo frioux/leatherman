@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/frioux/netrc"
+	"io"
 	"os"
 	"os/user"
 	"path/filepath"
+
+	"github.com/frioux/netrc"
 )
 
 // NetrcPassword prints passsword for passed machine and login
-func NetrcPassword(args []string) {
+func NetrcPassword(args []string, _ io.Reader) {
 	usr, err := user.Current()
 
 	if len(args) != 3 {

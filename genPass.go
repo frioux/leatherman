@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"time"
@@ -10,7 +11,7 @@ import (
 )
 
 // GenPass bcrypts the first argument with the second argument rounds.
-func GenPass(args []string) {
+func GenPass(args []string, _ io.Reader) {
 	if len(args) < 3 {
 		fmt.Fprintf(os.Stderr, "usage: %s $password [$cost]\n", args[0])
 		os.Exit(1)

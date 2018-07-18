@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"time"
@@ -13,7 +14,7 @@ const clear = "\r\x1b[J"
 
 // Pomotimer starts a timer for 25m or the duration expressed in the first
 // argument.
-func Pomotimer(args []string) {
+func Pomotimer(args []string, stdin io.Reader) {
 	timer, _ := time.ParseDuration("25m")
 	if len(args) > 1 {
 		var err error
@@ -40,7 +41,7 @@ func Pomotimer(args []string) {
 
 	c := time.Tick(1 * time.Second)
 	kb := make(chan string)
-	go kbChan(kb)
+	go kbChan(kb, stdin)
 
 	running := true
 	secondsRemaining := initialSeconds
@@ -75,10 +76,10 @@ LOOP:
 
 }
 
-func kbChan(keys chan string) {
+func kbChan(keys chan string, stdin io.Reader) {
 	var b = make([]byte, 1)
 	for {
-		os.Stdin.Read(b)
+		stdin.Read(b)
 		keys <- string(b)
 	}
 }

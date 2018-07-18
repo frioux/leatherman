@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"time"
 )
 
-func cat(c chan string, e chan error, quit chan struct{}) {
-	scanner := bufio.NewScanner(os.Stdin)
+func cat(c chan string, e chan error, quit chan struct{}, stdin io.Reader) {
+	scanner := bufio.NewScanner(stdin)
 	for scanner.Scan() {
 		c <- scanner.Text()
 	}
@@ -20,7 +21,7 @@ func cat(c chan string, e chan error, quit chan struct{}) {
 }
 
 // Debounce input from stdin to stdout
-func Debounce(args []string) {
+func Debounce(args []string, stdin io.Reader) {
 	var timeoutSeconds float64
 	var begin, end, h, help bool
 
@@ -70,7 +71,7 @@ func Debounce(args []string) {
 	quit := make(chan struct{})
 	err := make(chan error)
 
-	go cat(c, err, quit)
+	go cat(c, err, quit, stdin)
 
 	for {
 		var x string

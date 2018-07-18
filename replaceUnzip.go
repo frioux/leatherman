@@ -49,7 +49,7 @@ func genRoot(zipName string) string {
 // ReplaceUnzip acts like unzip, but leaves out .DS_Store and __MACOSX files,
 // and puts all of the zip contents in a single root directory if they were not
 // already.
-func ReplaceUnzip(args []string) {
+func ReplaceUnzip(args []string, _ io.Reader) {
 	if len(args) != 2 {
 		fmt.Println("Usage:", args[0], "some-zip-file.zip")
 		os.Exit(1)

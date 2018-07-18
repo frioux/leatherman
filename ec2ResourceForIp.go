@@ -3,15 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
+	"net"
+	"os"
+	"strings"
+	"sync"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/endpoints"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/elb"
-	"net"
-	"os"
-	"strings"
-	"sync"
 )
 
 type ipLookup struct {
@@ -39,7 +41,7 @@ func allRegions(cfg aws.Config) ([]string, error) {
 }
 
 // EC2ResourceForIP searches all regions and much of AWS for a given IP.
-func EC2ResourceForIP(args []string) {
+func EC2ResourceForIP(args []string, _ io.Reader) {
 	flags := flag.NewFlagSet("ec2-resource-for-ip", flag.ExitOnError)
 
 	flags.BoolVar(&verbose, "verbose", false, "Never stop talking")

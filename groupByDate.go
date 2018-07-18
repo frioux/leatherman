@@ -42,13 +42,13 @@ func parseArgs(args []string) error {
 
 // GroupByDate takes dates on stdin in format -i, will group them by format -g,
 // and write them in format -o.
-func GroupByDate(args []string) {
+func GroupByDate(args []string, stdin io.Reader) {
 	err := parseArgs(args[1:])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "group-by-date: %v\n", err)
 		os.Exit(1)
 	}
-	groupByDate(os.Stdin, os.Stdout)
+	groupByDate(stdin, os.Stdout)
 }
 
 func parseDate(format, input string) (time.Time, error) {
