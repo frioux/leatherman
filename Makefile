@@ -2,7 +2,9 @@ leatherman.xz: leatherman
 	xz leatherman
 
 leatherman: *.go
+	go get github.com/golang/lint
 	go get -v -t ./...
+	PATH="$(PATH):$(shell go env GOPATH)/bin"
 	golint -set_exit_status ./...
 	go vet ./...
 	go test
