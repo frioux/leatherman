@@ -19,6 +19,7 @@ func main() {
 		"backlight":            Backlight,
 		"clocks":               Clocks,
 		"csv2json":             CSVToJSON,
+		"csv2md":               CSVToMarkdown,
 		"debounce":             Debounce,
 		"dump-mozlz4":          DumpMozLZ4,
 		"ec2-resource-for-ip":  EC2ResourceForIP,

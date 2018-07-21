@@ -101,6 +101,10 @@ My personal, digital, wall of clocks.
 Reads CSV on stdin and writes JSON on stdout; first line of input is the header,
 and thus the keys of the JSON.
 
+### `csv2md`
+
+Reads CSV on stdin and writes Markdown on stdout.
+
 ### `debounce`
 
 Powerful tool for debouncing lines of input.
