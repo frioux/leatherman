@@ -6,6 +6,6 @@ leatherman: *.go
 	go get github.com/golang/lint/golint
 	golint -set_exit_status ./...
 	go vet ./...
-	go test
+	TZ=America/Los_Angeles go test
 	go build -ldflags "-X main.version=$(TRAVIS_COMMIT)"
 	strip leatherman
