@@ -71,14 +71,14 @@ func newFrecencyMap() frecencyMap { return map[string]*addr{} }
 // https://wiki.mozilla.org/User:Jesse/NewFrecency#Proposed_new_definition
 func (score frecencyMap) scoreEmail(email *mail.Message, now time.Time) {
 	for _, addr := range allAddrs(email) {
-		time, err := email.Header.Date()
-		if err != nil {
-			log.Println("Couldn't read date", err)
-			continue
-		}
-		age := now.Sub(time).Hours() / 24
-
 		if val, ok := score[strings.ToLower(addr.Address)]; ok {
+			time, err := email.Header.Date()
+			if err != nil {
+				log.Println("Couldn't read date", err)
+				continue
+			}
+			age := now.Sub(time).Hours() / 24
+
 			val.score += math.Exp(-lambda * age)
 		}
 	}
