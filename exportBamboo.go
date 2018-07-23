@@ -35,7 +35,7 @@ func authBabmoo() (*browser.Browser, error) {
 	return ua, nil
 }
 
-const dir = "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info"
+const bamboo = "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info"
 
 // ExportBambooHR will write the JSON extracted from bamboohr to stdout.
 func ExportBambooHR([]string, io.Reader) {
@@ -45,7 +45,7 @@ func ExportBambooHR([]string, io.Reader) {
 		os.Exit(1)
 	}
 
-	err = ua.Open(dir)
+	err = ua.Open(bamboo)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "export-bamboohr: %s\n", err)
 		os.Exit(1)
