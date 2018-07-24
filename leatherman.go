@@ -36,6 +36,7 @@ func main() {
 		"replace-unzip":      ReplaceUnzip,
 		"rss":                RSS,
 		"ssh-quote":          SSHQuote,
+		"undefer":            Undefer,
 		"yaml2json":          YAMLToJSON,
 
 		"help":    Help,

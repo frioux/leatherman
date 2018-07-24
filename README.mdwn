@@ -219,6 +219,20 @@ $ ssh-quote ls 'f*f'
 'sh -c '\''ls '\''\'"''"'f*f'\''\'\'
 ```
 
+### `undefer`
+
+Takes a directory argument, prints contents of each file named before the
+current date, and then deletes the file.
+
+If the current date were `2018-06-07` the starred files would be printed and
+then deleted:
+
+```
+ * 2018-01-01.txt
+ * 2018-06-06-awesome-file.md
+   2018-07-06.txt
+```
+
 ### `yaml2json`
 
 Reads YAML on stdin and writes JSON on stdout.
