@@ -18,6 +18,7 @@ import (
 )
 
 var jar *cookiejar.Jar
+var tidyRE = regexp.MustCompile(`^\s*(.*?)\s*$`)
 
 // ExpandURL replaces URLs from stdin with their markdown version, using a
 // title from the actual page, loaded using cookies discovered via the
@@ -72,7 +73,11 @@ func urlToLink(url string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("authBabmoo: %s", err)
 	}
-	return fmt.Sprintf("[%s](%s)", ua.Title(), url), nil
+	title := tidyRE.FindStringSubmatch(ua.Title())
+	if len(title) != 2 {
+		return "", fmt.Errorf("Title is blank")
+	}
+	return fmt.Sprintf("[%s](%s)", title[1], url), nil
 }
 
 var urlFinder *regexp.Regexp
