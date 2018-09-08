@@ -71,39 +71,47 @@ func ReplaceUnzip(args []string, _ io.Reader) error {
 	}
 
 	for _, f := range r.File {
-		if garbage.MatchString(f.Name) {
-			continue
+		err := extractMember(root, f)
+		if err != nil {
+			return errors.Wrap(err, "extractMember")
 		}
-		destName := filepath.Join(root, f.Name)
-		fmt.Printf("  inflating: %s\n", destName)
+	}
+	return nil
+}
 
-		rc, err := f.Open()
-		if err != nil {
-			return errors.Wrap(err, "Couldn't open zip file member")
-		}
-		dir := filepath.Dir(destName)
-		err = os.MkdirAll(dir, os.FileMode(0755))
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't create directory to extract to: %s", err)
-			continue
-		}
+func extractMember(root string, f *zip.File) error {
+	if garbage.MatchString(f.Name) {
+		return nil
+	}
+	destName := filepath.Join(root, f.Name)
+	fmt.Printf("  inflating: %s\n", destName)
 
-		file, err := os.Create(destName)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't create file to extract to: %s", err)
-			continue
-		}
+	rc, err := f.Open()
+	if err != nil {
+		return errors.Wrap(err, "Couldn't open zip file member")
+	}
+	defer rc.Close()
 
-		_, err = io.Copy(os.Stdout, file)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't copy zip file member (%s): %s", destName, err)
-		}
-		err = file.Close()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't close extracted file: %s", err)
-		}
+	dir := filepath.Dir(destName)
+	err = os.MkdirAll(dir, os.FileMode(0755))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't create directory to extract to: %s", err)
+		return nil
+	}
 
-		rc.Close()
+	file, err := os.Create(destName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't create file to extract to: %s", err)
+		return nil
+	}
+
+	_, err = io.Copy(file, rc)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't copy zip file member (%s): %s", destName, err)
+	}
+	err = file.Close()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't close extracted file: %s", err)
 	}
 
 	return nil
