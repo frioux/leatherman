@@ -14,3 +14,4 @@ leatherman: *.go
 	TZ=America/Los_Angeles go test
 	go build -ldflags "-X 'main.version=$(VERSION)' -X 'main.when=$(WHEN)' -X 'main.who=$(WHO)' -X 'main.where=$(WHERE)'"
 	strip leatherman
+	./leatherman version
