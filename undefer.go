@@ -10,14 +10,16 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 )
 
-var fs = afero.NewOsFs()
+var (
+	fs     = afero.NewOsFs()
+	dateRE = regexp.MustCompile(`^(\d{4})-(\d\d)-(\d\d)`)
+)
 
 func newFiles(dir string, files []os.FileInfo, now time.Time) ([]string, error) {
-	dateRE := regexp.MustCompile(`^(\d{4})-(\d\d)-(\d\d)`)
-
 	ret := make([]string, 0, len(files))
 
 	for _, file := range files {
@@ -27,15 +29,15 @@ func newFiles(dir string, files []os.FileInfo, now time.Time) ([]string, error) 
 		}
 		year, err := strconv.Atoi(matches[1])
 		if err != nil {
-			return nil, fmt.Errorf("couldn't parse %s: %s", file.Name(), err)
+			return nil, errors.Wrap(err, "couldn't parse "+file.Name())
 		}
 		month, err := strconv.Atoi(matches[2])
 		if err != nil {
-			return nil, fmt.Errorf("couldn't parse %s: %s", file.Name(), err)
+			return nil, errors.Wrap(err, "couldn't parse "+file.Name())
 		}
 		day, err := strconv.Atoi(matches[3])
 		if err != nil {
-			return nil, fmt.Errorf("couldn't parse %s: %s", file.Name(), err)
+			return nil, errors.Wrap(err, "couldn't parse "+file.Name())
 		}
 
 		then := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.Local)
@@ -52,19 +54,19 @@ func content(paths []string, stdout io.Writer) error {
 	for _, path := range paths {
 		file, err := fs.Open(path)
 		if err != nil {
-			return fmt.Errorf("couldn't Open: %s", err)
+			return errors.Wrap(err, "couldn't Open")
 		}
 		_, err = io.Copy(stdout, file)
 		if err != nil {
-			return fmt.Errorf("couldn't Copy: %s", err)
+			return errors.Wrap(err, "couldn't Copy")
 		}
 		err = file.Close()
 		if err != nil {
-			return fmt.Errorf("couldn't Close: %s", err)
+			return errors.Wrap(err, "couldn't Close")
 		}
 		err = fs.Remove(path)
 		if err != nil {
-			return fmt.Errorf("couldn't Remove: %s", err)
+			return errors.Wrap(err, "couldn't Remove")
 		}
 	}
 
@@ -73,7 +75,7 @@ func content(paths []string, stdout io.Writer) error {
 
 // Undefer prints the contents of files in the passed directory that have a
 // prefix of a date in the past, and then deletes the files.
-func Undefer(args []string, _ io.Reader) {
+func Undefer(args []string, _ io.Reader) error {
 	if len(args) > 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s $dir\n", args[0])
 		os.Exit(1)
@@ -81,18 +83,17 @@ func Undefer(args []string, _ io.Reader) {
 
 	files, err := afero.Afero{Fs: fs}.ReadDir(args[1])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't ReadDir: %s", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't ReadDir")
 	}
 
 	paths, err := newFiles(args[1], files, time.Now())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't get newFiles: %s", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't get newFiles")
 	}
 	err = content(paths, os.Stdout)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't write content: %s", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't write content")
 	}
+
+	return nil
 }

@@ -8,34 +8,32 @@ import (
 	"path/filepath"
 
 	"github.com/frioux/netrc"
+	"github.com/pkg/errors"
 )
 
 // NetrcPassword prints passsword for passed machine and login
-func NetrcPassword(args []string, _ io.Reader) {
-	usr, err := user.Current()
-
+func NetrcPassword(args []string, _ io.Reader) error {
 	if len(args) != 3 {
 		fmt.Println("Usage:\n\tnetrc-password $machine $login")
 		os.Exit(1)
 	}
 
+	usr, err := user.Current()
 	if err != nil {
-		fmt.Println("Couldn't get current user:", err)
-		os.Exit(-1)
+		return errors.Wrap(err, "Couldn't get current user")
 	}
 
 	n, err := netrc.Parse(filepath.Join(usr.HomeDir, ".netrc"))
-
 	if err != nil {
-		fmt.Println("Couldn't parse netrc", err)
-		os.Exit(-2)
+		return errors.Wrap(err, "Couldn't parse netrc")
 	}
 
 	login := n.MachineAndLogin(args[1], args[2])
 	if login == nil {
-		fmt.Println("Couldn't find login for", args[1], "and", args[2])
-		os.Exit(2)
+		return errors.New("Couldn't find login for " + args[2] + "@" + args[1])
 	}
 
 	fmt.Println(login.Get("password"))
+
+	return nil
 }

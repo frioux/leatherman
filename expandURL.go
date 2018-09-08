@@ -14,6 +14,7 @@ import (
 	"github.com/frioux/mozcookiejar"
 	"github.com/headzoo/surf"
 	_ "github.com/mattn/go-sqlite3" // sqlite3 required
+	"github.com/pkg/errors"
 	"golang.org/x/net/publicsuffix"
 )
 
@@ -23,47 +24,50 @@ var tidyRE = regexp.MustCompile(`^\s*(.*?)\s*$`)
 // ExpandURL replaces URLs from stdin with their markdown version, using a
 // title from the actual page, loaded using cookies discovered via the
 // MOZ_COOKIEJAR env var.
-func ExpandURL(args []string, stdin io.Reader) {
+func ExpandURL(args []string, stdin io.Reader) error {
 	// some cookies cause go to log warnings to stderr
 	log.SetOutput(ioutil.Discard)
 
-	jar = cj()
+	var err error
+	jar, err = cj()
+	if err != nil {
+		return errors.Wrap(err, "loading cookiejar")
+	}
+
 	scanner := bufio.NewScanner(stdin)
 
 	for scanner.Scan() {
 		fmt.Println(replaceLink(scanner.Text()))
 	}
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "reading standard input:", err)
+		return errors.Wrap(err, "reading standard input")
 	}
+
+	return nil
 }
 
-func cj() *cookiejar.Jar {
+func cj() (*cookiejar.Jar, error) {
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to build cookies: %s\n", err)
-		os.Exit(1)
+		return nil, errors.Wrap(err, "Failed to build cookies")
 	}
 
 	path := os.Getenv("MOZ_COOKIEJAR")
 	if path == "" {
-		fmt.Fprintln(os.Stderr, "MOZ_COOKIEJAR should be set for expand-url to work")
-		return jar
+		return nil, errors.New("MOZ_COOKIEJAR should be set for expand-url to work")
 	}
 	db, err := sql.Open("sqlite3", "file:"+path+"?cache=shared&_journal_mode=WAL")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to open db: %s\n", err)
-		os.Exit(1)
+		return nil, errors.Wrap(err, "Failed to open db")
 	}
 	db.SetMaxOpenConns(1)
 	defer db.Close()
 
 	err = mozcookiejar.LoadIntoJar(db, jar)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to load cookies: %s\n", err)
-		os.Exit(1)
+		return nil, errors.Wrap(err, "Failed to load cookies")
 	}
-	return jar
+	return jar, nil
 }
 
 func urlToLink(url string) (string, error) {

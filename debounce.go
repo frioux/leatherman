@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 func cat(c chan string, e chan error, quit chan struct{}, stdin io.Reader) {
@@ -21,7 +23,7 @@ func cat(c chan string, e chan error, quit chan struct{}, stdin io.Reader) {
 }
 
 // Debounce input from stdin to stdout
-func Debounce(args []string, stdin io.Reader) {
+func Debounce(args []string, stdin io.Reader) error {
 	var timeoutSeconds float64
 	var begin, end, h, help bool
 
@@ -33,10 +35,9 @@ func Debounce(args []string, stdin io.Reader) {
 	flags.BoolVar(&h, "h", false, "help for debounce")
 	flags.BoolVar(&help, "help", false, "help for debounce")
 
-	e := flags.Parse(args[1:])
-	if e != nil {
-		fmt.Println(e)
-		os.Exit(1)
+	err := flags.Parse(args[1:])
+	if err != nil {
+		return errors.Wrap(err, "flags.Parse")
 	}
 
 	if h || help {
@@ -64,14 +65,14 @@ func Debounce(args []string, stdin io.Reader) {
 			" inotifywait -mr -e modify,move . | debounce | xargs -i{} make test\n" +
 			"",
 		)
-		return
+		return nil
 	}
 
 	c := make(chan string)
 	quit := make(chan struct{})
-	err := make(chan error)
+	errchan := make(chan error)
 
-	go cat(c, err, quit, stdin)
+	go cat(c, errchan, quit, stdin)
 
 	for {
 		var x string
@@ -83,10 +84,10 @@ func Debounce(args []string, stdin io.Reader) {
 				shouldPrint = false
 				fmt.Println(x)
 			}
-		case x := <-err:
+		case x := <-errchan:
 			fmt.Fprintln(os.Stderr, "reading standard input:", x)
 		case <-quit:
-			return
+			return nil
 		}
 		timeout := time.After(time.Duration(timeoutSeconds) * time.Second)
 	InnerLoop:
@@ -95,10 +96,10 @@ func Debounce(args []string, stdin io.Reader) {
 			case x = <-c:
 				shouldPrint = true
 				timeout = time.After(time.Duration(timeoutSeconds) * time.Second)
-			case x := <-err:
+			case x := <-errchan:
 				fmt.Fprintln(os.Stderr, "reading standard input:", x)
 			case <-quit:
-				return
+				return nil
 			case <-timeout:
 				if end && shouldPrint {
 					fmt.Println(x)

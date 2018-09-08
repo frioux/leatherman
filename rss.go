@@ -9,11 +9,12 @@ import (
 	"sort"
 
 	"github.com/mmcdole/gofeed"
+	"github.com/pkg/errors"
 )
 
 // RSS takes a feed url and a file to store state.  Then it prints links of
 // any links it hasn't already printed before.
-func RSS(args []string, _ io.Reader) {
+func RSS(args []string, _ io.Reader) error {
 	if len(args) != 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s feedURL statefile\n", args[0])
 		os.Exit(1)
@@ -24,20 +25,17 @@ func RSS(args []string, _ io.Reader) {
 	fp := gofeed.NewParser()
 	feedURL, err := url.Parse(args[1])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't parse feed url: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't parse feed url")
 	}
 	f, err := fp.ParseURL(feedURL.String())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't fetch feed: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't fetch feed")
 	}
 	fixItems(feedURL, f.Items)
 
 	seen, err := syncRead(statePath, f.Items)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't sync read: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't sync read")
 	}
 
 	items := newItems(seen, f.Items)
@@ -46,9 +44,10 @@ func RSS(args []string, _ io.Reader) {
 
 	err = os.Rename(statePath+".tmp", statePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't rename state file: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't rename state file")
 	}
+
+	return nil
 }
 
 // fixItems ensures GUID is set and adds hostname and schema from feed link to
@@ -95,7 +94,7 @@ func syncRead(state string, items []*gofeed.Item) (map[string]bool, error) {
 
 	guids, err := readState(state)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't read state: %s", err)
+		return nil, errors.Wrap(err, "couldn't read state")
 	}
 
 	for _, g := range guids {
@@ -120,7 +119,7 @@ func syncRead(state string, items []*gofeed.Item) (map[string]bool, error) {
 
 	err = writeState(state, toStore)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't write state: %s", err)
+		return nil, errors.Wrap(err, "couldn't write state")
 	}
 	return ret, nil
 }
@@ -128,7 +127,7 @@ func syncRead(state string, items []*gofeed.Item) (map[string]bool, error) {
 func readState(state string) ([]string, error) {
 	file, err := os.Open(state)
 	if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("couldn't open state file: %s", err)
+		return nil, errors.Wrap(err, "couldn't open state file")
 	}
 
 	var guids []string
@@ -137,7 +136,7 @@ func readState(state string) ([]string, error) {
 		decoder := json.NewDecoder(file)
 		err = decoder.Decode(&guids)
 		if err != nil && !os.IsNotExist(err) {
-			return nil, fmt.Errorf("couldn't decode state file: %s", err)
+			return nil, errors.Wrap(err, "couldn't decode state file")
 		}
 	}
 
@@ -147,17 +146,17 @@ func readState(state string) ([]string, error) {
 func writeState(state string, guids []string) error {
 	tmp, err := os.Create(state + ".tmp")
 	if err != nil {
-		return fmt.Errorf("couldn't create state file: %s", err)
+		return errors.Wrap(err, "couldn't create state file")
 	}
 	encoder := json.NewEncoder(tmp)
 	encoder.SetIndent("", "\t")
 	err = encoder.Encode(guids)
 	if err != nil {
-		return fmt.Errorf("couldn't encode state file: %s", err)
+		return errors.Wrap(err, "couldn't encode state file")
 	}
 	err = tmp.Close()
 	if err != nil {
-		return fmt.Errorf("couldn't write state file: %s", err)
+		return errors.Wrap(err, "couldn't write state file")
 	}
 	return nil
 }

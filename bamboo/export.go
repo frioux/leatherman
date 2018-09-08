@@ -11,13 +11,14 @@ import (
 
 	"github.com/headzoo/surf"
 	"github.com/headzoo/surf/browser"
+	"github.com/pkg/errors"
 )
 
 func auth() (*browser.Browser, error) {
 	ua := surf.NewBrowser()
 	err := ua.Open("https://ziprecruiter1.bamboohr.com/login.php")
 	if err != nil {
-		return nil, fmt.Errorf("auth: %s", err)
+		return nil, errors.Wrap(err, "auth")
 	}
 
 	fm, err := ua.Form("form")
@@ -28,8 +29,8 @@ func auth() (*browser.Browser, error) {
 	fm.Input("username", os.Getenv("BAMBOO_USER"))
 	fm.Input("password", os.Getenv("BAMBOO_PASSWORD"))
 
-	if err := fm.Submit(); err != nil {
-		return nil, fmt.Errorf("auth: %s", err)
+	if err != nil {
+		return nil, errors.Wrap(err, "auth")
 	}
 
 	return ua, nil
@@ -38,7 +39,7 @@ func auth() (*browser.Browser, error) {
 const bamboo = "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info"
 
 // ExportDirectory will write the JSON extracted from bamboohr to stdout.
-func ExportDirectory([]string, io.Reader) {
+func ExportDirectory([]string, io.Reader) error {
 	ua, err := auth()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "export-bamboohr: %s\n", err)
@@ -55,30 +56,29 @@ func ExportDirectory([]string, io.Reader) {
 		fmt.Fprintf(os.Stderr, "export-bamboohr: %s\n", err)
 		os.Exit(1)
 	}
+
+	return nil
 }
 
 const tree = "https://ziprecruiter1.bamboohr.com/employees/orgchart.php?pin"
 
 // ExportOrgChart will write the JSON extracted from the bamboohr org chart
 // to stdout.
-func ExportOrgChart([]string, io.Reader) {
+func ExportOrgChart([]string, io.Reader) error {
 	ua, err := auth()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "export-bamboohr-tree: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "export-bamboohr-tree")
 	}
 
 	err = ua.Open(tree)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "export-bamboohr-tree: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "export-bamboohr-tree")
 	}
 	buff := bytes.NewBuffer([]byte{})
 
 	_, err = ua.Download(buff)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "export-bamboohr-tree: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "export-bamboohr-tree")
 	}
 
 	reader := bufio.NewReader(strings.NewReader(buff.String()))
@@ -94,11 +94,10 @@ func ExportOrgChart([]string, io.Reader) {
 		if strings.Contains(line, "json = ") {
 			if m := re.FindStringSubmatch(line); len(m) > 0 {
 				fmt.Print(m[1])
-				return
+				return nil
 			}
 		}
 	}
 
-	fmt.Fprint(os.Stderr, "export-bamboohr-tree: couldn't find json\n")
-	os.Exit(1)
+	return errors.New("export-bamboohr-tree: couldn't find json")
 }

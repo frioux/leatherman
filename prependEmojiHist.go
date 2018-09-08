@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/icza/backscanner"
+	"github.com/pkg/errors"
 	"golang.org/x/text/unicode/runenames"
 )
 
@@ -15,7 +16,7 @@ import (
 // it on standard out, but with the names of the characters per line instead of
 // the characters themselves.  Reproduces stdin on stdout, leaving out anything
 // already printed.
-func PrependEmojiHist(args []string, stdin io.Reader) {
+func PrependEmojiHist(args []string, stdin io.Reader) error {
 	if len(args) != 2 {
 		fmt.Fprintln(os.Stderr, "you must pass a history file!")
 		os.Exit(1)
@@ -23,15 +24,14 @@ func PrependEmojiHist(args []string, stdin io.Reader) {
 
 	file, err := os.Open(args[1])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't open history file: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't open history file")
 	}
 	fi, err := os.Stat(args[1])
-	var pos int
 	if err != nil && !os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "Couldn't stat history file: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't stat history file")
 	}
+
+	var pos int
 	if fi != nil {
 		pos = int(fi.Size())
 	}
@@ -44,8 +44,7 @@ func PrependEmojiHist(args []string, stdin io.Reader) {
 			break
 		}
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't read line: %s\n", err)
-			os.Exit(1)
+			return errors.Wrap(err, "Couldn't read line")
 		}
 
 		for i, char := range line {
@@ -71,4 +70,6 @@ func PrependEmojiHist(args []string, stdin io.Reader) {
 		seen[line] = true
 		fmt.Println(line)
 	}
+
+	return nil
 }

@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 var garbage = regexp.MustCompile(`(?:^__MACOSX/|/\.DS_Store$)`)
@@ -49,7 +51,7 @@ func genRoot(zipName string) string {
 // ReplaceUnzip acts like unzip, but leaves out .DS_Store and __MACOSX files,
 // and puts all of the zip contents in a single root directory if they were not
 // already.
-func ReplaceUnzip(args []string, _ io.Reader) {
+func ReplaceUnzip(args []string, _ io.Reader) error {
 	if len(args) != 2 {
 		fmt.Println("Usage:", args[0], "some-zip-file.zip")
 		os.Exit(1)
@@ -60,8 +62,7 @@ func ReplaceUnzip(args []string, _ io.Reader) {
 	fmt.Println("Archive:", zipName)
 	r, err := zip.OpenReader(zipName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't open zip file: %s", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't open zip file")
 	}
 	defer r.Close()
 	var root string
@@ -78,8 +79,7 @@ func ReplaceUnzip(args []string, _ io.Reader) {
 
 		rc, err := f.Open()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't open zip file member: %s", err)
-			os.Exit(1)
+			return errors.Wrap(err, "Couldn't open zip file member")
 		}
 		dir := filepath.Dir(destName)
 		err = os.MkdirAll(dir, os.FileMode(0755))
@@ -105,4 +105,6 @@ func ReplaceUnzip(args []string, _ io.Reader) {
 
 		rc.Close()
 	}
+
+	return nil
 }

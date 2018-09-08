@@ -6,16 +6,18 @@ import (
 	"io"
 	"log"
 	"os"
+
+	"github.com/pkg/errors"
 )
 
 // ToJSON converts input of CSV to JSON.
-func ToJSON(_ []string, stdin io.Reader) {
+func ToJSON(_ []string, stdin io.Reader) error {
 	reader := csv.NewReader(stdin)
 	writer := json.NewEncoder(os.Stdout)
 
 	header, err := reader.Read()
 	if err != nil {
-		log.Fatal("Can't read header, giving up")
+		return errors.New("Can't read header, giving up")
 	}
 
 	for {
@@ -36,4 +38,6 @@ func ToJSON(_ []string, stdin io.Reader) {
 
 		writer.Encode(toEncode)
 	}
+
+	return nil
 }

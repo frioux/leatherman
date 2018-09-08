@@ -6,33 +6,31 @@ import (
 	"io"
 	"os"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 const path = "/sys/class/backlight/intel_backlight"
 
 // Backlight modifies backlight brightness, assuming first arg is a percent.
-func Backlight(args []string, _ io.Reader) {
+func Backlight(args []string, _ io.Reader) error {
 	err := os.Chdir(path)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't chdir into %s: %s\n", path, err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't chdir into "+path)
 	}
 
 	if len(args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <change-as-integer-percent>\n", args[0])
-		os.Exit(1)
+		return fmt.Errorf("Usage: %s <change-as-integer-percent>", args[0])
 	}
 
 	change, err := strconv.Atoi(args[1])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Coudln't parse arg: %s", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't parse arg")
 	}
 
 	max, err := getMaxBrightness()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't getMaxBrightness: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't getMaxBrightness")
 	}
 
 	cur, err := getCurBrightness()
@@ -48,8 +46,7 @@ func Backlight(args []string, _ io.Reader) {
 
 	file, err := os.OpenFile("./brightness", os.O_RDWR, 0)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't open brightness for writing: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't open brightness for writing")
 	}
 
 	fmt.Fprintf(os.Stderr, "Setting brightness to %d\n", toWrite)
@@ -57,9 +54,10 @@ func Backlight(args []string, _ io.Reader) {
 	file.WriteString(fmt.Sprintf("%d\n", toWrite))
 	err = file.Close()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't write brightness: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't write brightness")
 	}
+
+	return nil
 }
 
 func getMaxBrightness() (int, error) {

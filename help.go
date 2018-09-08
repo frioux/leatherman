@@ -7,7 +7,7 @@ import (
 )
 
 // Help prints tool listing
-func Help(args []string, _ io.Reader) {
+func Help(_ []string, _ io.Reader) error {
 	tools := make([]string, 0, len(Dispatch))
 	for k := range Dispatch {
 		tools = append(tools, k)
@@ -19,4 +19,6 @@ func Help(args []string, _ io.Reader) {
 		str += " * " + k + "\n"
 	}
 	fmt.Println(str)
+
+	return nil
 }

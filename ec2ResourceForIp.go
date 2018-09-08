@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/elb"
+	"github.com/pkg/errors"
 )
 
 type ipLookup struct {
@@ -41,7 +42,7 @@ func allRegions(cfg aws.Config) ([]string, error) {
 }
 
 // EC2ResourceForIP searches all regions and much of AWS for a given IP.
-func EC2ResourceForIP(args []string, _ io.Reader) {
+func EC2ResourceForIP(args []string, _ io.Reader) error {
 	flags := flag.NewFlagSet("ec2-resource-for-ip", flag.ExitOnError)
 
 	flags.BoolVar(&verbose, "verbose", false, "Never stop talking")
@@ -53,7 +54,7 @@ func EC2ResourceForIP(args []string, _ io.Reader) {
 
 	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
-		panic("unable to load SDK config, " + err.Error())
+		return errors.Wrap(err, "unable to load SDK config")
 	}
 	cfg.Region = endpoints.UsWest2RegionID
 
@@ -175,6 +176,8 @@ func EC2ResourceForIP(args []string, _ io.Reader) {
 	for ip := range foundIps {
 		fmt.Printf("%s:\n", ip)
 	}
+
+	return nil
 }
 
 func findELB(region string, cfg aws.Config, ips []string, errC chan error, out chan ipLookup) error {

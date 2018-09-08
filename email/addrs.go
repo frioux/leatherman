@@ -2,6 +2,7 @@ package email // import "github.com/frioux/leatherman/email"
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -128,9 +129,9 @@ func sortAddrMap(score frecencyMap) []addr {
 
 // Addrs sorts the addresses passed on stdin based on how recently they were
 // used, based on the glob passed on the arguments.
-func Addrs(args []string, stdin io.Reader) {
+func Addrs(args []string, stdin io.Reader) error {
 	if len(args) != 2 {
-		log.Fatal("Please pass a glob")
+		return errors.New("Please pass a glob")
 	}
 
 	addrMap := buildAddrMap(stdin)
@@ -143,4 +144,6 @@ func Addrs(args []string, stdin io.Reader) {
 	for _, line := range addrs {
 		fmt.Println(line)
 	}
+
+	return nil
 }

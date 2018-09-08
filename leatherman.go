@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 
 	"github.com/frioux/leatherman/bamboo"
 	"github.com/frioux/leatherman/csv"
@@ -12,13 +15,13 @@ import (
 )
 
 // Dispatch is the dispatch table that maps command names to functions.
-var Dispatch map[string]func([]string, io.Reader)
+var Dispatch map[string]func([]string, io.Reader) error
 
 func main() {
 	which := filepath.Base(os.Args[0])
 	args := os.Args
 
-	Dispatch = map[string]func([]string, io.Reader){
+	Dispatch = map[string]func([]string, io.Reader) error{
 		"addrs":                email.Addrs,
 		"addrspec-to-tabs":     email.ToTabs,
 		"backlight":            Backlight,
@@ -59,5 +62,9 @@ func main() {
 		Help(os.Args, os.Stdin)
 		os.Exit(1)
 	}
-	fn(args, os.Stdin)
+	err := errors.Wrap(fn(args, os.Stdin), which)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
+	}
 }

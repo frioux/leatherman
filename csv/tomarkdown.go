@@ -6,16 +6,17 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // ToMarkdown converts input of CSV to Markdown
-func ToMarkdown(_ []string, stdin io.Reader) {
+func ToMarkdown(_ []string, stdin io.Reader) error {
 	reader := csv.NewReader(stdin)
 
 	header, err := reader.Read()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Can't read header, giving up")
-		os.Exit(1)
+		return errors.New("Can't read header, giving up")
 	}
 
 	fmt.Println(strings.Join(header, " | "))
@@ -38,4 +39,6 @@ func ToMarkdown(_ []string, stdin io.Reader) {
 		}
 		fmt.Println(strings.Join(record, " | "))
 	}
+
+	return nil
 }

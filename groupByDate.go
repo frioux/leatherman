@@ -11,6 +11,7 @@ import (
 
 	arg "github.com/alexflint/go-arg"
 	"github.com/jeffjen/datefmt"
+	"github.com/pkg/errors"
 )
 
 var cmdArgs struct {
@@ -42,13 +43,12 @@ func parseArgs(args []string) error {
 
 // GroupByDate takes dates on stdin in format -i, will group them by format -g,
 // and write them in format -o.
-func GroupByDate(args []string, stdin io.Reader) {
+func GroupByDate(args []string, stdin io.Reader) error {
 	err := parseArgs(args[1:])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "group-by-date: %v\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't parse args")
 	}
-	groupByDate(stdin, os.Stdout)
+	return groupByDate(stdin, os.Stdout)
 }
 
 func parseDate(format, input string) (time.Time, error) {
@@ -65,7 +65,7 @@ func formatDate(format string, date time.Time) (string, error) {
 	return date.Format(format), nil
 }
 
-func groupByDate(i io.Reader, o io.Writer) {
+func groupByDate(i io.Reader, o io.Writer) error {
 	in := csv.NewReader(i)
 	ret := map[string]int{}
 
@@ -107,7 +107,8 @@ func groupByDate(i io.Reader, o io.Writer) {
 	}
 	out.Flush()
 	if err := out.Error(); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to flush: %v\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Failed to flush")
 	}
+
+	return nil
 }

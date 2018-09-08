@@ -58,10 +58,10 @@ func t(l string) string {
 }
 
 // Clocks shows my personal, digital, wall of clocks.
-func Clocks(args []string, _ io.Reader) {
+func Clocks(args []string, _ io.Reader) error {
 	if len(args) > 1 && args[1] == "-h" {
 		fmt.Println("my personal, digital, wall of clocks")
-		return
+		return nil
 	}
 	fmt.Println("here : " + t("Local"))
 	fmt.Println("L.A. : " + t("America/Los_Angeles"))
@@ -70,4 +70,6 @@ func Clocks(args []string, _ io.Reader) {
 	fmt.Println("riba : " + t("Europe/Berlin"))
 	fmt.Println("seo  : " + t("Asia/Jerusalem"))
 	fmt.Println("UTC  : " + t("UTC"))
+
+	return nil
 }

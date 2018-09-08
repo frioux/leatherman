@@ -1,18 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 // Explode all the tools as symlinks
-func Explode(args []string, _ io.Reader) {
+func Explode(_ []string, _ io.Reader) error {
 	exe, err := os.Executable()
 	if err != nil {
-		fmt.Println("couldn't get Executable to explode", err)
-		os.Exit(1)
+		return errors.Wrap(err, "couldn't get Executable to explode")
 	}
 	dir := filepath.Dir(exe)
 	for k := range Dispatch {
@@ -22,9 +22,8 @@ func Explode(args []string, _ io.Reader) {
 		if k == "explode" {
 			continue
 		}
-		err := os.Symlink(exe, dir+"/"+k)
-		if err != nil {
-			// ignore for now
-		}
+		_ = os.Symlink(exe, dir+"/"+k)
 	}
+
+	return nil
 }

@@ -7,10 +7,11 @@ import (
 	"os"
 
 	"github.com/frioux/shellquote"
+	"github.com/pkg/errors"
 )
 
 // Fn generates shell scripts based on the args
-func Fn(args []string, _ io.Reader) {
+func Fn(args []string, _ io.Reader) error {
 	if len(args) < 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s $scriptname [-f] $command $tokens\n", args[0])
 		os.Exit(1)
@@ -30,47 +31,41 @@ func Fn(args []string, _ io.Reader) {
 		var err error
 		body, err = shellquote.Quote(args[2:])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't quote args to script script: %s\n", err)
-			os.Exit(1)
+			return errors.Wrap(err, "Couldn't quote args to script script")
 		}
 	}
 
 	// If script exists or we can't stat it
 	stat, err := os.Stat(script)
 	if stat != nil {
-		fmt.Fprintf(os.Stderr, "Script (%s) already exists\n", script)
-		os.Exit(1)
+		return errors.Wrap(err, "Script ("+script+") already exists")
 	} else if !os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "Couldn't stat new script: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't stat new script")
 	}
 
 	file, err := os.Create(script)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't create new script: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't create new script")
 	}
 
 	w := bufio.NewWriter(file)
 	_, err = w.WriteString("#!/bin/sh\n\n" + body + "\n")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't write to new script: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't write to new script")
 	}
 	err = w.Flush()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't flush new script: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't flush new script")
 	}
 
 	err = file.Close()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't save new script: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't save new script")
 	}
 	err = os.Chmod(script, os.FileMode(0755))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't chown new script: %s\n", err)
-		os.Exit(1)
+		return errors.Wrap(err, "Couldn't chown new script")
 	}
+
+	return nil
 }
