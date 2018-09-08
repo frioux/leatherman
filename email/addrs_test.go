@@ -1,4 +1,4 @@
-package main
+package email
 
 import (
 	"net/mail"

@@ -1,11 +1,11 @@
-package main
+package email
 
 import "strings"
 
-func ExampleAddrspecToTabs() {
+func ExampleToTabs() {
 
 	r := strings.NewReader(`"Frew Schmidt" <frew@frew.frew>`)
 
-	AddrspecToTabs(nil, r)
+	ToTabs(nil, r)
 	// Output: frew@frew.frew	Frew Schmidt
 }

@@ -1,4 +1,4 @@
-package main
+package bamboo // import "github.com/frioux/leatherman/bamboo"
 
 import (
 	"bufio"
@@ -13,23 +13,23 @@ import (
 	"github.com/headzoo/surf/browser"
 )
 
-func authBabmoo() (*browser.Browser, error) {
+func auth() (*browser.Browser, error) {
 	ua := surf.NewBrowser()
 	err := ua.Open("https://ziprecruiter1.bamboohr.com/login.php")
 	if err != nil {
-		return nil, fmt.Errorf("authBabmoo: %s", err)
+		return nil, fmt.Errorf("auth: %s", err)
 	}
 
 	fm, err := ua.Form("form")
 	if err != nil {
-		return nil, fmt.Errorf("authBabmoo: %s", err)
+		return nil, fmt.Errorf("auth: %s", err)
 	}
 
 	fm.Input("username", os.Getenv("BAMBOO_USER"))
 	fm.Input("password", os.Getenv("BAMBOO_PASSWORD"))
 
 	if err := fm.Submit(); err != nil {
-		return nil, fmt.Errorf("authBabmoo: %s", err)
+		return nil, fmt.Errorf("auth: %s", err)
 	}
 
 	return ua, nil
@@ -37,9 +37,9 @@ func authBabmoo() (*browser.Browser, error) {
 
 const bamboo = "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info"
 
-// ExportBambooHR will write the JSON extracted from bamboohr to stdout.
-func ExportBambooHR([]string, io.Reader) {
-	ua, err := authBabmoo()
+// ExportDirectory will write the JSON extracted from bamboohr to stdout.
+func ExportDirectory([]string, io.Reader) {
+	ua, err := auth()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "export-bamboohr: %s\n", err)
 		os.Exit(1)
@@ -59,10 +59,10 @@ func ExportBambooHR([]string, io.Reader) {
 
 const tree = "https://ziprecruiter1.bamboohr.com/employees/orgchart.php?pin"
 
-// ExportBambooHRTree will write the JSON extracted from the bamboohr org chart
+// ExportOrgChart will write the JSON extracted from the bamboohr org chart
 // to stdout.
-func ExportBambooHRTree([]string, io.Reader) {
-	ua, err := authBabmoo()
+func ExportOrgChart([]string, io.Reader) {
+	ua, err := auth()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "export-bamboohr-tree: %s\n", err)
 		os.Exit(1)

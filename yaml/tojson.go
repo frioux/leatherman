@@ -1,4 +1,4 @@
-package main
+package yaml // import "github.com/frioux/leatherman/yaml"
 
 import (
 	"encoding/json"
@@ -9,8 +9,8 @@ import (
 	"github.com/frioux/yaml"
 )
 
-// YAMLToJSON reads YAML on stdin and writes JSON on stdout.
-func YAMLToJSON(args []string, stdin io.Reader) {
+// ToJSON reads YAML on stdin and writes JSON on stdout.
+func ToJSON(_ []string, stdin io.Reader) {
 	d := yaml.NewDecoder(stdin)
 	e := json.NewEncoder(os.Stdout)
 

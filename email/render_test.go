@@ -1,14 +1,14 @@
-package main
+package email
 
 import "strings"
 
-func ExampleRenderMail() {
+func ExampleRender() {
 	r := strings.NewReader(`foo
 bar
 baz
 Date: Wed, 18 Jul 2019 16:00:00 +0000`)
 
-	RenderMail(nil, r)
+	Render(nil, r)
 	// Output:
 	// foo
 	// bar

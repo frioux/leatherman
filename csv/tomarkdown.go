@@ -1,4 +1,4 @@
-package main
+package csv // import "github.com/frioux/leatherman/csv"
 
 import (
 	"encoding/csv"
@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// CSVToMarkdown converts input of CSV to Markdown
-func CSVToMarkdown(_ []string, stdin io.Reader) {
+// ToMarkdown converts input of CSV to Markdown
+func ToMarkdown(_ []string, stdin io.Reader) {
 	reader := csv.NewReader(stdin)
 
 	header, err := reader.Read()

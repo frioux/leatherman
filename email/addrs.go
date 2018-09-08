@@ -1,4 +1,4 @@
-package main
+package email // import "github.com/frioux/leatherman/email"
 
 import (
 	"bufio"

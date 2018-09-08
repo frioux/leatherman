@@ -1,4 +1,4 @@
-package main
+package csv // import "github.com/frioux/leatherman/csv"
 
 import (
 	"encoding/csv"
@@ -8,8 +8,8 @@ import (
 	"os"
 )
 
-// CSVToJSON converts input of CSV to JSON.
-func CSVToJSON(args []string, stdin io.Reader) {
+// ToJSON converts input of CSV to JSON.
+func ToJSON(_ []string, stdin io.Reader) {
 	reader := csv.NewReader(stdin)
 	writer := json.NewEncoder(os.Stdout)
 

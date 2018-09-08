@@ -4,6 +4,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/frioux/leatherman/bamboo"
+	"github.com/frioux/leatherman/csv"
+	"github.com/frioux/leatherman/email"
+	"github.com/frioux/leatherman/yaml"
 )
 
 // Dispatch is the dispatch table that maps command names to functions.
@@ -14,30 +19,30 @@ func main() {
 	args := os.Args
 
 	Dispatch = map[string]func([]string, io.Reader){
-		"addrs":                Addrs,
-		"addrspec-to-tabs":     AddrspecToTabs,
+		"addrs":                email.Addrs,
+		"addrspec-to-tabs":     email.ToTabs,
 		"backlight":            Backlight,
 		"clocks":               Clocks,
-		"csv2json":             CSVToJSON,
-		"csv2md":               CSVToMarkdown,
+		"csv2json":             csv.ToJSON,
+		"csv2md":               csv.ToMarkdown,
 		"debounce":             Debounce,
 		"dump-mozlz4":          DumpMozLZ4,
 		"ec2-resource-for-ip":  EC2ResourceForIP,
 		"expand-url":           ExpandURL,
-		"export-bamboohr":      ExportBambooHR,
-		"export-bamboohr-tree": ExportBambooHRTree,
-		"fn":                 Fn,
-		"gen-pass":           GenPass,
-		"group-by-date":      GroupByDate,
-		"netrc-password":     NetrcPassword,
-		"pomotimer":          Pomotimer,
-		"prepend-emoji-hist": PrependEmojiHist,
-		"render-mail":        RenderMail,
-		"replace-unzip":      ReplaceUnzip,
-		"rss":                RSS,
-		"ssh-quote":          SSHQuote,
-		"undefer":            Undefer,
-		"yaml2json":          YAMLToJSON,
+		"export-bamboohr":      bamboo.ExportDirectory,
+		"export-bamboohr-tree": bamboo.ExportOrgChart,
+		"fn":                   Fn,
+		"gen-pass":             GenPass,
+		"group-by-date":        GroupByDate,
+		"netrc-password":       NetrcPassword,
+		"pomotimer":            Pomotimer,
+		"prepend-emoji-hist":   PrependEmojiHist,
+		"render-mail":          email.Render,
+		"replace-unzip":        ReplaceUnzip,
+		"rss":                  RSS,
+		"ssh-quote":            SSHQuote,
+		"undefer":              Undefer,
+		"yaml2json":            yaml.ToJSON,
 
 		"help":    Help,
 		"version": Version,
