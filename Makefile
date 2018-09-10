@@ -1,4 +1,4 @@
-VERSION := $(shell git rev-parse HEAD || echo $TRAVIS_COMMIT)
+VERSION := $(shell git describe --abbrev=7 --dirty --always || echo $TRAVIS_COMMIT)
 WHEN := $(shell date)
 WHO := $(shell whoami)
 WHERE := $(shell hostname -f)
