@@ -13,6 +13,5 @@ leatherman: *.go
 	golint -set_exit_status ./...
 	go vet ./...
 	TZ=America/Los_Angeles go test
-	go build -ldflags "-X 'main.version=$(VERSION)' -X 'main.when=$(WHEN)' -X 'main.who=$(WHO)' -X 'main.where=$(WHERE)'"
-	strip leatherman
+	go build -ldflags "-s -X 'main.version=$(VERSION)' -X 'main.when=$(WHEN)' -X 'main.who=$(WHO)' -X 'main.where=$(WHERE)'"
 	./leatherman version
