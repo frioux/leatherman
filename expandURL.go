@@ -84,11 +84,7 @@ func urlToLink(url string) (string, error) {
 	return fmt.Sprintf("[%s](%s)", title[1], url), nil
 }
 
-var urlFinder *regexp.Regexp
-
-func init() {
-	urlFinder = regexp.MustCompile(`^(|.*\s)(https?://\S+)(\s.*|)$`)
-}
+var urlFinder = regexp.MustCompile(`^(|.*\s)(https?://\S+)(\s.*|)$`)
 
 func replaceLink(line string) string {
 	for {

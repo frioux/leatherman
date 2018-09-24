@@ -114,6 +114,13 @@ Powerful tool for debouncing lines of input.
 Dump the contents of a `mozlz4` (aka `jsonlz4`) file commonly used by Firefox.
 Just takes the name of the file to dump and writes to standard out.
 
+### `defer-lwn`
+
+Create [undefer files](#undefer) for any lines containing a markdown link to
+`LWN.` Lines will be added in no particular order.  Lines not containing links
+(or otherwise running into errors) will be printed to standard out, with errors
+going to standard error.
+
 ### `ec2-resource-for-ip`
 
 Pass IPs as arguments and this will find them in EC2 (and other places in AWS.)
