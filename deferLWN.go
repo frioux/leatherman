@@ -29,26 +29,6 @@ func DeferLWN(args []string, stdin io.Reader) error {
 	// wg ensures that we block till all lines are done
 	wg := sync.WaitGroup{}
 
-	// stgwg ensures that the following two channels will run to completion
-	stdwg := sync.WaitGroup{}
-	stdwg.Add(2)
-
-	outC := make(chan string)
-	go func() { // finishes when outC is closed
-		for line := range outC {
-			fmt.Fprintln(os.Stdout, line)
-		}
-		stdwg.Done()
-	}()
-
-	errC := make(chan string)
-	go func() { // finishes when errC is closed
-		for line := range errC {
-			fmt.Fprintln(os.Stderr, line)
-		}
-		stdwg.Done()
-	}()
-
 	s := bufio.NewScanner(stdin)
 
 	for s.Scan() {
@@ -60,8 +40,8 @@ func DeferLWN(args []string, stdin io.Reader) error {
 		go func() {
 			err := deferLink(line, dir)
 			if err != nil {
-				errC <- err.Error()
-				outC <- line
+				fmt.Fprintln(os.Stderr, err)
+				fmt.Println(line)
 			}
 			<-tokens
 			wg.Done()
@@ -69,11 +49,6 @@ func DeferLWN(args []string, stdin io.Reader) error {
 	}
 
 	wg.Wait()
-	close(outC)
-	close(errC)
-
-	stdwg.Wait()
-
 	if s.Err() != nil {
 		return errors.Wrap(s.Err(), "bufio.Scanner.Scan()")
 	}
