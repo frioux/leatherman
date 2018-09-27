@@ -10,6 +10,7 @@ import (
 	"net/http/cookiejar"
 	"os"
 	"regexp"
+	"sync"
 
 	"github.com/frioux/mozcookiejar"
 	"github.com/headzoo/surf"
@@ -35,12 +36,37 @@ func ExpandURL(args []string, stdin io.Reader) error {
 	}
 
 	scanner := bufio.NewScanner(stdin)
+	lines := []string{}
 
 	for scanner.Scan() {
-		fmt.Println(replaceLink(scanner.Text()))
+		lines = append(lines, scanner.Text())
 	}
 	if err := scanner.Err(); err != nil {
 		return errors.Wrap(err, "reading standard input")
+	}
+
+	// tokens limits parallelism to 10
+	tokens := make(chan struct{}, 10)
+
+	// wg ensures that we block till all lines are done
+	wg := sync.WaitGroup{}
+
+	for i := range lines {
+		i := i
+		wg.Add(1)
+		tokens <- struct{}{}
+
+		go func() {
+			lines[i] = replaceLink(lines[i])
+			<-tokens
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	for _, line := range lines {
+		fmt.Println(line)
 	}
 
 	return nil
