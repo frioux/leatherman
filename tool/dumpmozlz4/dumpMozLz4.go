@@ -1,4 +1,4 @@
-package main
+package dumpmozlz4
 
 import (
 	"fmt"

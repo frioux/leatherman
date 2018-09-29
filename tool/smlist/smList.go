@@ -1,4 +1,4 @@
-package main
+package smlist
 
 import (
 	"encoding/json"

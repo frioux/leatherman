@@ -1,4 +1,4 @@
-package main
+package sshquote
 
 func ExampleSSHQuote() {
 	SSHQuote([]string{"ssh-quote", "foo", "bar"}, nil)

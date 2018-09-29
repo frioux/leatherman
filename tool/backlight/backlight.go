@@ -1,4 +1,4 @@
-package main
+package backlight
 
 import (
 	"bufio"

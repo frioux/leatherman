@@ -1,4 +1,4 @@
-package main
+package replaceunzip
 
 import (
 	"archive/zip"

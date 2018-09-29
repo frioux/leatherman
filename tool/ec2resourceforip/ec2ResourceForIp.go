@@ -1,4 +1,4 @@
-package main
+package ec2resourceforip
 
 import (
 	"flag"
