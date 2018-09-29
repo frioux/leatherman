@@ -9,8 +9,9 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/frioux/leatherman/lwn"
 	"github.com/pkg/errors"
+
+	"github.com/frioux/leatherman/pkg/lwn"
 )
 
 // DeferLWN writes the input that contained links to be made available in the

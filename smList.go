@@ -7,8 +7,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/frioux/leatherman/sweetmarias"
 	"github.com/pkg/errors"
+
+	"github.com/frioux/leatherman/pkg/sweetmarias"
 )
 
 // SMList prints a line of JSON for each Sweet Maria's coffee.

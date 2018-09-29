@@ -1,4 +1,4 @@
-package sweetmarias
+package sweetmarias // import "github.com/frioux/leatherman/pkg/sweetmarias"
 
 import (
 	"log"

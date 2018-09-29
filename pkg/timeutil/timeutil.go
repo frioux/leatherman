@@ -1,4 +1,4 @@
-package timeutil
+package timeutil // import "github.com/frioux/leatherman/pkg/timeutil"
 
 import "time"
 

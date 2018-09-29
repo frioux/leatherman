@@ -1,4 +1,4 @@
-package lwn // import "github.com/frioux/leatherman/lwn"
+package lwn // import "github.com/frioux/leatherman/pkg/lwn"
 
 import (
 	"bufio"
