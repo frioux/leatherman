@@ -73,9 +73,9 @@ func content(paths []string, stdout io.Writer) error {
 	return nil
 }
 
-// Undefer prints the contents of files in the passed directory that have a
+// Run prints the contents of files in the passed directory that have a
 // prefix of a date in the past, and then deletes the files.
-func Undefer(args []string, _ io.Reader) error {
+func Run(args []string, _ io.Reader) error {
 	if len(args) > 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s $dir\n", args[0])
 		os.Exit(1)

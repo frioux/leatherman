@@ -22,10 +22,10 @@ import (
 var jar *cookiejar.Jar
 var tidyRE = regexp.MustCompile(`^\s*(.*?)\s*$`)
 
-// ExpandURL replaces URLs from stdin with their markdown version, using a
+// Run replaces URLs from stdin with their markdown version, using a
 // title from the actual page, loaded using cookies discovered via the
 // MOZ_COOKIEJAR env var.
-func ExpandURL(args []string, stdin io.Reader) error {
+func Run(args []string, stdin io.Reader) error {
 	// some cookies cause go to log warnings to stderr
 	log.SetOutput(ioutil.Discard)
 

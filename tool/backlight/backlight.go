@@ -12,8 +12,8 @@ import (
 
 const path = "/sys/class/backlight/intel_backlight"
 
-// Backlight modifies backlight brightness, assuming first arg is a percent.
-func Backlight(args []string, _ io.Reader) error {
+// Run modifies backlight brightness, assuming first arg is a percent.
+func Run(args []string, _ io.Reader) error {
 	err := os.Chdir(path)
 	if err != nil {
 		return errors.Wrap(err, "Couldn't chdir into "+path)

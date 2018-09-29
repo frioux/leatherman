@@ -11,8 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// NetrcPassword prints passsword for passed machine and login
-func NetrcPassword(args []string, _ io.Reader) error {
+// Run prints passsword for passed machine and login
+func Run(args []string, _ io.Reader) error {
 	if len(args) != 3 {
 		fmt.Println("Usage:\n\tnetrc-password $machine $login")
 		os.Exit(1)

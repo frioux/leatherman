@@ -12,8 +12,8 @@ import (
 	"github.com/frioux/leatherman/pkg/sweetmarias"
 )
 
-// SMList prints a line of JSON for each Sweet Maria's coffee.
-func SMList(_ []string, _ io.Reader) error {
+// Run prints a line of JSON for each Sweet Maria's coffee.
+func Run(_ []string, _ io.Reader) error {
 	wg := sync.WaitGroup{}
 
 	tokens := make(chan struct{}, 10)

@@ -10,8 +10,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Fn generates shell scripts based on the args
-func Fn(args []string, _ io.Reader) error {
+// Run generates shell scripts based on the args
+func Run(args []string, _ io.Reader) error {
 	if len(args) < 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s $scriptname [-f] $command $tokens\n", args[0])
 		os.Exit(1)

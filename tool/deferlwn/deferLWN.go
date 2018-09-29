@@ -16,10 +16,10 @@ import (
 	"github.com/frioux/leatherman/pkg/timeutil"
 )
 
-// DeferLWN writes the input that contained links to be made available in the
+// Run writes the input that contained links to be made available in the
 // future on the relevant day, and otherwise prints the lines on standard
 // output.
-func DeferLWN(args []string, stdin io.Reader) error {
+func Run(args []string, stdin io.Reader) error {
 	if len(args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <dir>\n", args[0])
 		os.Exit(1)

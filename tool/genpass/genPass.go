@@ -11,8 +11,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// GenPass bcrypts the first argument with the second argument rounds.
-func GenPass(args []string, _ io.Reader) error {
+// Run bcrypts the first argument with the second argument rounds.
+func Run(args []string, _ io.Reader) error {
 	if len(args) < 3 {
 		fmt.Fprintf(os.Stderr, "usage: %s $password [$cost]\n", args[0])
 		os.Exit(1)

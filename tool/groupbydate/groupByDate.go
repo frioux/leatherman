@@ -41,9 +41,9 @@ func parseArgs(args []string) error {
 	return nil
 }
 
-// GroupByDate takes dates on stdin in format -i, will group them by format -g,
+// Run takes dates on stdin in format -i, will group them by format -g,
 // and write them in format -o.
-func GroupByDate(args []string, stdin io.Reader) error {
+func Run(args []string, stdin io.Reader) error {
 	err := parseArgs(args[1:])
 	if err != nil {
 		return errors.Wrap(err, "Couldn't parse args")

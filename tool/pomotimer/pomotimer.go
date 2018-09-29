@@ -12,9 +12,9 @@ import (
 
 const clear = "\r\x1b[J"
 
-// Pomotimer starts a timer for 25m or the duration expressed in the first
+// Run starts a timer for 25m or the duration expressed in the first
 // argument.
-func Pomotimer(args []string, stdin io.Reader) error {
+func Run(args []string, stdin io.Reader) error {
 	timer, _ := time.ParseDuration("25m")
 	if len(args) > 1 {
 		var err error

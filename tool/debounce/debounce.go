@@ -22,8 +22,8 @@ func cat(c chan string, e chan error, quit chan struct{}, stdin io.Reader) {
 	quit <- struct{}{}
 }
 
-// Debounce input from stdin to stdout
-func Debounce(args []string, stdin io.Reader) error {
+// Run debounces input from stdin to stdout
+func Run(args []string, stdin io.Reader) error {
 	var timeoutSeconds float64
 	var begin, end, h, help bool
 

@@ -1,6 +1,6 @@
 package sshquote
 
-func ExampleSSHQuote() {
-	SSHQuote([]string{"ssh-quote", "foo", "bar"}, nil)
+func ExampleRun() {
+	Run([]string{"ssh-quote", "foo", "bar"}, nil)
 	// Output: 'sh -c '\''foo bar'\'
 }
