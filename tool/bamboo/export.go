@@ -1,4 +1,4 @@
-package bamboo // import "github.com/frioux/leatherman/bamboo"
+package bamboo // import "github.com/frioux/leatherman/tool/bamboo"
 
 import (
 	"bufio"

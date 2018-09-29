@@ -8,10 +8,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/frioux/leatherman/bamboo"
-	"github.com/frioux/leatherman/csv"
-	"github.com/frioux/leatherman/email"
-	"github.com/frioux/leatherman/yaml"
+	"github.com/frioux/leatherman/tool/bamboo"
+	"github.com/frioux/leatherman/tool/csv"
+	"github.com/frioux/leatherman/tool/email"
+	"github.com/frioux/leatherman/tool/yaml"
 )
 
 // Dispatch is the dispatch table that maps command names to functions.

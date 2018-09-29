@@ -1,4 +1,4 @@
-package csv // import "github.com/frioux/leatherman/csv"
+package csv // import "github.com/frioux/leatherman/tool/csv"
 
 import (
 	"encoding/csv"
