@@ -3,15 +3,15 @@ WHEN := $(shell date)
 WHO := $(shell whoami)
 WHERE := $(shell hostname -f)
 
-leatherman.xz: leatherman
-	xz leatherman
+cmd/leatherman/leatherman.xz: cmd/leatherman/leatherman
+	xz cmd/leatherman/leatherman
 
-leatherman: *.go
+cmd/leatherman/leatherman:
 	( cd / ; go get -u github.com/golang/lint/golint )
 	export GO111MODULE=on
 	go get -t ./...
 	golint -set_exit_status ./...
 	go vet ./...
 	TZ=America/Los_Angeles go test ./...
-	go build -ldflags "-s -X 'main.version=$(VERSION)' -X 'main.when=$(WHEN)' -X 'main.who=$(WHO)' -X 'main.where=$(WHERE)'"
-	./leatherman version
+	( cd cmd/leatherman; go build -ldflags "-s -X 'main.version=$(VERSION)' -X 'main.when=$(WHEN)' -X 'main.who=$(WHO)' -X 'main.where=$(WHERE)'" )
+	cmd/leatherman/leatherman version
