@@ -45,6 +45,7 @@ func main() {
 		"replace-unzip":      ReplaceUnzip,
 		"rss":                RSS,
 		"ssh-quote":          SSHQuote,
+		"sm-list":            SMList,
 		"undefer":            Undefer,
 		"yaml2json":          yaml.ToJSON,
 
