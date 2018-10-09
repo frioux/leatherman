@@ -30,15 +30,16 @@ func Run(_ []string, _ io.Reader) error {
 		tokens <- struct{}{}
 		url := url
 		go func() {
-			c, _ := sweetmarias.LoadCoffee(url)
+			defer func() { wg.Done(); <-tokens }()
+			c, err := sweetmarias.LoadCoffee(url)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, errors.Wrap(err, "sweetmarias.AllCoffees"))
+				fmt.Fprintln(os.Stderr, errors.Wrap(err, "sweetmarias.LoadCoffee"))
+				return
 			}
-			wg.Done()
-			<-tokens
-			_ = e.Encode(c)
+			err = e.Encode(c)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, errors.Wrap(err, "json.Encode"))
+				return
 			}
 		}()
 	}
