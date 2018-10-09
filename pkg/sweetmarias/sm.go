@@ -41,9 +41,22 @@ func LoadCoffee(url string) (Coffee, error) {
 	c := Coffee{URL: url}
 
 	c.Overview = doc.Find("div.overview p").Text()
+	if c.Overview == "" {
+		c.Overview = doc.Find("div.overview div.value").Text()
+	}
+
 	c.Title = doc.Find("h1.page-title span").Text()
+
 	c.FarmNotes = doc.Find("div.origin-notes span").Text()
+	if c.FarmNotes == "" {
+		c.FarmNotes = doc.Find("div.origin-notes p").Text()
+	}
+
 	c.CuppingNotes = doc.Find("div.cupping-notes span").Text()
+	if c.CuppingNotes == "" {
+		c.CuppingNotes = doc.Find("div.cupping-notes p").Text()
+	}
+
 	score, err := strconv.ParseFloat(doc.Find("h5.score-value").Text(), 32)
 	if err != nil {
 		return Coffee{}, errors.Wrap(err, "strconv.ParseFloat")
