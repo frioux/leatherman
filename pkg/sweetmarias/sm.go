@@ -57,11 +57,13 @@ func LoadCoffee(url string) (Coffee, error) {
 		c.CuppingNotes = doc.Find("div.cupping-notes p").Text()
 	}
 
-	score, err := strconv.ParseFloat(doc.Find("h5.score-value").Text(), 32)
-	if err != nil {
-		return Coffee{}, errors.Wrap(err, "strconv.ParseFloat")
+	if scoreStr := doc.Find("h5.score-value").Text(); scoreStr != "" {
+		score, err := strconv.ParseFloat(scoreStr, 32)
+		if err != nil {
+			return Coffee{}, errors.Wrap(err, "strconv.ParseFloat")
+		}
+		c.Score = float32(score)
 	}
-	c.Score = float32(score)
 
 	c.AdditionalAttributes = map[string]string{}
 
