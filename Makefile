@@ -7,7 +7,7 @@ cmd/leatherman/leatherman.xz: cmd/leatherman/leatherman
 	xz cmd/leatherman/leatherman
 
 cmd/leatherman/leatherman:
-	( cd / ; go get -u github.com/golang/lint/golint )
+	( cd / ; go get -u golang.org/x/lint/golint )
 	export GO111MODULE=on
 	go get -t ./...
 	golint -set_exit_status ./...
