@@ -1,7 +1,7 @@
 module github.com/frioux/leatherman
 
 require (
-	github.com/PuerkitoBio/goquery v1.4.1 // indirect
+	github.com/PuerkitoBio/goquery v1.4.1
 	github.com/alexflint/go-arg v0.0.0-20180516182405-f7c0423bd11e
 	github.com/alexflint/go-scalar v0.0.0-20170216020425-e80c3b7ed292 // indirect
 	github.com/andybalholm/cascadia v1.0.0 // indirect
