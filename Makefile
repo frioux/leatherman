@@ -4,7 +4,7 @@ WHO := $(shell whoami)
 WHERE := $(shell hostname -f)
 
 cmd/leatherman/leatherman.xz: cmd/leatherman/leatherman
-	xz cmd/leatherman/leatherman
+	xz --stdout cmd/leatherman/leatherman > cmd/leatherman/leatherman.xz
 
 cmd/leatherman/leatherman: export GO111MODULE = on
 cmd/leatherman/leatherman:
