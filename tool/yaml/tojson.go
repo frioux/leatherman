@@ -5,8 +5,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/frioux/yaml"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
 // ToJSON reads YAML on stdin and writes JSON on stdout.
