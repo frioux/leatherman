@@ -4,11 +4,8 @@ go:
   - 1.11.x
 script:
   - make
-  - cd cmd/leatherman
-  - GO111MODULE=on GOOS=windows go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always || echo $TRAVIS_COMMIT)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'" -o leatherman-windows
-  - xz leatherman-windows
-  - GO111MODULE=on GOOS=darwin go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always || echo $TRAVIS_COMMIT)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'" -o leatherman-osx
-  - xz leatherman-osx
+  - ( cd cmd/leatherman; GO111MODULE=on GOOS=windows go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always || echo $TRAVIS_COMMIT)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'"; xz leatherman; mv leatherman.xz leatherman-windows.xz )
+  - ( cd cmd/leatherman; GO111MODULE=on GOOS=darwin go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always || echo $TRAVIS_COMMIT)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'"; xz leatherman; mv leatherman.xz leatherman-osx.xz )
 deploy:
   provider: releases
   api_key:
