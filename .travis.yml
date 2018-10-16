@@ -2,11 +2,18 @@ language: go
 
 go:
   - 1.11.x
+script:
+  - ( cd cmd/leatherman; GO111MODULE=on GOOS=windows go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always || echo $TRAVIS_COMMIT)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'"; xz leatherman.exe; mv leatherman.exe.xz ../../leatherman-windows.xz )
+  - ( ls cmd/leatherman; cd cmd/leatherman; GO111MODULE=on GOOS=darwin go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always || echo $TRAVIS_COMMIT)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'"; xz leatherman; mv leatherman.xz ../../leatherman-osx.xz )
+  - make
 deploy:
   provider: releases
   api_key:
     secure: P0KTRK62g9QFdeM8P0ZIG0KlTlkflQsji0h1pJaAEMeowaxx9M5OAqV7SQHyTWwwzcejD0cGFlF1oDtZvkLAqz92g42iUf1gj9CMsW585uu1fhZTPUo0VlX4IdzlqV8zPMXUNW+ZH2Qx1cMUaM6RRdIHBsPwgOPdUdDQ9YNqt/JWo1fMpvVJ/Bho2VLZp4bR2taR8JzLdSUGqUDIXi6s6ZJx7TBo+eVg9i7SiPaACm5Wg3vyRuVsE0U3v0X68pyTrwTSMysr9J09VX//8wtuqHJypeVSndVFSMPBHEwzKSVhkNWIdM/rYqNyW2xIDRgTrJTf8O9ZVH4qTAOYKPE6lkQJAt9RfMICEg2f09M/LUb8glYUwcx3ewWLUVX9MLjhUB5eCZEnCnV5355O50J8WZ2GXtGSdunwzAaMx/jaQL4dpJLKpqcoajScgWSGDzYeTs+s6sE8+URCzOHaOAsab8k2bFDv8oLfqov0ZqXrtBo/A6vqz1CxJjc9Z5zFYK2x4dQS3KMWy9ttYIKs9T5OQLuNqB8rWZVolFOoVr9pg3aTh0D/Wz6es4J2R5JvBRt2jAUMKCYxExSPSK7Cfp05Hdf+VJzKVrd0dm20fBIQ3ZxghPqdZ9Tx3JbowfvuwqprfEhGUvCtfAXEybQ1zhoTESOuEkfTIDN99993J0zqHi4=
-  file: cmd/leatherman/leatherman.xz
+  file:
+     - cmd/leatherman/leatherman.xz
+     - leatherman-osx.xz
+     - leatherman-windows.xz
   skip_cleanup: true
   on:
     repo: frioux/leatherman

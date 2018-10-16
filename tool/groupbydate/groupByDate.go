@@ -6,11 +6,9 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	arg "github.com/alexflint/go-arg"
-	"github.com/jeffjen/datefmt"
 	"github.com/pkg/errors"
 )
 
@@ -49,20 +47,6 @@ func Run(args []string, stdin io.Reader) error {
 		return errors.Wrap(err, "Couldn't parse args")
 	}
 	return groupByDate(stdin, os.Stdout)
-}
-
-func parseDate(format, input string) (time.Time, error) {
-	if strings.ContainsRune(format, '%') {
-		return datefmt.Strptime(format, input)
-	}
-	return time.Parse(format, input)
-}
-
-func formatDate(format string, date time.Time) (string, error) {
-	if strings.ContainsRune(format, '%') {
-		return datefmt.Strftime(format, date)
-	}
-	return date.Format(format), nil
 }
 
 func groupByDate(i io.Reader, o io.Writer) error {
