@@ -11,7 +11,6 @@ require (
 	github.com/frioux/mozlz4 v0.0.1
 	github.com/frioux/netrc v0.0.0-20180205001430-19d128e0f715
 	github.com/frioux/shellquote v0.0.2
-	github.com/frioux/yaml v2.1.0+incompatible // indirect
 	github.com/go-ini/ini v1.38.2 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c // indirect
 	github.com/headzoo/surf v1.0.0
