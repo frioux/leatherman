@@ -22,12 +22,14 @@ to pull the latest binary at install time and run the `explode` tool.
 
 ## Installation
 
-Here's a copy pasteable script to install the leatherman:
+Here's a copy pasteable script to install the leatherman on OSX or Linux:
 
 ``` bash
+OS=$([ $(uname -s) = "Darwin" ] && echo "-osx")
 LMURL="$(curl -s https://api.github.com/repos/frioux/leatherman/releases/latest |
    grep browser_download_url |
-   cut -d '"' -f 4)"
+   cut -d '"' -f 4 |
+   grep -F leatherman${OS}.xz )"
 mkdir -p ~/bin
 curl -sL "$LMURL" > ~/bin/leatherman.xz
 xz -d -f ~/bin/leatherman.xz
