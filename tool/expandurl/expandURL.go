@@ -32,7 +32,8 @@ func Run(args []string, stdin io.Reader) error {
 	var err error
 	jar, err = cj()
 	if err != nil {
-		return errors.Wrap(err, "loading cookiejar")
+		fmt.Fprintf(os.Stderr, "%s\n", errors.Wrap(err, "loading cookiejar"))
+		jar, _ = cookiejar.New(nil)
 	}
 
 	scanner := bufio.NewScanner(stdin)
