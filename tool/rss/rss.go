@@ -25,17 +25,17 @@ func Run(args []string, _ io.Reader) error {
 	fp := gofeed.NewParser()
 	feedURL, err := url.Parse(args[1])
 	if err != nil {
-		return errors.Wrap(err, "Couldn't parse feed url")
+		return errors.Wrapf(err, "Couldn't parse feed url (%s)", feedURL)
 	}
 	f, err := fp.ParseURL(feedURL.String())
 	if err != nil {
-		return errors.Wrap(err, "Couldn't fetch feed")
+		return errors.Wrapf(err, "Couldn't fetch feed (%s)", feedURL)
 	}
 	fixItems(feedURL, f.Items)
 
 	seen, err := syncRead(statePath, f.Items)
 	if err != nil {
-		return errors.Wrap(err, "Couldn't sync read")
+		return errors.Wrapf(err, "Couldn't sync read (%s)", feedURL)
 	}
 
 	items := newItems(seen, f.Items)
@@ -44,7 +44,7 @@ func Run(args []string, _ io.Reader) error {
 
 	err = os.Rename(statePath+".tmp", statePath)
 	if err != nil {
-		return errors.Wrap(err, "Couldn't rename state file")
+		return errors.Wrapf(err, "Couldn't rename state file (%s)", feedURL)
 	}
 
 	return nil
