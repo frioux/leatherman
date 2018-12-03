@@ -7,7 +7,7 @@ import (
 )
 
 func ExampleToJSON() {
-	r := strings.NewReader("---\n  - foo: 1\n  - bar: 2")
+	r := strings.NewReader("---\n  - foo: 1\n  - bar: 2\n---\nx: 1\n")
 
 	err := ToJSON(nil, r)
 	if err != nil {
@@ -16,4 +16,5 @@ func ExampleToJSON() {
 	}
 	// Output:
 	// [{"foo":1},{"bar":2}]
+	// {"x":1}
 }

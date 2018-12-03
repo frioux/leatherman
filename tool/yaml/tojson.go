@@ -15,14 +15,20 @@ func ToJSON(_ []string, stdin io.Reader) error {
 	e := json.NewEncoder(os.Stdout)
 
 	var data interface{}
-	err := d.Decode(&data)
-	if err != nil {
-		return errors.Wrap(err, "Couldn't decode YAML")
-	}
 
-	err = e.Encode(data)
-	if err != nil {
-		return errors.Wrap(err, "Couldn't encode JSON")
+	for {
+		err := d.Decode(&data)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return errors.Wrap(err, "Couldn't decode YAML")
+		}
+
+		err = e.Encode(data)
+		if err != nil {
+			return errors.Wrap(err, "Couldn't encode JSON")
+		}
 	}
 
 	return nil
