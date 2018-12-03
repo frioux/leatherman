@@ -83,17 +83,45 @@ func cj() (*cookiejar.Jar, error) {
 	if path == "" {
 		return nil, errors.New("MOZ_COOKIEJAR should be set for expand-url to work")
 	}
-	db, err := sql.Open("sqlite3", "file:"+path+"?cache=shared&_journal_mode=WAL")
+
+	orig, err := os.Open(path)
+	if err != nil {
+		return nil, errors.Wrap(err, "os.Open for copying")
+	}
+
+	dest, err := ioutil.TempFile("", "")
+	if err != nil {
+		return nil, errors.Wrap(err, "ioutil.TempFile for copying")
+	}
+
+	_, err = io.Copy(dest, orig)
+	if err != nil {
+		return nil, errors.Wrap(err, "io.Copy for copying")
+	}
+	err = dest.Close()
+	if err != nil {
+		return nil, errors.Wrap(err, "dest.Close for copying")
+	}
+	err = orig.Close()
+	if err != nil {
+		return nil, errors.Wrap(err, "orig.Close for copying")
+	}
+
+	db, err := sql.Open("sqlite3", "file:"+dest.Name())
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to open db")
 	}
-	db.SetMaxOpenConns(1)
 	defer db.Close()
 
 	err = mozcookiejar.LoadIntoJar(db, jar)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to load cookies")
 	}
+	err = os.Remove(dest.Name())
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to clean up db copy")
+	}
+
 	return jar, nil
 }
 
