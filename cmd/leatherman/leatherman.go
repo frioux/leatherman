@@ -15,7 +15,6 @@ import (
 	"github.com/frioux/leatherman/tool/debounce"
 	"github.com/frioux/leatherman/tool/deferlwn"
 	"github.com/frioux/leatherman/tool/dumpmozlz4"
-	"github.com/frioux/leatherman/tool/ec2resourceforip"
 	"github.com/frioux/leatherman/tool/email"
 	"github.com/frioux/leatherman/tool/expandurl"
 	"github.com/frioux/leatherman/tool/fn"
@@ -49,23 +48,22 @@ func main() {
 		"debounce":             debounce.Run,
 		"defer-lwn":            deferlwn.Run,
 		"dump-mozlz4":          dumpmozlz4.Run,
-		"ec2-resource-for-ip":  ec2resourceforip.Run,
 		"expand-url":           expandurl.Run,
 		"export-bamboohr":      bamboo.ExportDirectory,
 		"export-bamboohr-tree": bamboo.ExportOrgChart,
-		"fn":                 fn.Run,
-		"gen-pass":           genpass.Run,
-		"group-by-date":      groupbydate.Run,
-		"netrc-password":     netrcpassword.Run,
-		"pomotimer":          pomotimer.Run,
-		"prepend-emoji-hist": prependemojihist.Run,
-		"render-mail":        email.Render,
-		"replace-unzip":      replaceunzip.Run,
-		"rss":                rss.Run,
-		"ssh-quote":          sshquote.Run,
-		"sm-list":            smlist.Run,
-		"undefer":            undefer.Run,
-		"yaml2json":          yaml.ToJSON,
+		"fn":                   fn.Run,
+		"gen-pass":             genpass.Run,
+		"group-by-date":        groupbydate.Run,
+		"netrc-password":       netrcpassword.Run,
+		"pomotimer":            pomotimer.Run,
+		"prepend-emoji-hist":   prependemojihist.Run,
+		"render-mail":          email.Render,
+		"replace-unzip":        replaceunzip.Run,
+		"rss":                  rss.Run,
+		"ssh-quote":            sshquote.Run,
+		"sm-list":              smlist.Run,
+		"undefer":              undefer.Run,
+		"yaml2json":            yaml.ToJSON,
 
 		"help":    Help,
 		"version": Version,

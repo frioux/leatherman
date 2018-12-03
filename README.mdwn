@@ -123,10 +123,6 @@ Create [undefer files](#undefer) for any lines containing a markdown link to
 (or otherwise running into errors) will be printed to standard out, with errors
 going to standard error.
 
-### `ec2-resource-for-ip`
-
-Pass IPs as arguments and this will find them in EC2 (and other places in AWS.)
-
 ### `expand-url`
 
 Reads text on STDIN and writes the same text back, converting any links to
