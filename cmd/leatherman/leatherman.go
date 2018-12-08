@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"runtime/trace"
 
 	"github.com/pkg/errors"
 
@@ -35,6 +37,8 @@ import (
 var Dispatch map[string]func([]string, io.Reader) error
 
 func main() {
+	startDebug()
+
 	which := filepath.Base(os.Args[0])
 	args := os.Args
 
@@ -78,11 +82,19 @@ func main() {
 	fn, ok := Dispatch[which]
 	if !ok {
 		Help(os.Args, os.Stdin)
+		stopDebug()
 		os.Exit(1)
 	}
-	err := errors.Wrap(fn(args, os.Stdin), which)
+	var err error
+
+	trace.WithRegion(context.Background(), which, func() {
+		err = errors.Wrap(fn(args, os.Stdin), which)
+	})
+
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
+		stopDebug()
 		os.Exit(1)
 	}
+	stopDebug()
 }

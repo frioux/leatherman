@@ -252,3 +252,15 @@ then deleted:
 
 Reads YAML on stdin and writes JSON on stdout.
 
+## Debugging
+
+In an effort to make debugging simpler, I've created three ways to see what
+`leatherman` is doing:
+
+ 1. `LMTRACE=$somefile` will write an execution trace to `$somefile`.
+ 2. `LMPROF=$somefile` will write a cpu profile to `$somefile`.
+ 3. The pprof http endpoint is exposed on `localhost:6060/debug/pprof`; the port
+    can be overridden by setting `LMHTTPPROF=$someport`
+
+Since so many of the tools are short lived my assumption is that the execution
+trace will be the most useful.
