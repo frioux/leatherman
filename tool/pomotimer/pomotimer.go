@@ -47,7 +47,8 @@ func Run(args []string, stdin io.Reader) error {
 		_ = exec.Command("tmux", "setw", "automatic-rename", "on").Run()
 	}()
 
-	c := time.Tick(1 * time.Second)
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
 	kb := make(chan string)
 	go kbChan(kb, stdin)
 
@@ -56,7 +57,7 @@ func Run(args []string, stdin io.Reader) error {
 LOOP:
 	for {
 		select {
-		case <-c:
+		case <-ticker.C:
 			if secondsRemaining > 1 {
 				if !running {
 					continue
