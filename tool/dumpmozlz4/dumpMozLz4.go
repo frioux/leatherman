@@ -20,6 +20,9 @@ func Run(args []string, _ io.Reader) error {
 	}
 
 	r, err := mozlz4.NewReader(file)
+	if err != nil {
+		return errors.Wrap(err, "mozlz4.NewReader")
+	}
 	_, err = io.Copy(os.Stdout, r)
 	if err != nil {
 		return errors.Wrap(err, "Couldn't copy")

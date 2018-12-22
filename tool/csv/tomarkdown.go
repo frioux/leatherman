@@ -16,7 +16,7 @@ func ToMarkdown(_ []string, stdin io.Reader) error {
 
 	header, err := reader.Read()
 	if err != nil {
-		return errors.New("Can't read header, giving up")
+		return errors.New("can't read header, giving up")
 	}
 
 	fmt.Println(strings.Join(header, " | "))

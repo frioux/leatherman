@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // ToJSON reads YAML on stdin and writes JSON on stdout.

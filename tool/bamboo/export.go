@@ -26,8 +26,14 @@ func auth() (*browser.Browser, error) {
 		return nil, fmt.Errorf("auth: %s", err)
 	}
 
-	fm.Input("username", os.Getenv("BAMBOO_USER"))
-	fm.Input("password", os.Getenv("BAMBOO_PASSWORD"))
+	err = fm.Input("username", os.Getenv("BAMBOO_USER"))
+	if err != nil {
+		return nil, errors.Wrap(err, "fm.Input")
+	}
+	err = fm.Input("password", os.Getenv("BAMBOO_PASSWORD"))
+	if err != nil {
+		return nil, errors.Wrap(err, "fm.Input")
+	}
 
 	err = fm.Submit()
 	if err != nil {

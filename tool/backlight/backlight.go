@@ -34,6 +34,9 @@ func Run(args []string, _ io.Reader) error {
 	}
 
 	cur, err := getCurBrightness()
+	if err != nil {
+		return errors.Wrap(err, "getCurBrightness")
+	}
 
 	var toWrite = change*max/100 + cur
 	fmt.Fprintf(os.Stderr, "%d = %d*%d/100 + %d\n", toWrite, change, max, cur)
@@ -51,7 +54,10 @@ func Run(args []string, _ io.Reader) error {
 
 	fmt.Fprintf(os.Stderr, "Setting brightness to %d\n", toWrite)
 
-	file.WriteString(fmt.Sprintf("%d\n", toWrite))
+	_, err = file.WriteString(fmt.Sprintf("%d\n", toWrite))
+	if err != nil {
+		return errors.Wrap(err, "file.WriteString")
+	}
 	err = file.Close()
 	if err != nil {
 		return errors.Wrap(err, "Couldn't write brightness")

@@ -13,7 +13,7 @@ import (
 var re = regexp.MustCompile(`^\s+available on (\w+ \d+, \d{4})\)$`)
 
 // ErrNotFound means date couldn't be found in page.
-var ErrNotFound = errors.New("Couldn't find date, already released or never private")
+var ErrNotFound = errors.New("couldn't find date, already released or never private")
 
 // AvailableOn returns date the passed page will be free to read.
 func AvailableOn(page *url.URL) (time.Time, error) {

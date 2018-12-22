@@ -81,7 +81,7 @@ func main() {
 
 	fn, ok := Dispatch[which]
 	if !ok {
-		Help(os.Args, os.Stdin)
+		_ = Help(os.Args, os.Stdin)
 		stopDebug()
 		os.Exit(1)
 	}

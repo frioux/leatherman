@@ -60,7 +60,7 @@ func Run(args []string, stdin io.Reader) error {
 }
 
 var (
-	errNoMatch = errors.New("No matching url")
+	errNoMatch = errors.New("no matching url")
 	linkFinder = regexp.MustCompile(`^(.*\()(https?://\S+)(\).*)$`)
 )
 

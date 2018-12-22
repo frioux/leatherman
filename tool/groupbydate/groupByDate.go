@@ -62,7 +62,7 @@ func groupByDate(i io.Reader, o io.Writer) error {
 			fmt.Fprintf(os.Stderr, "Couldn't parse line: %v\n", err)
 			continue
 		}
-		date, err := parseDate(cmdArgs.InLayout, string(record[0]))
+		date, err := parseDate(cmdArgs.InLayout, record[0])
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Couldn't parse date: %v\n", err)
 			continue
@@ -87,7 +87,10 @@ func groupByDate(i io.Reader, o io.Writer) error {
 			fmt.Fprintf(os.Stderr, "Coudln't format date for output: %v\n", err)
 			continue
 		}
-		out.Write([]string{outDate, strconv.Itoa(val)})
+		err = out.Write([]string{outDate, strconv.Itoa(val)})
+		if err != nil {
+			return errors.Wrap(err, "csv.Write")
+		}
 	}
 	out.Flush()
 	if err := out.Error(); err != nil {

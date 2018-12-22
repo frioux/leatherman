@@ -74,7 +74,7 @@ func Run(args []string, stdin io.Reader) error {
 }
 
 func cj() (*cookiejar.Jar, error) {
-	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
+	j, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to build cookies")
 	}
@@ -113,7 +113,7 @@ func cj() (*cookiejar.Jar, error) {
 	}
 	defer db.Close()
 
-	err = mozcookiejar.LoadIntoJar(db, jar)
+	err = mozcookiejar.LoadIntoJar(db, j)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to load cookies")
 	}
@@ -122,7 +122,7 @@ func cj() (*cookiejar.Jar, error) {
 		return nil, errors.Wrap(err, "Failed to clean up db copy")
 	}
 
-	return jar, nil
+	return j, nil
 }
 
 func urlToLink(url string) (string, error) {
@@ -134,7 +134,7 @@ func urlToLink(url string) (string, error) {
 	}
 	title := tidyRE.FindStringSubmatch(ua.Title())
 	if len(title) != 2 {
-		return "", fmt.Errorf("Title is blank")
+		return "", fmt.Errorf("title is blank")
 	}
 	return fmt.Sprintf("[%s](%s)", title[1], url), nil
 }

@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 const clear = "\r\x1b[J"
@@ -29,13 +31,21 @@ func Run(args []string, stdin io.Reader) error {
 	fmt.Print("[p]ause [r]eset abort[!]\n\n")
 
 	// disable input buffering
-	exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
+	err := exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
+	if err != nil {
+		return errors.Wrap(err, "couldn't disable input buffering")
+	}
 	// do not display entered characters on the screen
-	exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
+	err = exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
+	if err != nil {
+		return errors.Wrap(err, "couldn't hide input")
+	}
 
 	// restore the echoing state when exiting
-	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
-	defer exec.Command("tmux", "setw", "automatic-rename", "on").Run()
+	defer func() {
+		_ = exec.Command("stty", "-F", "/dev/tty", "echo").Run()
+		_ = exec.Command("tmux", "setw", "automatic-rename", "on").Run()
+	}()
 
 	c := time.Tick(1 * time.Second)
 	kb := make(chan string)
@@ -75,10 +85,14 @@ LOOP:
 	return nil
 }
 
+// XXX messy
 func kbChan(keys chan string, stdin io.Reader) {
 	var b = make([]byte, 1)
 	for {
-		stdin.Read(b)
+		_, err := stdin.Read(b)
+		if err != nil {
+			break
+		}
 		keys <- string(b)
 	}
 }

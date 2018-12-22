@@ -131,7 +131,7 @@ func sortAddrMap(score frecencyMap) []addr {
 // used, based on the glob passed on the arguments.
 func Addrs(args []string, stdin io.Reader) error {
 	if len(args) != 2 {
-		return errors.New("Please pass a glob")
+		return errors.New("please pass a glob")
 	}
 
 	addrMap := buildAddrMap(stdin)
