@@ -83,7 +83,14 @@ func extractMember(root string, f *zip.File) error {
 	if garbage.MatchString(f.Name) {
 		return nil
 	}
-	destName := filepath.Join(root, f.Name)
+	segments := filepath.SplitList(f.Name)
+	for _, s := range segments {
+		if s == ".." {
+			return errors.New(".. not allowed in member name (Name=" + f.Name + ")")
+		}
+	}
+	destName := filepath.Join(append([]string{root}, segments...)...)
+
 	fmt.Printf("  inflating: %s\n", destName)
 
 	rc, err := f.Open()
