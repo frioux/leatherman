@@ -25,13 +25,13 @@ func cat(c chan string, e chan error, quit chan struct{}, stdin io.Reader) {
 // Run debounces input from stdin to stdout
 func Run(args []string, stdin io.Reader) error {
 	var timeoutSeconds float64
-	var begin, end, h, help bool
+	var leading, trailing, h, help bool
 
 	flags := flag.NewFlagSet("debounce", flag.ExitOnError)
 
 	flags.Float64Var(&timeoutSeconds, "lockoutTime", 1, "amount of time between output")
-	flags.BoolVar(&begin, "leadingEdge", false, "trigger at leading edge of cycle")
-	flags.BoolVar(&end, "trailingEdge", true, "trigger at trailing edge of cycle")
+	flags.BoolVar(&leading, "leadingEdge", false, "trigger at leading edge of cycle")
+	flags.BoolVar(&trailing, "trailingEdge", true, "trigger at trailing edge of cycle")
 	flags.BoolVar(&h, "h", false, "help for debounce")
 	flags.BoolVar(&help, "help", false, "help for debounce")
 
@@ -80,7 +80,7 @@ func Run(args []string, stdin io.Reader) error {
 		select {
 		case x = <-c:
 			shouldPrint = true
-			if begin {
+			if leading {
 				shouldPrint = false
 				fmt.Println(x)
 			}
@@ -101,7 +101,7 @@ func Run(args []string, stdin io.Reader) error {
 			case <-quit:
 				return nil
 			case <-timeout:
-				if end && shouldPrint {
+				if trailing && shouldPrint {
 					fmt.Println(x)
 				}
 				break InnerLoop
