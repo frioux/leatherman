@@ -1,4 +1,4 @@
-package yaml // import "github.com/frioux/leatherman/tool/yaml"
+package yaml
 
 import (
 	"encoding/json"

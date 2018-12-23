@@ -4,12 +4,6 @@ This is a little project simply to make trivial tools in Go effortless for my
 personal usage.  These tools are almost surely of low utility to most people,
 but may be instructive nonetheless.
 
-Project layout should be familiar to most Go programmers, with the exception of
-the `/tool/` directory.  This directory contains the tools which are effectively
-`main`, but have their own names.  There are enough tools at this point that
-accidentally reusing package variables is a real risk, hence the
-package-per-tool structure.
-
 [I have CI/CD to build this into a single
 binary](https://github.com/frioux/leatherman/blob/master/.travis.yml) and [an
 `explode` tool that builds
