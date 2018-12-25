@@ -93,6 +93,10 @@ func extractMember(root string, f *zip.File) error {
 
 	fmt.Printf("  inflating: %s\n", destName)
 
+	if f.FileInfo().IsDir() {
+		return errors.Wrap(os.Mkdir(destName, os.FileMode(0755)), "os.Mkdir")
+	}
+
 	rc, err := f.Open()
 	if err != nil {
 		return errors.Wrap(err, "Couldn't open zip file member")
@@ -116,6 +120,12 @@ func extractMember(root string, f *zip.File) error {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't copy zip file member (%s): %s", destName, err)
 	}
+
+	err = file.Chmod(f.FileInfo().Mode())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't chown extracted file: %s", err)
+	}
+
 	err = file.Close()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't close extracted file: %s", err)
