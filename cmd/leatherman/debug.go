@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"runtime/pprof"
@@ -18,7 +19,16 @@ func startDebug() {
 	go func() {
 		err := http.ListenAndServe("localhost:"+port, nil)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to http.ListenAndServe: %s\n", err)
+			if oerr, ok := err.(*net.OpError); ok && oerr.Op == "listen" {
+				if ierr, ok := oerr.Err.(*os.SyscallError); ok && ierr.Err.Error() == "address already in use" {
+					err := http.ListenAndServe("localhost:0", nil)
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "failed to http.ListenAndServe: %s\n", err)
+					}
+				}
+			} else {
+				fmt.Fprintf(os.Stderr, "failed to http.ListenAndServe: %s\n", err)
+			}
 		}
 	}()
 	if os.Getenv("LMTRACE") != "" {
