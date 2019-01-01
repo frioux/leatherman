@@ -52,6 +52,7 @@ func main() {
 		"debounce":             debounce.Run,
 		"defer-lwn":            deferlwn.Run,
 		"dump-mozlz4":          dumpmozlz4.Run,
+		"email2json":           email.ToJSON,
 		"expand-url":           expandurl.Run,
 		"export-bamboohr":      bamboo.ExportDirectory,
 		"export-bamboohr-tree": bamboo.ExportOrgChart,
