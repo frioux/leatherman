@@ -3,6 +3,7 @@ package email
 import (
 	"encoding/json"
 	"io"
+	"mime"
 	"net/mail"
 	"os"
 	"path/filepath"
@@ -10,8 +11,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+type email struct {
+	Header map[string]string
+}
+
 func toJSON(path string, w io.Writer) error {
-	e := json.NewEncoder(w)
+	enc := json.NewEncoder(w)
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -19,11 +24,23 @@ func toJSON(path string, w io.Writer) error {
 	}
 	defer file.Close()
 
-	email, err := mail.ReadMessage(file)
+	e, err := mail.ReadMessage(file)
 	if err != nil {
 		return errors.Wrap(err, "mail.ReadMessage, path="+path)
 	}
-	err = e.Encode(email)
+
+	dec := new(mime.WordDecoder)
+
+	eml := email{Header: make(map[string]string)}
+	for k := range e.Header {
+		header, err := dec.DecodeHeader(e.Header.Get(k))
+		if err != nil {
+			panic(err)
+		}
+		eml.Header[k] = header
+	}
+
+	err = enc.Encode(eml)
 	if err != nil {
 		return errors.Wrap(err, "json.Encode")
 	}
