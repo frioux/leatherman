@@ -10,6 +10,7 @@ require (
 	github.com/frioux/mozlz4 v0.0.1
 	github.com/frioux/netrc v0.0.0-20180205001430-19d128e0f715
 	github.com/frioux/shellquote v0.0.2
+	github.com/fsnotify/fsnotify v1.4.7
 	github.com/headzoo/surf v1.0.0
 	github.com/headzoo/ut v0.0.0-20140828025907-5657594ccf1d // indirect
 	github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f
@@ -24,6 +25,7 @@ require (
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/crypto v0.0.0-20180904163835-0709b304e793
 	golang.org/x/net v0.0.0-20180906233101-161cd47e91fd
+	golang.org/x/sys v0.0.0-20190109145017-48ac38b7c8cb // indirect
 	golang.org/x/text v0.3.0
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.2.1

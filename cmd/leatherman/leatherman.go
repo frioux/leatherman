@@ -22,6 +22,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/fn"
 	"github.com/frioux/leatherman/internal/tool/genpass"
 	"github.com/frioux/leatherman/internal/tool/groupbydate"
+	"github.com/frioux/leatherman/internal/tool/minotaur"
 	"github.com/frioux/leatherman/internal/tool/netrcpassword"
 	"github.com/frioux/leatherman/internal/tool/pomotimer"
 	"github.com/frioux/leatherman/internal/tool/prependemojihist"
@@ -62,6 +63,7 @@ func main() {
 		"netrc-password":       netrcpassword.Run,
 		"pomotimer":            pomotimer.Run,
 		"prepend-emoji-hist":   prependemojihist.Run,
+		"minotaur":             minotaur.Run,
 		"render-mail":          email.Render,
 		"replace-unzip":        replaceunzip.Run,
 		"rss":                  rss.Run,
