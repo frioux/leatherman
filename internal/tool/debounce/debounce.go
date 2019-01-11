@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func cat(c chan string, e chan error, quit chan struct{}, stdin io.Reader) {
+func cat(c chan<- string, e chan<- error, quit chan<- struct{}, stdin io.Reader) {
 	scanner := bufio.NewScanner(stdin)
 	for scanner.Scan() {
 		c <- scanner.Text()
@@ -19,7 +19,7 @@ func cat(c chan string, e chan error, quit chan struct{}, stdin io.Reader) {
 	if err := scanner.Err(); err != nil {
 		e <- err
 	}
-	quit <- struct{}{}
+	close(quit)
 }
 
 // Run debounces input from stdin to stdout
