@@ -5,9 +5,14 @@ import "errors"
 var (
 	errNoScript = errors.New("no script passed, forgot -- ?")
 	errNoDirs   = errors.New("no dirs passed")
+	errUsage    = errors.New("usage: minotaur <dir1> [dir2 dir3] -- <cmd> [args to cmd]")
 )
 
 func parseFlags(args []string) ([]string, []string, error) {
+	if len(args) < 3 {
+		return nil, nil, errUsage
+	}
+
 	var dirs, script []string
 
 	var token string
