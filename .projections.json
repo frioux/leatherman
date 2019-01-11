@@ -1,0 +1,5 @@
+{
+   "internal/tool/*.go": {
+      "type": "tool"
+   }
+}
