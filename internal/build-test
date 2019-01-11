@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+no warnings 'uninitialized';
+
+use autodie ':all';
+
+exit 0 if !grep { /\.go$/ } @ARGV;
+
+system 'go', 'test', './...';
+
+system 'go', 'build', './cmd/leatherman/...';
+
+print "Built new leatherman at " . localtime . "\n";

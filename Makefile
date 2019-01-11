@@ -15,3 +15,6 @@ cmd/leatherman/leatherman:
 	TZ=America/Los_Angeles go test ./...
 	( cd cmd/leatherman; go build -ldflags "-s -X 'main.version=$(VERSION)' -X 'main.when=$(WHEN)' -X 'main.who=$(WHO)' -X 'main.where=$(WHERE)'" )
 	cmd/leatherman/leatherman version
+
+watch:
+	minotaur . -- ./internal/build-test
