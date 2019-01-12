@@ -67,8 +67,9 @@ func Run(args []string, _ io.Reader) error {
 				}
 				events = make(map[string]bool)
 				cmd := exec.Command(s[0], s[1:]...)
-				out, err := cmd.CombinedOutput()
-				fmt.Print(string(out))
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				err := cmd.Run()
 				if err != nil && c.verbose {
 					fmt.Fprintf(os.Stderr, "script (%q) failed: %s\n", s, err)
 				}
