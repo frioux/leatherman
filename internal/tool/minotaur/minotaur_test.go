@@ -2,6 +2,7 @@ package minotaur
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -14,9 +15,12 @@ func TestParseArgs(t *testing.T) {
 
 		in []string
 
-		expectedDirs, expectedCmd []string
-		expectedErr               error
+		expectedConfig config
+		expectedErr    error
 	}
+
+	include := regexp.MustCompile("")
+	ignore := regexp.MustCompile("(^.git|/.git$|/.git/)")
 
 	var table = []row{{
 		name: "simple and correct",
@@ -25,8 +29,12 @@ func TestParseArgs(t *testing.T) {
 			"--",
 			"foo", "bar",
 		},
-		expectedDirs: []string{"./foo", "./bar"},
-		expectedCmd:  []string{"foo", "bar"},
+		expectedConfig: config{
+			dirs:    []string{"./foo", "./bar"},
+			script:  []string{"foo", "bar"},
+			include: include,
+			ignore:  ignore,
+		},
 	}, {
 		name: "missing --",
 		in: []string{
@@ -34,20 +42,11 @@ func TestParseArgs(t *testing.T) {
 			"foo", "bar",
 		},
 		expectedErr: errNoScript,
-	}, {
-		name: "early --",
-		in: []string{
-			"--",
-			"./foo", "./bar",
-			"foo", "bar",
-		},
-		expectedErr: errNoDirs,
 	}}
 
 	for i, test := range table {
-		dirs, cmd, err := parseFlags(test.in)
-		assert.Equal(t, test.expectedDirs, dirs, fmt.Sprintf("%s (%d): dirs", test.name, i))
-		assert.Equal(t, test.expectedCmd, cmd, fmt.Sprintf("%s (%d): cmd", test.name, i))
+		c, err := parseFlags(test.in)
+		assert.Equal(t, test.expectedConfig, c, fmt.Sprintf("%s (%d): c", test.name, i))
 		assert.Equal(t, test.expectedErr, errors.Cause(err), fmt.Sprintf("%s (%d): err", test.name, i))
 	}
 }

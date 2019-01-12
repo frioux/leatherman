@@ -1,6 +1,11 @@
 package minotaur
 
-import "errors"
+import (
+	"flag"
+	"regexp"
+
+	"github.com/pkg/errors"
+)
 
 var (
 	errNoScript = errors.New("no script passed, forgot -- ?")
@@ -8,9 +13,33 @@ var (
 	errUsage    = errors.New("usage: minotaur <dir1> [dir2 dir3] -- <cmd> [args to cmd]")
 )
 
-func parseFlags(args []string) ([]string, []string, error) {
+type config struct {
+	dirs   []string
+	script []string
+
+	include, ignore *regexp.Regexp
+}
+
+func parseFlags(args []string) (config, error) {
+	flags := flag.NewFlagSet("minotaur", flag.ExitOnError)
+
+	var ignoreStr, includeStr string
+
+	flags.StringVar(&includeStr, "include", "", "regexp matching directories to include")
+	flags.StringVar(&ignoreStr, "ignore", "(^.git|/.git$|/.git/)", "regexp matching directories to include")
+
+	err := flags.Parse(args)
+	if err != nil {
+		return config{}, errors.Wrap(err, "flags.Parse")
+	}
+
+	include := regexp.MustCompile(includeStr)
+	ignore := regexp.MustCompile(ignoreStr)
+
+	args = flags.Args()
+
 	if len(args) < 3 {
-		return nil, nil, errUsage
+		return config{}, errUsage
 	}
 
 	var dirs, script []string
@@ -27,12 +56,17 @@ func parseFlags(args []string) ([]string, []string, error) {
 	script = args
 
 	if len(script) == 0 {
-		return nil, nil, errNoScript
+		return config{}, errNoScript
 	}
 
 	if len(dirs) == 0 {
-		return nil, nil, errNoDirs
+		return config{}, errNoDirs
 	}
 
-	return dirs, script, nil
+	return config{
+		dirs:    dirs,
+		script:  script,
+		include: include,
+		ignore:  ignore,
+	}, nil
 }

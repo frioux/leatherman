@@ -175,7 +175,9 @@ format.
 ### `minotaur`
 
 ```bash
-minotaur ~/code/leatherman -- sh -c 'go test ~/code/leatherman/...'
+minotaur -include internal -ignore yaml \
+   ~/code/leatherman -- \
+   sh -c 'go test ~/code/leatherman/...'
 ```
 
 Watches one or more directories (before the `--`) and runs a script when events
@@ -212,6 +214,9 @@ done | ts
 You can do all kinds of interesting things in the script, for example you could
 verify that the events deserve a restart, then restart a service, the block till
 the service can serve traffic, then restart some other related service.
+
+The `-include` and `-ignore` arguments are optional; by default `-include` is
+empty, so matches everything, and `-ignore` matches `.git`.
 
 ### `netrc-password`
 

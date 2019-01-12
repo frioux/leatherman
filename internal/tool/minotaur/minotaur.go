@@ -16,7 +16,7 @@ import (
 func Run(args []string, _ io.Reader) error {
 	args = args[1:]
 
-	dirs, script, err := parseFlags(args)
+	c, err := parseFlags(args)
 	if err != nil {
 		return errors.Wrap(err, "parseFlags")
 	}
@@ -42,7 +42,7 @@ func Run(args []string, _ io.Reader) error {
 					stat, err := os.Stat(event.Name)
 					if err != nil {
 						fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
-					} else if stat.IsDir() {
+					} else if stat.IsDir() && c.include.MatchString(event.Name) && !c.ignore.MatchString(event.Name) {
 						err := watcher.Add(event.Name)
 						if err != nil {
 							fmt.Fprintf(os.Stderr, "failed to watch %s: %s\n", event.Name, err)
@@ -60,31 +60,37 @@ func Run(args []string, _ io.Reader) error {
 				}
 				fmt.Println("error:", err)
 			case <-timeout:
-				s := make([]string, 0, len(script)+len(events))
-				s = append(s, script...)
+				s := make([]string, 0, len(c.script)+len(events))
+				s = append(s, c.script...)
 				for e := range events {
 					s = append(s, e)
 				}
 				events = make(map[string]bool)
 				cmd := exec.Command(s[0], s[1:]...)
 				out, err := cmd.CombinedOutput()
+				fmt.Print(string(out))
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "script (%q) failed: %s\n", s, err)
-					continue
 				}
-				fmt.Print(string(out))
 			}
 
 		}
 	}()
 
-	for _, path := range dirs {
+	for _, path := range c.dirs {
 		err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 
 			if !info.IsDir() {
+				return nil
+			}
+
+			if c.ignore.MatchString(path) {
+				return filepath.SkipDir
+			}
+			if !c.include.MatchString(path) {
 				return nil
 			}
 
