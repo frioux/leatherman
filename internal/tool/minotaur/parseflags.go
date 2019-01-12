@@ -18,15 +18,19 @@ type config struct {
 	script []string
 
 	include, ignore *regexp.Regexp
+
+	verbose bool
 }
 
 func parseFlags(args []string) (config, error) {
 	flags := flag.NewFlagSet("minotaur", flag.ExitOnError)
 
 	var ignoreStr, includeStr string
+	var verbose bool
 
 	flags.StringVar(&includeStr, "include", "", "regexp matching directories to include")
 	flags.StringVar(&ignoreStr, "ignore", "(^.git|/.git$|/.git/)", "regexp matching directories to include")
+	flags.BoolVar(&verbose, "verbose", false, "enable verbose output")
 
 	err := flags.Parse(args)
 	if err != nil {
@@ -68,5 +72,6 @@ func parseFlags(args []string) (config, error) {
 		script:  script,
 		include: include,
 		ignore:  ignore,
+		verbose: verbose,
 	}, nil
 }

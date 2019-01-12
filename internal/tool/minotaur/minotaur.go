@@ -46,7 +46,7 @@ func Run(args []string, _ io.Reader) error {
 						err := watcher.Add(event.Name)
 						if err != nil {
 							fmt.Fprintf(os.Stderr, "failed to watch %s: %s\n", event.Name, err)
-						} else {
+						} else if c.verbose {
 							fmt.Fprintf(os.Stderr, "watching %s\n", event.Name)
 						}
 					}
@@ -69,7 +69,7 @@ func Run(args []string, _ io.Reader) error {
 				cmd := exec.Command(s[0], s[1:]...)
 				out, err := cmd.CombinedOutput()
 				fmt.Print(string(out))
-				if err != nil {
+				if err != nil && c.verbose {
 					fmt.Fprintf(os.Stderr, "script (%q) failed: %s\n", s, err)
 				}
 			}
@@ -94,7 +94,9 @@ func Run(args []string, _ io.Reader) error {
 				return nil
 			}
 
-			fmt.Fprintln(os.Stderr, "watching "+path)
+			if c.verbose {
+				fmt.Fprintln(os.Stderr, "watching "+path)
+			}
 			return errors.Wrap(watcher.Add(path), "fsnotify.Watcher.Add")
 		})
 		if err != nil {
