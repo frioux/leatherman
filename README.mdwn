@@ -10,7 +10,7 @@ binary](https://github.com/frioux/leatherman/blob/master/.travis.yml) and [an
 symlinks](https://github.com/frioux/leatherman/blob/master/cmd/leatherman/explode.go)
 for each tool in the busybox style.
 
-[I have add automation in my
+[I have automation in my
 dotfiles](https://github.com/frioux/dotfiles/blob/bef8303c19e2cefac7dfbec420ad8d45b95415b8/install.sh#L133-L141)
 to pull the latest binary at install time and run the `explode` tool.
 
