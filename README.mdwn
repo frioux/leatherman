@@ -313,6 +313,15 @@ then deleted:
    2018-07-06.txt
 ```
 
+### `uni`
+
+```bash
+$ uni ⢾
+'⢾' @ 10430 aka BRAILLE PATTERN DOTS-234568 ( graphic | printable | symbol )
+```
+
+Inspects the unicode characters passed as an argument.
+
 ### `yaml2json`
 
 Reads YAML on stdin and writes JSON on stdout.
