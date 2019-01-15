@@ -212,7 +212,7 @@ done | ts
 ```
 
 You can do all kinds of interesting things in the script, for example you could
-verify that the events deserve a restart, then restart a service, the block till
+verify that the events deserve a restart, then restart a service, then block till
 the service can serve traffic, then restart some other related service.
 
 The `-include` and `-ignore` arguments are optional; by default `-include` is
