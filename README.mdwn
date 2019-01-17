@@ -299,6 +299,16 @@ $ ssh-quote ls 'f*f'
 'sh -c '\''ls '\''\'"''"'f*f'\''\'\'
 ```
 
+### `toml2json`
+
+```bash
+$ echo 'foo = "bar"` | toml2json
+{"foo":"bar"}
+```
+
+Reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON on
+stdout.
+
 ### `undefer`
 
 Takes a directory argument, prints contents of each file named before the
