@@ -48,8 +48,9 @@ func Run(args []string, stdin io.Reader) error {
 	deadline := time.Now().Add(duration)
 	remaining := deadline.Sub(time.Now())
 
-	setProcessName("PT" + formatTime(remaining))
 	fmt.Print("[p]ause [r]eset abort[!]\n\n")
+	setProcessName("PT" + formatTime(remaining+time.Second))
+	fmt.Print(clear+formatTime(remaining+time.Second), " remaining")
 
 	kb := make(chan rune)
 	go kbChan(kb, stdin)
