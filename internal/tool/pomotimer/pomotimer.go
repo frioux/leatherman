@@ -83,7 +83,7 @@ LOOP:
 				}
 			case 'r':
 				deadline = time.Now().Add(duration)
-			case '!':
+			case '!', 'q':
 				{
 					fmt.Println(clear + "aborting timer!")
 					break LOOP
