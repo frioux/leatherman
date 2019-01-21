@@ -69,19 +69,24 @@ LOOP:
 			}
 			fmt.Print(clear+formatTime(remaining), " remaining")
 		case key := <-kb:
-			if key == 'p' {
-				if running {
-					ticker.Stop()
-				} else {
-					ticker = time.NewTicker(time.Second)
-					deadline = time.Now().Add(remaining)
+			switch key {
+			case 'p':
+				{
+					if running {
+						ticker.Stop()
+					} else {
+						ticker = time.NewTicker(time.Second)
+						deadline = time.Now().Add(remaining)
+					}
+					running = !running
 				}
-				running = !running
-			} else if key == 'r' {
+			case 'r':
 				deadline = time.Now().Add(duration)
-			} else if key == '!' {
-				fmt.Println(clear + "aborting timer!")
-				break LOOP
+			case '!':
+				{
+					fmt.Println(clear + "aborting timer!")
+					break LOOP
+				}
 			}
 		}
 	}
