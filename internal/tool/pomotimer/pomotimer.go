@@ -49,7 +49,7 @@ func Run(args []string, stdin io.Reader) error {
 
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
-	kb := make(chan string)
+	kb := make(chan rune)
 	go kbChan(kb, stdin)
 
 	running := true
@@ -72,11 +72,11 @@ LOOP:
 				break LOOP
 			}
 		case key := <-kb:
-			if key == "p" {
+			if key == 'p' {
 				running = !running
-			} else if key == "r" {
+			} else if key == 'r' {
 				secondsRemaining = initialSeconds
-			} else if key == "!" {
+			} else if key == '!' {
 				fmt.Println(clear + "aborting timer!")
 				break LOOP
 			}
@@ -87,14 +87,14 @@ LOOP:
 }
 
 // XXX messy
-func kbChan(keys chan string, stdin io.Reader) {
+func kbChan(keys chan<- rune, stdin io.Reader) {
 	var b = make([]byte, 1)
 	for {
 		_, err := stdin.Read(b)
 		if err != nil {
 			break
 		}
-		keys <- string(b)
+		keys <- rune(b[0])
 	}
 }
 
