@@ -56,21 +56,20 @@ func Run(args []string, stdin io.Reader) error {
 	secondsRemaining := initialSeconds
 LOOP:
 	for {
+		if secondsRemaining < 0 {
+			fmt.Println(clear + "Take a break!\a")
+			break
+		}
 		select {
 		case <-ticker.C:
-			if secondsRemaining > 1 {
-				if !running {
-					continue
-				}
-				if secondsRemaining%30 == 0 {
-					setProcessName("PT" + formatTime(secondsRemaining))
-				}
-				fmt.Print(clear+formatTime(secondsRemaining), " remaining")
-				secondsRemaining--
-			} else {
-				fmt.Println(clear + "Take a break!\a")
-				break LOOP
+			if !running {
+				continue
 			}
+			if secondsRemaining%30 == 0 {
+				setProcessName("PT" + formatTime(secondsRemaining))
+			}
+			fmt.Print(clear+formatTime(secondsRemaining), " remaining")
+			secondsRemaining--
 		case key := <-kb:
 			if key == 'p' {
 				running = !running
