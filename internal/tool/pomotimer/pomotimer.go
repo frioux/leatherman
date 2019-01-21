@@ -15,17 +15,17 @@ const clear = "\r\x1b[J"
 // Run starts a timer for 25m or the duration expressed in the first
 // argument.
 func Run(args []string, stdin io.Reader) error {
-	timer, _ := time.ParseDuration("25m")
+	duration := 25 * time.Minute
 	if len(args) > 1 {
 		var err error
-		timer, err = time.ParseDuration(args[1])
+		duration, err = time.ParseDuration(args[1])
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "pomotimer: couldn't parse duration: %s", err)
 			os.Exit(1)
 		}
 	}
 
-	initialSeconds := int(timer.Seconds())
+	initialSeconds := int(duration.Seconds())
 
 	setProcessName("PT" + formatTime(initialSeconds))
 	fmt.Print("[p]ause [r]eset abort[!]\n\n")
