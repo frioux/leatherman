@@ -108,6 +108,6 @@ func kbChan(keys chan<- rune, stdin io.Reader) {
 }
 
 func formatTime(r time.Duration) string {
-	s := int(math.Round(r.Seconds()))
+	s := int(math.Round(r.Seconds())) - 1
 	return fmt.Sprintf("%02d:%02d", s/60, s%60)
 }
