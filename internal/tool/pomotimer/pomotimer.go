@@ -3,6 +3,7 @@ package pomotimer
 import (
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"os/exec"
 	"time"
@@ -25,11 +26,6 @@ func Run(args []string, stdin io.Reader) error {
 		}
 	}
 
-	initialSeconds := int(duration.Seconds())
-
-	setProcessName("PT" + formatTime(initialSeconds))
-	fmt.Print("[p]ause [r]eset abort[!]\n\n")
-
 	// disable input buffering
 	err := exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
 	if err != nil {
@@ -49,32 +45,40 @@ func Run(args []string, stdin io.Reader) error {
 
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
+	deadline := time.Now().Add(duration)
+	remaining := deadline.Sub(time.Now())
+
+	setProcessName("PT" + formatTime(remaining))
+	fmt.Print("[p]ause [r]eset abort[!]\n\n")
+
 	kb := make(chan rune)
 	go kbChan(kb, stdin)
 
 	running := true
-	secondsRemaining := initialSeconds
 LOOP:
 	for {
-		if secondsRemaining < 0 {
-			fmt.Println(clear + "Take a break!\a")
-			break
-		}
+		remaining = deadline.Sub(time.Now())
 		select {
 		case <-ticker.C:
-			if !running {
-				continue
+			if time.Now().After(deadline) {
+				fmt.Println(clear + "Take a break!\a")
+				break LOOP
 			}
-			if secondsRemaining%30 == 0 {
-				setProcessName("PT" + formatTime(secondsRemaining))
+			if int(math.Round(remaining.Seconds()))%30 == 0 {
+				setProcessName("PT" + formatTime(remaining))
 			}
-			fmt.Print(clear+formatTime(secondsRemaining), " remaining")
-			secondsRemaining--
+			fmt.Print(clear+formatTime(remaining), " remaining")
 		case key := <-kb:
 			if key == 'p' {
+				if running {
+					ticker.Stop()
+				} else {
+					ticker = time.NewTicker(time.Second)
+					deadline = time.Now().Add(remaining)
+				}
 				running = !running
 			} else if key == 'r' {
-				secondsRemaining = initialSeconds
+				deadline = time.Now().Add(duration)
 			} else if key == '!' {
 				fmt.Println(clear + "aborting timer!")
 				break LOOP
@@ -97,6 +101,7 @@ func kbChan(keys chan<- rune, stdin io.Reader) {
 	}
 }
 
-func formatTime(s int) string {
+func formatTime(r time.Duration) string {
+	s := int(math.Round(r.Seconds()))
 	return fmt.Sprintf("%02d:%02d", s/60, s%60)
 }
