@@ -2,38 +2,32 @@ package groupbydate
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
 	"time"
 
-	arg "github.com/alexflint/go-arg"
 	"github.com/pkg/errors"
 )
 
 var cmdArgs struct {
-	InLayout    string `arg:"-i"`
-	GroupLayout string `arg:"-g"`
-	OutLayout   string `arg:"-o"`
-	ByDay       bool
+	InLayout    string
+	GroupLayout string
+	OutLayout   string
 }
 
 func parseArgs(args []string) error {
-	cmdArgs.InLayout = time.RFC3339Nano
-	cmdArgs.OutLayout = time.RFC3339Nano
-	cmdArgs.GroupLayout = "2006-01-02"
-	p, err := arg.NewParser(arg.Config{}, &cmdArgs)
+	flags := flag.NewFlagSet("group-by-date", flag.ExitOnError)
+
+	flags.StringVar(&cmdArgs.InLayout, "in", time.RFC3339Nano, "format to parse when reading input")
+	flags.StringVar(&cmdArgs.OutLayout, "out", time.RFC3339Nano, "format to write when writing output")
+	flags.StringVar(&cmdArgs.GroupLayout, "group", "2006-01-02", "format to group by internally")
+
+	err := flags.Parse(args[1:])
 	if err != nil {
-		return err
-	}
-	err = p.Parse(args)
-	if err == arg.ErrHelp {
-		p.WriteHelp(os.Stdout)
-		os.Exit(0)
-	}
-	if err != nil {
-		return err
+		return errors.Wrap(err, "flags.Parse")
 	}
 
 	return nil
@@ -42,7 +36,7 @@ func parseArgs(args []string) error {
 // Run takes dates on stdin in format -i, will group them by format -g,
 // and write them in format -o.
 func Run(args []string, stdin io.Reader) error {
-	err := parseArgs(args[1:])
+	err := parseArgs(args)
 	if err != nil {
 		return errors.Wrap(err, "Couldn't parse args")
 	}
