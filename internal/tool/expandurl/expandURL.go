@@ -7,19 +7,19 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"net/http/cookiejar"
 	"os"
 	"regexp"
 	"sync"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/frioux/mozcookiejar"
-	"github.com/headzoo/surf"
 	_ "github.com/mattn/go-sqlite3" // sqlite3 required
 	"github.com/pkg/errors"
 	"golang.org/x/net/publicsuffix"
 )
 
-var jar *cookiejar.Jar
 var tidyRE = regexp.MustCompile(`^\s*(.*?)\s*$`)
 
 // Run replaces URLs from stdin with their markdown version, using a
@@ -29,12 +29,12 @@ func Run(args []string, stdin io.Reader) error {
 	// some cookies cause go to log warnings to stderr
 	log.SetOutput(ioutil.Discard)
 
-	var err error
-	jar, err = cj()
+	jar, err := cj()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", errors.Wrap(err, "loading cookiejar"))
 		jar, _ = cookiejar.New(nil)
 	}
+	ua := &http.Client{Jar: jar}
 
 	scanner := bufio.NewScanner(stdin)
 	lines := []string{}
@@ -58,7 +58,7 @@ func Run(args []string, stdin io.Reader) error {
 		tokens <- struct{}{}
 
 		go func() {
-			lines[i] = replaceLink(lines[i])
+			lines[i] = replaceLink(ua, lines[i])
 			<-tokens
 			wg.Done()
 		}()
@@ -125,14 +125,17 @@ func cj() (*cookiejar.Jar, error) {
 	return j, nil
 }
 
-func urlToLink(url string) (string, error) {
-	ua := surf.NewBrowser()
-	ua.SetCookieJar(jar)
-	err := ua.Open(url)
+func urlToLink(ua *http.Client, url string) (string, error) {
+	resp, err := ua.Get(url)
 	if err != nil {
-		return "", fmt.Errorf("authBabmoo: %s", err)
+		return "", fmt.Errorf("ua.Get: %s", err)
 	}
-	title := tidyRE.FindStringSubmatch(ua.Title())
+
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("goquery.NewDocumentFromReader: %s", err)
+	}
+	title := tidyRE.FindStringSubmatch(doc.Find("title").Text())
 	if len(title) != 2 {
 		return "", fmt.Errorf("title is blank")
 	}
@@ -141,10 +144,10 @@ func urlToLink(url string) (string, error) {
 
 var urlFinder = regexp.MustCompile(`^(|.*\s)(https?://\S+)(\s.*|)$`)
 
-func replaceLink(line string) string {
+func replaceLink(ua *http.Client, line string) string {
 	for {
 		if match := urlFinder.FindStringSubmatch(line); len(match) > 0 {
-			md, err := urlToLink(match[2])
+			md, err := urlToLink(ua, match[2])
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err)
 				break
