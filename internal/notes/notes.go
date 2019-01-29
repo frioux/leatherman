@@ -21,7 +21,7 @@ title: {{.}}
 tags: [ private, inbox ]
 ---
 
-{{.}}
+ * {{.}}
 
 `)
 	if err != nil {
