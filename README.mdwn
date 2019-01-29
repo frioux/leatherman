@@ -1,0 +1,12 @@
+# Amygdala
+
+Computer asisted brain stem.
+
+This is meant to be a simpler replacement to [my lizard
+brain](https://github.com/frioux/Lizard-Brain), both because the world has
+improved and so have I.
+
+The old system's design was around allowing arbitrary inputs and outputs; the
+new system is only decoupled as I see fit, instead of enforcing that arbitrarily
+from the start.  It seems likely that this will end up deployed to and depending
+on AWS, in which case the code will include terraform to manage it.
