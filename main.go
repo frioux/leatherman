@@ -52,14 +52,14 @@ func main() {
 
 func twilio(cl *http.Client, tok string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		if bcrypt.CompareHashAndPassword(pass, []byte(r.Header.Get("Authorization"))) != nil {
-			rw.WriteHeader(403)
-			return
-		}
-
 		if err := r.ParseForm(); err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			io.WriteString(rw, "Couldn't Parse Form")
+			return
+		}
+
+		if bcrypt.CompareHashAndPassword(pass, []byte(r.Form.Get("Authorization"))) != nil {
+			rw.WriteHeader(403)
 			return
 		}
 
