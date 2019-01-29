@@ -42,7 +42,7 @@ func Todo(cl *http.Client, tok, message string) error {
 	buf := body(message)
 
 	sha := sha1.Sum([]byte(message))
-	path := "/testing/todo-" + hex.EncodeToString(sha[:])
+	path := "/notes/content/posts/todo-" + hex.EncodeToString(sha[:])
 
 	up := dropbox.UploadParams{Path: path, Autorename: true}
 	if err := dropbox.Create(cl, tok, up, buf); err != nil {
