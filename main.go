@@ -81,5 +81,10 @@ func twilio(cl *http.Client, tok string) http.HandlerFunc {
 
 			panic(err)
 		}
+
+		rw.WriteHeader(http.StatusOK)
+		rw.Header().Set("Content-Type", "application/xml")
+		io.WriteString(rw, `<?xml version="1.0" encoding="UTF-8"?>
+			<Response><Message><Body>got em.</Body></Message></Response>`)
 	}
 }
