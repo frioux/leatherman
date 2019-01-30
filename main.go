@@ -8,7 +8,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"text/template"
 	"time"
 
 	"github.com/frioux/amygdala/internal/notes"
@@ -58,13 +57,11 @@ func twilio(cl *http.Client, tok string) http.HandlerFunc {
 
 	responses := []string{
 		"station",
-		"aight",
+		"got em.",
 		"👍",
-	}
-
-	responseSMS, err := template.New("zzz").Parse(`{{.}}`)
-	if err != nil {
-		panic(err)
+		"ack",
+		"10-4",
+		"wilco",
 	}
 
 	return func(rw http.ResponseWriter, r *http.Request) {
@@ -101,11 +98,11 @@ func twilio(cl *http.Client, tok string) http.HandlerFunc {
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Set("Content-Type", "application/xml")
 
-		response := "🤷"
+		response := "Aight"
 		res := rSrc.Intn(100 + len(responses))
 		if res > 100 {
 			response = responses[res-100]
 		}
-		responseSMS.Execute(rw, response)
+		io.WriteString(rw, response)
 	}
 }
