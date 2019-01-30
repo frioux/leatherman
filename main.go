@@ -62,6 +62,7 @@ func twilio(cl *http.Client, tok string) http.HandlerFunc {
 		"ack",
 		"10-4",
 		"wilco",
+		"aye aye cap'm'",
 	}
 
 	return func(rw http.ResponseWriter, r *http.Request) {
