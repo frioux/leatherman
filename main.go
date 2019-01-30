@@ -3,10 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"html/template"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/frioux/amygdala/internal/notes"
 	"golang.org/x/crypto/bcrypt"
@@ -51,6 +54,20 @@ func main() {
 }
 
 func twilio(cl *http.Client, tok string) http.HandlerFunc {
+	rSrc := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	responses := []string{
+		"station",
+		"aight",
+		"👍",
+	}
+
+	responseSMS, err := template.New("zzz").Parse(`<?xml version="1.0" encoding="UTF-8"?>
+			<Response><Message><Body>{{.}}</Body></Message></Response>`)
+	if err != nil {
+		panic(err)
+	}
+
 	return func(rw http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
@@ -84,7 +101,12 @@ func twilio(cl *http.Client, tok string) http.HandlerFunc {
 
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Set("Content-Type", "application/xml")
-		io.WriteString(rw, `<?xml version="1.0" encoding="UTF-8"?>
-			<Response><Message><Body>got em.</Body></Message></Response>`)
+
+		response := "🤷"
+		res := rSrc.Intn(100 + len(responses))
+		if res > 100 {
+			response = responses[res-100]
+		}
+		responseSMS.Execute(rw, response)
 	}
 }
