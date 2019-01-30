@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
+	"text/template"
 	"time"
 
 	"github.com/frioux/amygdala/internal/notes"
@@ -62,8 +62,7 @@ func twilio(cl *http.Client, tok string) http.HandlerFunc {
 		"👍",
 	}
 
-	responseSMS, err := template.New("zzz").Parse(`<?xml version="1.0" encoding="UTF-8"?>
-			<Response><Message><Body>{{.}}</Body></Message></Response>`)
+	responseSMS, err := template.New("zzz").Parse(`{{.}}`)
 	if err != nil {
 		panic(err)
 	}
