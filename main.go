@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/frioux/amygdala/internal/middleware"
 	"github.com/frioux/amygdala/internal/notes"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -47,7 +48,9 @@ func main() {
 	flag.Parse()
 	cl := &http.Client{}
 
-	http.HandleFunc("/twilio", twilio(cl, dropboxAccessToken))
+	http.Handle("/twilio", middleware.Adapt(twilio(cl, dropboxAccessToken),
+		middleware.Log(os.Stdout),
+	))
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }
