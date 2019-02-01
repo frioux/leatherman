@@ -12,14 +12,14 @@ import (
 
 	"github.com/frioux/amygdala/internal/middleware"
 	"github.com/frioux/amygdala/internal/notes"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/frioux/amygdala/internal/twilio"
 )
 
 var (
 	dropboxAccessToken, myCell string
 )
 
-var pass []byte
+var twilioAuthToken, twilioURL []byte
 
 func init() {
 	dropboxAccessToken = os.Getenv("DROPBOX_ACCESS_TOKEN")
@@ -32,10 +32,8 @@ func init() {
 		panic("cell is missing")
 	}
 
-	pass = []byte(os.Getenv("TWILIO_PASSWORD"))
-	if len(pass) == 0 {
-		panic("password is missing")
-	}
+	twilioAuthToken = []byte(os.Getenv("TWILIO_AUTH_TOKEN"))
+	twilioURL = []byte(os.Getenv("TWILIO_URL"))
 }
 
 var port int
@@ -48,14 +46,14 @@ func main() {
 	flag.Parse()
 	cl := &http.Client{}
 
-	http.Handle("/twilio", middleware.Adapt(twilio(cl, dropboxAccessToken),
+	http.Handle("/twilio", middleware.Adapt(receiveSMS(cl, dropboxAccessToken),
 		middleware.Log(os.Stdout),
 	))
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }
 
-func twilio(cl *http.Client, tok string) http.HandlerFunc {
+func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 	rSrc := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	responses := []string{
@@ -75,7 +73,7 @@ func twilio(cl *http.Client, tok string) http.HandlerFunc {
 			return
 		}
 
-		if bcrypt.CompareHashAndPassword(pass, []byte(r.Form.Get("Authorization"))) != nil {
+		if ok, err := twilio.CheckMAC(twilioAuthToken, twilioURL, r); err != nil || !ok {
 			rw.WriteHeader(403)
 			return
 		}
