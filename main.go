@@ -4,15 +4,16 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/frioux/amygdala/internal/log"
 	"github.com/frioux/amygdala/internal/middleware"
 	"github.com/frioux/amygdala/internal/notes"
 	"github.com/frioux/amygdala/internal/twilio"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -59,7 +60,8 @@ func main() {
 		middleware.Log(os.Stdout),
 	))
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
+	log.Err(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
+	os.Exit(1)
 }
 
 func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
@@ -67,11 +69,15 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 		if err := r.ParseForm(); err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			io.WriteString(rw, "Couldn't Parse Form")
+			log.Err(errors.Wrap(err, "http.Request.ParseForm"))
 			return
 		}
 
 		if ok, err := twilio.CheckMAC(twilioAuthToken, twilioURL, r); err != nil || !ok {
 			rw.WriteHeader(403)
+			if err != nil {
+				log.Err(errors.Wrap(err, "twilio.CheckMAC"))
+			}
 			return
 		}
 
@@ -91,6 +97,7 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 		resp, err := notes.Dispatch(cl, tok, message)
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
+			log.Err(errors.Wrap(err, "notes.Dispatch"))
 			return
 		}
 
