@@ -1,7 +1,6 @@
 package notes
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 
@@ -24,7 +23,6 @@ func init() {
 
 func Dispatch(cl *http.Client, tok, input string) (string, error) {
 	for _, r := range rules {
-		fmt.Printf("%s => %q\n", r.Regexp, input)
 		if !r.MatchString(input) {
 			continue
 		}
