@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/frioux/amygdala/internal/dropbox"
@@ -101,7 +102,8 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 			return
 		}
 
-		if message == "inspire me" {
+		inspireCommand := regexp.MustCompile(`(?i)^\s*inspire\s+me\s*$`)
+		if inspireCommand.MatchString(message) {
 			r, err := dropbox.Download(cl, tok, "/notes/content/posts/inspiration.md")
 			if err != nil {
 				rw.WriteHeader(http.StatusInternalServerError)
