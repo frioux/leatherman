@@ -41,6 +41,8 @@ func main() {
 	encodedSignature := base64.StdEncoding.EncodeToString(sig)
 
 	req.Header.Set("X-Twilio-Signature", encodedSignature)
+	req.Header.Set("User-Agent", "twilioemu")
+
 	r.Reset(vals.Encode())
 
 	cl := &http.Client{}
