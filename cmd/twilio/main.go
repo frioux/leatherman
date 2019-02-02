@@ -50,6 +50,10 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println(resp.Status)
+	for k, v := range resp.Header {
+		fmt.Printf("%s: %s\n", k, v[0])
+	}
+	fmt.Println()
 	if _, err := io.Copy(os.Stdout, resp.Body); err != nil {
 		fmt.Printf("Failed load bodu: %s\n", err)
 		os.Exit(1)
