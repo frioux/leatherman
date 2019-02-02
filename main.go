@@ -100,6 +100,7 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 
 		if err := notes.Todo(cl, tok, message); err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
+			return
 
 			panic(err)
 		}

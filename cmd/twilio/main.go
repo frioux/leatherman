@@ -32,7 +32,8 @@ func main() {
 	r := strings.NewReader(vals.Encode())
 	req, err := http.NewRequest("POST", endpoint, r)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Failed building request: %s\n", err)
+		os.Exit(1)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.ParseForm()
@@ -45,10 +46,12 @@ func main() {
 	cl := &http.Client{}
 	resp, err := cl.Do(req)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Failed submitting to amygdala: %s\n", err)
+		os.Exit(1)
 	}
 	fmt.Println(resp.Status)
 	if _, err := io.Copy(os.Stdout, resp.Body); err != nil {
-		panic(err)
+		fmt.Printf("Failed load bodu: %s\n", err)
+		os.Exit(1)
 	}
 }
