@@ -64,3 +64,47 @@ func Create(cl *http.Client, token string, up UploadParams, body io.Reader) erro
 
 	return nil
 }
+
+func encodeDownloadParams(path string) (string, error) {
+	buf := &bytes.Buffer{}
+
+	e := json.NewEncoder(buf)
+	err := e.Encode(struct {
+		Path string `json:"path"`
+	}{path})
+	if err != nil {
+		return "", errors.Wrap(err, "json.Encode")
+	}
+
+	return strings.TrimSuffix(buf.String(), "\n"), nil
+}
+
+// Download a file
+func Download(cl *http.Client, token, path string) (io.Reader, error) {
+	req, err := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/download", &bytes.Buffer{})
+	if err != nil {
+		return nil, errors.Wrap(err, "http.NewRequest")
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
+	apiArg, err := encodeDownloadParams(path)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Dropbox-API-Arg", apiArg)
+
+	resp, err := cl.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "http.Client.Do")
+	}
+
+	if resp.StatusCode > 399 {
+		buf := &bytes.Buffer{}
+		if _, err := io.Copy(buf, resp.Body); err != nil {
+			return nil, errors.Wrap(err, "io.Copy")
+		}
+		return nil, errors.New(buf.String())
+	}
+
+	return resp.Body, nil
+}

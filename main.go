@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/middleware"
 	"github.com/frioux/amygdala/internal/notes"
 	"github.com/frioux/amygdala/internal/twilio"
@@ -22,6 +23,8 @@ var (
 var twilioAuthToken, twilioURL []byte
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
+
 	dropboxAccessToken = os.Getenv("DROPBOX_ACCESS_TOKEN")
 	if dropboxAccessToken == "" {
 		panic("dropbox token is missing")
@@ -95,6 +98,22 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 		if message == "" {
 			rw.WriteHeader(http.StatusBadRequest)
 			io.WriteString(rw, "No Message\n")
+			return
+		}
+
+		if message == "inspire me" {
+			r, err := dropbox.Download(cl, tok, "/notes/content/posts/inspiration.md")
+			if err != nil {
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			n, err := notes.BeerMe(r)
+			if err != nil {
+				rw.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			rw.WriteHeader(http.StatusOK)
+			fmt.Fprintln(rw, n)
 			return
 		}
 
