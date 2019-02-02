@@ -14,6 +14,7 @@ import (
 	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/middleware"
 	"github.com/frioux/amygdala/internal/notes"
+	"github.com/frioux/amygdala/internal/personality"
 	"github.com/frioux/amygdala/internal/twilio"
 )
 
@@ -65,18 +66,6 @@ func main() {
 }
 
 func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
-	rSrc := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	responses := []string{
-		"station",
-		"got em.",
-		"👍",
-		"ack",
-		"10-4",
-		"wilco",
-		"aye aye cap'm'",
-	}
-
 	return func(rw http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
@@ -129,11 +118,6 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Set("Content-Type", "application/xml")
 
-		response := "Aight"
-		res := rSrc.Intn(100 + len(responses))
-		if res > 100 {
-			response = responses[res-100]
-		}
-		io.WriteString(rw, response+"\n")
+		io.WriteString(rw, personality.Ack()+"\n")
 	}
 }
