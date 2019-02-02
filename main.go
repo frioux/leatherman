@@ -113,6 +113,6 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 		if res > 100 {
 			response = responses[res-100]
 		}
-		io.WriteString(rw, response)
+		io.WriteString(rw, response+"\n")
 	}
 }
