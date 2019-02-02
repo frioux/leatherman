@@ -1,55 +1,35 @@
 package notes
 
 import (
-	"bytes"
-	"crypto/sha1"
-	"encoding/hex"
-	"html/template"
-	"io"
+	"fmt"
 	"net/http"
+	"regexp"
 
-	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/pkg/errors"
 )
 
-var bodyTemplate *template.Template
+type rule struct {
+	*regexp.Regexp
+	action func(*http.Client, string, string) (string, error)
+}
+
+var rules []rule
 
 func init() {
-	var err error
-	bodyTemplate, err = template.New("xxx").Parse(`---
-title: {{.Message}}
-tags: [ private, inbox ]
-guid: {{.ID}}
----
-
- * {{.Message}}
-
-`)
-	if err != nil {
-		panic(err)
+	rules = []rule{
+		{Regexp: regexp.MustCompile(`(?i)^\s*inspire\s+me\s*$`), action: inspireMe},
+		{Regexp: regexp.MustCompile(``), action: todo},
 	}
 }
 
-func body(message, id string) io.Reader {
-	buf := &bytes.Buffer{}
-
-	bodyTemplate.Execute(buf, struct{ Message, ID string }{message, id})
-
-	return buf
-}
-
-// Todo creates an item tagged inbox
-func Todo(cl *http.Client, tok, message string) error {
-	sha := sha1.Sum([]byte(message))
-	id := hex.EncodeToString(sha[:])
-	path := "/notes/content/posts/todo-" + id + ".md"
-
-	buf := body(message, id)
-
-	up := dropbox.UploadParams{Path: path, Autorename: true}
-	if err := dropbox.Create(cl, tok, up, buf); err != nil {
-		return errors.Wrap(err, "dropbox.Create")
+func Dispatch(cl *http.Client, tok, input string) (string, error) {
+	for _, r := range rules {
+		fmt.Printf("%s => %q\n", r.Regexp, input)
+		if !r.MatchString(input) {
+			continue
+		}
+		return r.action(cl, tok, input)
 	}
 
-	return nil
+	return "", errors.New("no rules matched")
 }

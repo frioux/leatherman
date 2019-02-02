@@ -8,13 +8,10 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"regexp"
 	"time"
 
-	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/middleware"
 	"github.com/frioux/amygdala/internal/notes"
-	"github.com/frioux/amygdala/internal/personality"
 	"github.com/frioux/amygdala/internal/twilio"
 )
 
@@ -91,33 +88,15 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 			return
 		}
 
-		inspireCommand := regexp.MustCompile(`(?i)^\s*inspire\s+me\s*$`)
-		if inspireCommand.MatchString(message) {
-			r, err := dropbox.Download(cl, tok, "/notes/content/posts/inspiration.md")
-			if err != nil {
-				rw.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			n, err := notes.BeerMe(r)
-			if err != nil {
-				rw.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			rw.WriteHeader(http.StatusOK)
-			fmt.Fprintln(rw, n)
-			return
-		}
-
-		if err := notes.Todo(cl, tok, message); err != nil {
+		resp, err := notes.Dispatch(cl, tok, message)
+		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
-
-			panic(err)
 		}
 
 		rw.WriteHeader(http.StatusOK)
-		rw.Header().Set("Content-Type", "application/xml")
+		rw.Header().Set("Content-Type", "text/plain")
 
-		io.WriteString(rw, personality.Ack()+"\n")
+		io.WriteString(rw, resp+"\n")
 	}
 }

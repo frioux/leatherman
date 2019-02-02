@@ -2,15 +2,18 @@ package notes
 
 import (
 	"bufio"
-	"errors"
 	"io"
 	"math/rand"
+	"net/http"
 	"regexp"
+
+	"github.com/frioux/amygdala/internal/dropbox"
+	"github.com/pkg/errors"
 )
 
 var isItem = regexp.MustCompile(`^\s+\*\s+(.*)$`)
 
-func BeerMe(r io.Reader) (string, error) {
+func beerMe(r io.Reader) (string, error) {
 	s := bufio.NewScanner(r)
 
 	o := []string{}
@@ -29,4 +32,16 @@ func BeerMe(r io.Reader) (string, error) {
 	rand.Shuffle(len(o), func(i, j int) { o[i], o[j] = o[j], o[i] })
 
 	return o[0], nil
+}
+
+func inspireMe(cl *http.Client, tok, _ string) (string, error) {
+	r, err := dropbox.Download(cl, tok, "/notes/content/posts/inspiration.md")
+	if err != nil {
+		return "", errors.Wrap(err, "dropbox.Download")
+	}
+	n, err := beerMe(r)
+	if err != nil {
+		return "", err
+	}
+	return n, nil
 }
