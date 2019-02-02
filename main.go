@@ -29,11 +29,18 @@ func init() {
 
 	myCell = os.Getenv("MY_CELL")
 	if myCell == "" {
-		panic("cell is missing")
+		myCell = "+15555555555"
 	}
 
 	twilioAuthToken = []byte(os.Getenv("TWILIO_AUTH_TOKEN"))
+	if len(twilioAuthToken) == 0 {
+		twilioAuthToken = []byte("xyzzy")
+	}
+
 	twilioURL = []byte(os.Getenv("TWILIO_URL"))
+	if len(twilioURL) == 0 {
+		twilioURL = []byte("http://localhost:8080/twilio")
+	}
 }
 
 var port int
