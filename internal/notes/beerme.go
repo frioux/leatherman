@@ -2,6 +2,7 @@ package notes
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
@@ -12,7 +13,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-var isItem = regexp.MustCompile(`^\s?\*\s+(.*)$`)
+var isItem = regexp.MustCompile(`^\s?\*\s+(.*?)\s*$`)
+var mdLink = regexp.MustCompile(`^\[(.*)\]\((.*)\)$`)
 
 func beerMe(r io.Reader) (string, error) {
 	s := bufio.NewScanner(r)
@@ -31,6 +33,11 @@ func beerMe(r io.Reader) (string, error) {
 	}
 
 	rand.Shuffle(len(o), func(i, j int) { o[i], o[j] = o[j], o[i] })
+
+	fmt.Println(mdLink.FindStringSubmatch(o[0]))
+	if l := mdLink.FindStringSubmatch(o[0]); len(l) == 3 {
+		return fmt.Sprintf("[%s]( %s )", l[1], l[2]), nil
+	}
 
 	return o[0], nil
 }
