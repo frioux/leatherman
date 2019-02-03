@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -19,7 +20,10 @@ func init() {
 func main() {
 	cl := &http.Client{}
 
-	if err := notes.Todo(cl, tok, os.Args[1]); err != nil {
-		panic(err)
+	message, err := notes.Dispatch(cl, tok, os.Args[1])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
 	}
+	fmt.Println(message)
 }
