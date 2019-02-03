@@ -30,6 +30,7 @@ func Ack() string {
 
 var errs = []string{
 	"COMPTER FAIL",
+	"Shucks Howdy! 🤠",
 	"FAIL🐳",
 }
 
