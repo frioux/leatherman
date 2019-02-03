@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var isItem = regexp.MustCompile(`^\s+\*\s+(.*)$`)
+var isItem = regexp.MustCompile(`^\s?\*\s+(.*)$`)
 
 func beerMe(r io.Reader) (string, error) {
 	s := bufio.NewScanner(r)
