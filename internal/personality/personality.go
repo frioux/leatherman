@@ -1,10 +1,13 @@
+// Package personality returns pseudorandom responses for the lulz.
+// If you don't call rand.Seed() with something sensible it won't even be
+// pseudorandom.
 package personality
 
 import (
 	"math/rand"
 )
 
-var responses = []string{
+var acks = []string{
 	"station",
 	"got em.",
 	"👍",
@@ -14,14 +17,23 @@ var responses = []string{
 	"aye aye cap'm'",
 }
 
-// Ack returns a random string meaning "yes"; you should rand.Seed() before
-// calling this.
+// Ack returns a string meaning "yes"
 func Ack() string {
 	const offset = 100
-	res := rand.Intn(offset + len(responses))
+	res := rand.Intn(offset + len(acks))
 	if res > offset {
-		return responses[res-offset]
+		return acks[res-offset]
 	}
 
 	return "Aight"
+}
+
+var errs = []string{
+	"COMPTER FAIL",
+	"FAIL🐳",
+}
+
+// Err returns a string meaning something went wrong
+func Err() string {
+	return errs[rand.Intn(len(errs))]
 }

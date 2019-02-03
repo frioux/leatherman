@@ -49,7 +49,7 @@ func todo(cl *http.Client, tok, message string) (string, error) {
 
 	up := dropbox.UploadParams{Path: path, Autorename: true}
 	if err := dropbox.Create(cl, tok, up, buf); err != nil {
-		return "", errors.Wrap(err, "dropbox.Create")
+		return personality.Err(), errors.Wrap(err, "dropbox.Create")
 	}
 
 	return personality.Ack(), nil
