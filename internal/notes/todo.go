@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
-	"html/template"
 	"io"
 	"net/http"
+	"text/template"
 
 	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/personality"
@@ -18,7 +18,7 @@ var bodyTemplate *template.Template
 func init() {
 	var err error
 	bodyTemplate, err = template.New("xxx").Parse(`---
-title: {{.Message}}
+title: {{.Message | printf "%q"}}
 tags: [ private, inbox ]
 guid: {{.ID}}
 ---
