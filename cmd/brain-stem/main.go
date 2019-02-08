@@ -27,9 +27,9 @@ func main() {
 	cl := &http.Client{}
 
 	message, err := notes.Dispatch(cl, tok, os.Args[1])
+	fmt.Println(message)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
+		fmt.Fprintf(os.Stderr, "(%s)\n", err)
 		os.Exit(1)
 	}
-	fmt.Println(message)
 }
