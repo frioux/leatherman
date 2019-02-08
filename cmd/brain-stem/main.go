@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/frioux/amygdala/internal/notes"
 )
@@ -15,6 +17,10 @@ func init() {
 	if tok == "" {
 		panic("dropbox token is missing")
 	}
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
 }
 
 func main() {
