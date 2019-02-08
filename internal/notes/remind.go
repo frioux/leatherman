@@ -23,7 +23,7 @@ func remind(cl *http.Client, tok, message string) (string, error) {
 
 	sha := sha1.Sum([]byte(what))
 	id := hex.EncodeToString(sha[:])
-	path := "/notes/.alerts/" + when.Format(time.RFC3339) + "-" + id + ".txt"
+	path := "/notes/.alerts/" + when.Format(time.RFC3339) + "_" + id + ".txt"
 
 	buf := strings.NewReader(what)
 
