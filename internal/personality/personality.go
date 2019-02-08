@@ -38,3 +38,22 @@ var errs = []string{
 func Err() string {
 	return errs[rand.Intn(len(errs))]
 }
+
+var userErrs = []string{
+	"PEBCAK",
+	"You're holding it wrong",
+	"WRONG",
+}
+
+type invalidInput interface {
+	Error() string
+	InvalidInput()
+}
+
+// UserErr returns a string meaning invalid input
+func UserErr(err error) string {
+	if ii, ok := err.(invalidInput); ok {
+		return userErrs[rand.Intn(len(userErrs))] + ": " + ii.Error()
+	}
+	return Err()
+}

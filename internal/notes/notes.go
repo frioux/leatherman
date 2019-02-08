@@ -17,6 +17,7 @@ var rules []rule
 func init() {
 	rules = []rule{
 		{Regexp: regexp.MustCompile(`(?i)^\s*inspire\s+me\s*$`), action: inspireMe},
+		{Regexp: regexp.MustCompile(`(?i)^\s*remind\s+me\s*`), action: remind},
 		{Regexp: regexp.MustCompile(``), action: todo},
 	}
 }
