@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -34,7 +36,34 @@ func main() {
 type driver func(string) error
 
 func pushover(message string) error {
-	return errors.New("not yet implemented")
+	token := os.Getenv("PUSHOVER_TOKEN")
+	if token == "" {
+		return errors.New("PUSHOVER_TOKEN not set")
+	}
+	user := os.Getenv("PUSHOVER_USER")
+	if user == "" {
+		return errors.New("PUSHOVER_USER not set")
+	}
+	device := os.Getenv("PUSHOVER_DEVICE")
+	if device == "" {
+		return errors.New("PUSHOVER_DEVICE not set")
+	}
+
+	resp, err := http.PostForm("https://api.pushover.net/1/messages.json", url.Values{
+		"token":   {token},
+		"user":    {user},
+		"message": {message},
+		"device":  {device},
+	})
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return errors.New("failed to pushover")
+	}
+
+	return nil
 }
 
 func wall(message string) error {
