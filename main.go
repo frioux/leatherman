@@ -96,10 +96,11 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 
 		resp, err := notes.Dispatch(cl, tok, message)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
 			// normally it's a really bad idea to use other values if the error is
 			// non-nil, but care has been taken to propogate cheeky responses even
 			// in that situation.
+			//
+			// Note that the cheeky values won't work unless we return a 200 OK.
 			io.WriteString(rw, resp+"\n")
 			log.Err(errors.Wrap(err, "notes.Dispatch"))
 			return
