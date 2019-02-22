@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ToJSON will convert TOML read on STDIN to JSON on STDOUT
 func ToJSON(_ []string, stdin io.Reader) error {
 	buf := new(bytes.Buffer)
 	if _, err := io.Copy(buf, stdin); err != nil {
