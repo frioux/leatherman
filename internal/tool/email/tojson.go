@@ -3,16 +3,21 @@ package email
 import (
 	"encoding/json"
 	"io"
+	"io/ioutil"
+	"log"
 	"mime"
+	"mime/multipart"
 	"net/mail"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 )
 
 type email struct {
 	Header map[string]string
+	Body   map[string]string
 }
 
 func toJSON(path string, w io.Writer) error {
@@ -31,13 +36,43 @@ func toJSON(path string, w io.Writer) error {
 
 	dec := new(mime.WordDecoder)
 
-	eml := email{Header: make(map[string]string)}
+	eml := email{Header: make(map[string]string), Body: make(map[string]string)}
 	for k := range e.Header {
 		header, err := dec.DecodeHeader(e.Header.Get(k))
 		if err != nil {
 			panic(err)
 		}
 		eml.Header[k] = header
+	}
+
+	mediaType, params, err := mime.ParseMediaType(e.Header.Get("Content-Type"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if strings.HasPrefix(mediaType, "multipart/") {
+		mr := multipart.NewReader(e.Body, params["boundary"])
+		for {
+			p, err := mr.NextPart()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatal(err)
+			}
+			slurp, err := ioutil.ReadAll(p)
+			if err != nil {
+				log.Fatal(err)
+			}
+			partMediaType, _, err := mime.ParseMediaType(p.Header.Get("Content-Type"))
+			if err != nil {
+				log.Fatal(err)
+			}
+			if partMediaType != "text/plain" {
+				continue
+			}
+
+			eml.Body[partMediaType] = string(slurp)
+		}
 	}
 
 	err = enc.Encode(eml)
