@@ -3,7 +3,7 @@ module github.com/frioux/leatherman
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/PuerkitoBio/goquery v1.5.0
-	github.com/erikdubbelboer/gspt v0.0.0-20180711091504-e39e726e09cc
+	github.com/erikdubbelboer/gspt v0.0.0-20190125194910-e68493906b83
 	github.com/frioux/mozcookiejar v0.0.2
 	github.com/frioux/mozlz4 v0.0.1
 	github.com/frioux/netrc v0.0.0-20190125054817-37b89b8d2a2d

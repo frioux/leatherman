@@ -7,8 +7,8 @@ github.com/andybalholm/cascadia v1.0.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9Pq
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/erikdubbelboer/gspt v0.0.0-20180711091504-e39e726e09cc h1:OkY8xo2eLXGykHkN5pIDD86KMFpPyn1uS6wfr9mBGG0=
-github.com/erikdubbelboer/gspt v0.0.0-20180711091504-e39e726e09cc/go.mod h1:v6o7m/E9bfvm79dE1iFiF+3T7zLBnrjYjkWMa1J+Hv0=
+github.com/erikdubbelboer/gspt v0.0.0-20190125194910-e68493906b83 h1:ngHdSomn2MyugZYKHiycad2xERwIrmMlET7A0lC0UU4=
+github.com/erikdubbelboer/gspt v0.0.0-20190125194910-e68493906b83/go.mod h1:v6o7m/E9bfvm79dE1iFiF+3T7zLBnrjYjkWMa1J+Hv0=
 github.com/frioux/mozcookiejar v0.0.2 h1:vAPbreMlaQsMPbedqv+h9OUMyLmtwWr9b1LqmOPcEYA=
 github.com/frioux/mozcookiejar v0.0.2/go.mod h1:XA6YqSJViOtLsWH5dRSOj6nh/laBXu9EAdGFF6NEE9Q=
 github.com/frioux/mozlz4 v0.0.1 h1:22TfRKdmz4QGmAxVB6IXKTMknPXjc1v+VdMaeqqTmPE=
