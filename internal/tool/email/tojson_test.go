@@ -1,0 +1,51 @@
+package email
+
+import (
+	"bytes"
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestToJSON(t *testing.T) {
+	r := strings.NewReader(`MIME-Version: 1.0
+Date: Fri, 22 Mar 2019 21:00:48 -0700
+Message-ID: <CA+xnatts1+B99DipMtTmw66bLinR=60da4rU3emQM=UW-ifPsw@mail.gmail.com>
+Subject: Tweet from Official AJ Smith (@officalajsmith)
+From: Frew Schmidt <frew@xyzzy.com>
+To: Frew@xyzzy.com
+Content-Type: multipart/alternative; boundary="0000000000004d71c00584bb0498"
+
+--0000000000004d71c00584bb0498
+Content-Type: text/plain; charset="UTF-8"
+
+Official AJ Smith (@officalajsmith) tweeted at 8:47 PM on Fri, Mar 22, 2019:
+@JacobyDave
+I found this entertaining and felt the need to share with someone.
+https://t.co/BK3lJWTsT5
+(https://twitter.com/officalajsmith/status/1109300669209554945?s=03)
+
+Get the official Twitter app at https://twitter.com/download?s=13
+
+--0000000000004d71c00584bb0498
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto">Official AJ Smith (@officalajsmith) tweeted at 8:47 PM on=
+ Fri, Mar 22, 2019:<br>@JacobyDave <br>I found this entertaining and felt t=
+he need to share with someone. <a href=3D"https://t.co/BK3lJWTsT5">https://=
+t.co/BK3lJWTsT5</a><br>(<a href=3D"https://twitter.com/officalajsmith/statu=
+s/1109300669209554945?s=3D03">https://twitter.com/officalajsmith/status/110=
+9300669209554945?s=3D03</a>)<br><br>Get the official Twitter app at <a href=
+=3D"https://twitter.com/download?s=3D13">https://twitter.com/download?s=3D1=
+3</a></div>
+
+--0000000000004d71c00584bb0498--
+`)
+
+	buf := &bytes.Buffer{}
+	err := toJSON(r, buf)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"Header":{"Content-Type":"multipart/alternative; boundary=\"0000000000004d71c00584bb0498\"","Date":"Fri, 22 Mar 2019 21:00:48 -0700","From":"Frew Schmidt \u003cfrew@xyzzy.com\u003e","Message-Id":"\u003cCA+xnatts1+B99DipMtTmw66bLinR=60da4rU3emQM=UW-ifPsw@mail.gmail.com\u003e","Mime-Version":"1.0","Subject":"Tweet from Official AJ Smith (@officalajsmith)","To":"Frew@xyzzy.com"}}`, buf.String())
+}

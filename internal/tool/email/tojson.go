@@ -15,18 +15,12 @@ type email struct {
 	Header map[string]string
 }
 
-func toJSON(path string, w io.Writer) error {
+func toJSON(r io.Reader, w io.Writer) error {
 	enc := json.NewEncoder(w)
 
-	file, err := os.Open(path)
+	e, err := mail.ReadMessage(r)
 	if err != nil {
-		return errors.Wrap(err, "os.Open")
-	}
-	defer file.Close()
-
-	e, err := mail.ReadMessage(file)
-	if err != nil {
-		return errors.Wrap(err, "mail.ReadMessage, path="+path)
+		return errors.Wrap(err, "mail.ReadMessage")
 	}
 
 	dec := new(mime.WordDecoder)
@@ -48,6 +42,16 @@ func toJSON(path string, w io.Writer) error {
 	return nil
 }
 
+func toJSONFromFile(path string, w io.Writer) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return errors.Wrap(err, "os.Open")
+	}
+	defer file.Close()
+
+	return toJSON(file, w)
+}
+
 // ToJSON produces a JSON version of an email based on a list of globs.
 func ToJSON(args []string, stdin io.Reader) error {
 	if len(args) < 2 {
@@ -61,7 +65,7 @@ func ToJSON(args []string, stdin io.Reader) error {
 		}
 
 		for _, path := range matches {
-			err = toJSON(path, os.Stdout)
+			err = toJSONFromFile(path, os.Stdout)
 			if err != nil {
 				return err
 			}
