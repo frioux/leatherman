@@ -26,13 +26,17 @@ func Run(args []string, stdin io.Reader) error {
 	}
 	dir := args[1]
 
+	return run(dir, stdin, os.Stdout, os.Stderr)
+}
+
+func run(dir string, r io.Reader, w, wErr io.Writer) error {
 	// tokens limits parallelism to 10
 	tokens := make(chan struct{}, 10)
 
 	// wg ensures that we block till all lines are done
 	wg := sync.WaitGroup{}
 
-	s := bufio.NewScanner(stdin)
+	s := bufio.NewScanner(r)
 
 	for s.Scan() {
 		line := s.Text()
@@ -43,8 +47,8 @@ func Run(args []string, stdin io.Reader) error {
 		go func() {
 			err := deferLink(line, dir)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				fmt.Println(line)
+				fmt.Fprintln(wErr, err)
+				fmt.Fprintln(w, line)
 			}
 			<-tokens
 			wg.Done()
@@ -57,6 +61,7 @@ func Run(args []string, stdin io.Reader) error {
 	}
 
 	return nil
+
 }
 
 var (
