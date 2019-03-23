@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"strconv"
 	"time"
 )
-
-var now = time.Now().In(time.Local)
 
 func cmpDates(there, here time.Time) int8 {
 	tDate := there.Truncate(time.Duration(24) * time.Hour)
@@ -22,7 +21,7 @@ func cmpDates(there, here time.Time) int8 {
 	}
 }
 
-func t(l string) string {
+func t(now time.Time, l string) string {
 	loc, err := time.LoadLocation(l)
 	if err != nil {
 		log.Fatal(err)
@@ -63,13 +62,20 @@ func Run(args []string, _ io.Reader) error {
 		fmt.Println("my personal, digital, wall of clocks")
 		return nil
 	}
-	fmt.Println("here : " + t("Local"))
-	fmt.Println("L.A. : " + t("America/Los_Angeles"))
-	fmt.Println("MS/TX: " + t("America/Chicago"))
-	fmt.Println("rjbs : " + t("America/New_York"))
-	fmt.Println("riba : " + t("Europe/Berlin"))
-	fmt.Println("seo  : " + t("Asia/Jerusalem"))
-	fmt.Println("UTC  : " + t("UTC"))
+
+	now := time.Now().In(time.Local)
+
+	run(now, os.Stdout)
 
 	return nil
+}
+
+func run(now time.Time, w io.Writer) {
+	fmt.Fprintln(w, "here : "+t(now, "Local"))
+	fmt.Fprintln(w, "L.A. : "+t(now, "America/Los_Angeles"))
+	fmt.Fprintln(w, "MS/TX: "+t(now, "America/Chicago"))
+	fmt.Fprintln(w, "rjbs : "+t(now, "America/New_York"))
+	fmt.Fprintln(w, "riba : "+t(now, "Europe/Berlin"))
+	fmt.Fprintln(w, "seo  : "+t(now, "Asia/Jerusalem"))
+	fmt.Fprintln(w, "UTC  : "+t(now, "UTC"))
 }
