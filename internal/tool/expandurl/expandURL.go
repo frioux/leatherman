@@ -26,6 +26,10 @@ var tidyRE = regexp.MustCompile(`^\s*(.*?)\s*$`)
 // title from the actual page, loaded using cookies discovered via the
 // MOZ_COOKIEJAR env var.
 func Run(args []string, stdin io.Reader) error {
+	return run(stdin, os.Stdout)
+}
+
+func run(r io.Reader, w io.Writer) error {
 	// some cookies cause go to log warnings to stderr
 	log.SetOutput(ioutil.Discard)
 
@@ -36,7 +40,7 @@ func Run(args []string, stdin io.Reader) error {
 	}
 	ua := &http.Client{Jar: jar}
 
-	scanner := bufio.NewScanner(stdin)
+	scanner := bufio.NewScanner(r)
 	lines := []string{}
 
 	for scanner.Scan() {
@@ -67,7 +71,7 @@ func Run(args []string, stdin io.Reader) error {
 	wg.Wait()
 
 	for _, line := range lines {
-		fmt.Println(line)
+		fmt.Fprintln(w, line)
 	}
 
 	return nil
