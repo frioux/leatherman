@@ -20,10 +20,12 @@ func Run(args []string, _ io.Reader) error {
 		os.Exit(1)
 	}
 
-	statePath := args[2]
+	return run(args[1], args[2], os.Stdout)
+}
 
+func run(urlString, statePath string, w io.Writer) error {
 	fp := gofeed.NewParser()
-	feedURL, err := url.Parse(args[1])
+	feedURL, err := url.Parse(urlString)
 	if err != nil {
 		return errors.Wrapf(err, "Couldn't parse feed url (%s)", feedURL)
 	}
@@ -40,7 +42,7 @@ func Run(args []string, _ io.Reader) error {
 
 	items := newItems(seen, f.Items)
 
-	renderItems(os.Stdout, items)
+	renderItems(w, items)
 
 	err = os.Rename(statePath+".tmp", statePath)
 	if err != nil {
