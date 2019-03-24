@@ -15,9 +15,9 @@ import (
 
 var garbage = regexp.MustCompile(`(?:^__MACOSX/|/\.DS_Store$)`)
 
-func hasRoot(r *zip.ReadCloser) bool {
-	names := make([]string, 0, len(r.File))
-	for _, f := range r.File {
+func hasRoot(ms []*zip.File) bool {
+	names := make([]string, 0, len(ms))
+	for _, f := range ms {
 		if garbage.MatchString(f.Name) {
 			continue
 		}
@@ -66,35 +66,51 @@ func Run(args []string, _ io.Reader) error {
 	}
 	defer r.Close()
 	var root string
-	if !hasRoot(r) {
+	if !hasRoot(r.File) {
 		root = genRoot(zipName)
 	}
 
-	for _, f := range r.File {
-		err := extractMember(root, f)
-		if err != nil {
+	ms, err := sanitize(root, r.File)
+	if err != nil {
+		return err
+	}
+
+	for _, f := range ms {
+		if err := extractMember(f); err != nil {
+			fmt.Printf("  inflating: %s\n", f.Name)
+
 			return errors.Wrap(err, "extractMember")
 		}
 	}
 	return nil
 }
 
-func extractMember(root string, f *zip.File) error {
-	if garbage.MatchString(f.Name) {
-		return nil
-	}
-	segments := filepath.SplitList(f.Name)
-	for _, s := range segments {
-		if s == ".." {
-			return errors.New(".. not allowed in member name (Name=" + f.Name + ")")
+// sanitize injects a root into all members if they do not share one, filters
+// out garbage files, and errors if any of the members have ".." in the name
+func sanitize(root string, ms []*zip.File) ([]*zip.File, error) {
+	ret := make([]*zip.File, 0, len(ms))
+
+	for _, m := range ms {
+		if garbage.MatchString(m.Name) {
+			continue
 		}
+		segments := strings.Split(m.Name, "/")
+		for _, s := range segments {
+			fmt.Println(s)
+			if s == ".." {
+				return nil, errors.New(".. not allowed in member name (Name=" + m.Name + ")")
+			}
+		}
+		m.Name = filepath.Join(append([]string{root}, segments...)...)
+		ret = append(ret, m)
 	}
-	destName := filepath.Join(append([]string{root}, segments...)...)
 
-	fmt.Printf("  inflating: %s\n", destName)
+	return ret, nil
+}
 
+func extractMember(f *zip.File) error {
 	if f.FileInfo().IsDir() {
-		return errors.Wrap(os.Mkdir(destName, os.FileMode(0755)), "os.Mkdir")
+		return errors.Wrap(os.Mkdir(f.Name, os.FileMode(0755)), "os.Mkdir")
 	}
 
 	rc, err := f.Open()
@@ -103,14 +119,14 @@ func extractMember(root string, f *zip.File) error {
 	}
 	defer rc.Close()
 
-	dir := filepath.Dir(destName)
+	dir := filepath.Dir(f.Name)
 	err = os.MkdirAll(dir, os.FileMode(0755))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't create directory to extract to: %s", err)
 		return nil
 	}
 
-	file, err := os.Create(destName)
+	file, err := os.Create(f.Name)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't create file to extract to: %s", err)
 		return nil
@@ -118,7 +134,7 @@ func extractMember(root string, f *zip.File) error {
 
 	_, err = io.Copy(file, rc)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't copy zip file member (%s): %s", destName, err)
+		fmt.Fprintf(os.Stderr, "Couldn't copy zip file member (%s): %s", f.Name, err)
 	}
 
 	err = file.Chmod(f.FileInfo().Mode())
