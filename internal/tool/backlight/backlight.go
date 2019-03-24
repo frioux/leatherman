@@ -28,6 +28,10 @@ func Run(args []string, _ io.Reader) error {
 		return errors.Wrap(err, "Couldn't parse arg")
 	}
 
+	return run(change)
+}
+
+func run(change int) error {
 	max, err := getMaxBrightness()
 	if err != nil {
 		return errors.Wrap(err, "Couldn't getMaxBrightness")
