@@ -2,6 +2,7 @@ package sweetmarias // import "github.com/frioux/leatherman/pkg/sweetmarias"
 
 import (
 	"fmt"
+	"io"
 	"math/rand"
 	"net/http"
 
@@ -25,7 +26,11 @@ func AllCoffees() ([]string, error) {
 			fmt.Sprintf("%d %s", res.StatusCode, res.Status))
 	}
 
-	doc, err := goquery.NewDocumentFromReader(res.Body)
+	return allCoffees(res.Body)
+}
+
+func allCoffees(r io.Reader) ([]string, error) {
+	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, errors.Wrap(err, "goquery.NewDocumentFromReader")
 	}
