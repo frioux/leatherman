@@ -10,8 +10,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/frioux/leatherman/internal/bytesx"
 )
 
 func TestExtractMember(t *testing.T) {
@@ -129,7 +127,7 @@ func TestGenRoot(t *testing.T) {
 }
 
 func buildZip(files map[string][]byte) (*zip.Reader, error) {
-	buf := &bytesx.Buffer{}
+	buf := &bytes.Buffer{}
 	zw := zip.NewWriter(buf)
 
 	for name, contents := range files {
@@ -145,7 +143,7 @@ func buildZip(files map[string][]byte) (*zip.Reader, error) {
 		return nil, errors.Wrap(err, "zr.Close")
 	}
 
-	return zip.NewReader(buf, int64(buf.Len()))
+	return zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
 }
 
 func TestBuildZip(t *testing.T) {
@@ -163,7 +161,7 @@ func TestBuildZip(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Couldn't open member: %s", err)
 		}
-		b := &bytesx.Buffer{}
+		b := &bytes.Buffer{}
 		_, err = io.Copy(b, r)
 		if err != nil {
 			t.Fatalf("Couldn't copy member: %s", err)
