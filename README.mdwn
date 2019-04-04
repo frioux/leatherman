@@ -307,6 +307,16 @@ rating:
 $ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
 ```
 
+### `srv`
+
+Serve a directory over http; takes a single optional parameter which is the dir
+to serve, default is `.`:
+
+```bash
+$ srv ~
+Serving /home/frew on [::]:21873
+```
+
 ### `ssh-quote`
 
 Prepares the arguments such that they can be pasted into an ssh command safely.

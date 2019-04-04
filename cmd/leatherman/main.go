@@ -30,6 +30,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/replaceunzip"
 	"github.com/frioux/leatherman/internal/tool/rss"
 	"github.com/frioux/leatherman/internal/tool/smlist"
+	"github.com/frioux/leatherman/internal/tool/srv"
 	"github.com/frioux/leatherman/internal/tool/sshquote"
 	"github.com/frioux/leatherman/internal/tool/toml"
 	"github.com/frioux/leatherman/internal/tool/undefer"
@@ -73,6 +74,7 @@ func main() {
 		"rss":                  rss.Run,
 		"ssh-quote":            sshquote.Run,
 		"sm-list":              smlist.Run,
+		"srv":                  srv.Serve,
 		"toml2json":            toml.ToJSON,
 		"undefer":              undefer.Run,
 		"uni":                  uni.Describe,
