@@ -6,8 +6,6 @@ import (
 	"errors"
 	"io"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"regexp"
 	"unicode"
 )
@@ -31,21 +29,21 @@ type Login struct {
 
 // Parse the netrc file at the given path
 // It returns a Netrc instance
-func Parse(path string) (*Netrc, error) {
-	file, err := read(path)
+func Parse(path string) (Netrc, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return Netrc{}, err
 	}
 	netrc, err := parse(lex(file))
 	if err != nil {
-		return nil, err
+		return Netrc{}, err
 	}
 	netrc.Path = path
 	return netrc, nil
 }
 
 // Machine gets a login by machine name
-func (n *Netrc) Machine(name string) *Login {
+func (n Netrc) Machine(name string) *Login {
 	for _, m := range n.logins {
 		if m.Name == name {
 			return m
@@ -55,30 +53,13 @@ func (n *Netrc) Machine(name string) *Login {
 }
 
 // MachineAndLogin gets a login by machine name and login name
-func (n *Netrc) MachineAndLogin(name, login string) *Login {
+func (n Netrc) MachineAndLogin(name, login string) *Login {
 	for _, m := range n.logins {
 		if m.Name == name && m.Get("login") == login {
 			return m
 		}
 	}
 	return nil
-}
-
-func read(path string) (io.Reader, error) {
-	if filepath.Ext(path) == ".gpg" {
-		cmd := exec.Command("gpg", "--batch", "--quiet", "--decrypt", path)
-		cmd.Stderr = os.Stderr
-		stdout, err := cmd.StdoutPipe()
-		if err != nil {
-			return nil, err
-		}
-		err = cmd.Start()
-		if err != nil {
-			return nil, err
-		}
-		return stdout, nil
-	}
-	return os.Open(path)
 }
 
 func lex(file io.Reader) []string {
@@ -128,8 +109,8 @@ func lex(file io.Reader) []string {
 	return tokens
 }
 
-func parse(tokens []string) (*Netrc, error) {
-	n := &Netrc{}
+func parse(tokens []string) (Netrc, error) {
+	n := Netrc{}
 	n.logins = make([]*Login, 0, 20)
 	var machine *Login
 	for i, token := range tokens {
