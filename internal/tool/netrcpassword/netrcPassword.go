@@ -29,7 +29,7 @@ func Run(args []string, _ io.Reader) error {
 	}
 
 	login := n.MachineAndLogin(args[1], args[2])
-	if login == nil {
+	if login.IsZero() {
 		return errors.New("Couldn't find login for " + args[2] + "@" + args[1])
 	}
 
