@@ -23,7 +23,7 @@ func TestDeferLink(t *testing.T) {
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		f, err := os.Open("./page.html")
+		f, err := os.Open("./testdata/page.html")
 		if err != nil {
 			panic(err)
 		}
