@@ -33,7 +33,7 @@ func Run(args []string, _ io.Reader) error {
 		return errors.New("Couldn't find login for " + args[2] + "@" + args[1])
 	}
 
-	fmt.Println(login.Get("password"))
+	fmt.Println(login.Password)
 
 	return nil
 }

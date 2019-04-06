@@ -54,7 +54,7 @@ func (n Netrc) Machine(name string) *Login {
 // MachineAndLogin gets a login by machine name and login name
 func (n Netrc) MachineAndLogin(name, login string) *Login {
 	for _, m := range n.logins {
-		if m.Name == name && m.Get("login") == login {
+		if m.Name == name && m.Login == login {
 			return m
 		}
 	}
@@ -137,20 +137,4 @@ func parse(tokens []string) (Netrc, error) {
 		}
 	}
 	return n, nil
-}
-
-// Get a property from a machine
-func (m *Login) Get(name string) string {
-	switch name {
-	case "login":
-		return m.Login
-	case "password":
-		return m.Password
-	case "account":
-		return m.Account
-	case "macdef":
-		return m.Macdef
-	default:
-		return "???"
-	}
 }
