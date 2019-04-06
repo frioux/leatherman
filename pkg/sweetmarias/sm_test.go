@@ -14,7 +14,7 @@ import (
 func TestLoadCoffee(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		f, err := os.Open("./sm.html")
+		f, err := os.Open("./testdata/sm.html")
 		if err != nil {
 			panic(err)
 		}
