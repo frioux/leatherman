@@ -101,7 +101,7 @@ func lex(file io.Reader) []string {
 		}
 		return 0, nil, nil
 	})
-	tokens := make([]string, 0, 100)
+	tokens := []string{}
 	for scanner.Scan() {
 		tokens = append(tokens, scanner.Text())
 	}
@@ -110,7 +110,7 @@ func lex(file io.Reader) []string {
 
 func parse(tokens []string) (Netrc, error) {
 	n := Netrc{}
-	n.Logins = make([]*Login, 0, 20)
+	n.Logins = []*Login{}
 	var machine *Login
 	for i, token := range tokens {
 		// group tokens into machines
