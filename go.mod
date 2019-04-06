@@ -5,7 +5,6 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.0
 	github.com/erikdubbelboer/gspt v0.0.0-20190125194910-e68493906b83
 	github.com/frioux/mozcookiejar v0.0.2
-	github.com/frioux/netrc v0.0.0-20190125054817-37b89b8d2a2d
 	github.com/frioux/shellquote v0.0.2
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/headzoo/surf v1.0.0

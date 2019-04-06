@@ -7,7 +7,7 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/frioux/netrc"
+	"github.com/frioux/leatherman/pkg/netrc"
 	"github.com/pkg/errors"
 )
 
