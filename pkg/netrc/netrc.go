@@ -14,10 +14,7 @@ import (
 var ErrInvalidNetrc = errors.New("Invalid netrc")
 
 // Netrc file
-type Netrc struct {
-	Path   string
-	Logins []*Login
-}
+type Netrc []*Login
 
 // Login from the netrc file
 type Login struct {
@@ -31,19 +28,18 @@ type Login struct {
 func Parse(path string) (Netrc, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return Netrc{}, err
+		return nil, err
 	}
 	netrc, err := parse(lex(file))
 	if err != nil {
-		return Netrc{}, err
+		return nil, err
 	}
-	netrc.Path = path
 	return netrc, nil
 }
 
 // Machine gets a login by machine name
 func (n Netrc) Machine(name string) *Login {
-	for _, m := range n.Logins {
+	for _, m := range n {
 		if m.Name == name {
 			return m
 		}
@@ -53,7 +49,7 @@ func (n Netrc) Machine(name string) *Login {
 
 // MachineAndLogin gets a login by machine name and login name
 func (n Netrc) MachineAndLogin(name, login string) *Login {
-	for _, m := range n.Logins {
+	for _, m := range n {
 		if m.Name == name && m.Login == login {
 			return m
 		}
@@ -109,15 +105,14 @@ func lex(file io.Reader) []string {
 }
 
 func parse(tokens []string) (Netrc, error) {
-	n := Netrc{}
-	n.Logins = []*Login{}
+	n := Netrc([]*Login{})
 	var machine *Login
 	for i, token := range tokens {
 		// group tokens into machines
 		if token == "machine" || token == "default" {
 			// start new group
 			machine = &Login{}
-			n.Logins = append(n.Logins, machine)
+			n = append(n, machine)
 			if token == "default" {
 				machine.IsDefault = true
 				machine.Name = "default"
