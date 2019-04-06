@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/frioux/mozlz4"
+	"github.com/frioux/leatherman/pkg/mozlz4"
 	"github.com/pkg/errors"
 )
 

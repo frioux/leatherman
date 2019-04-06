@@ -11,8 +11,6 @@ github.com/erikdubbelboer/gspt v0.0.0-20190125194910-e68493906b83 h1:ngHdSomn2My
 github.com/erikdubbelboer/gspt v0.0.0-20190125194910-e68493906b83/go.mod h1:v6o7m/E9bfvm79dE1iFiF+3T7zLBnrjYjkWMa1J+Hv0=
 github.com/frioux/mozcookiejar v0.0.2 h1:vAPbreMlaQsMPbedqv+h9OUMyLmtwWr9b1LqmOPcEYA=
 github.com/frioux/mozcookiejar v0.0.2/go.mod h1:XA6YqSJViOtLsWH5dRSOj6nh/laBXu9EAdGFF6NEE9Q=
-github.com/frioux/mozlz4 v0.0.1 h1:22TfRKdmz4QGmAxVB6IXKTMknPXjc1v+VdMaeqqTmPE=
-github.com/frioux/mozlz4 v0.0.1/go.mod h1:nNYJvJfnYk9CR7BdhrVhccB7z8gYvUuOggNvqChYTk0=
 github.com/frioux/netrc v0.0.0-20190125054817-37b89b8d2a2d h1:1529lO2sMK3+Pm7D6uRZcAhzp1WAqeyzXdHbg1RFncU=
 github.com/frioux/netrc v0.0.0-20190125054817-37b89b8d2a2d/go.mod h1:Y4qsRBVQEhuujHdjar/vt5NUZ6tB31Ua5hx47En02+0=
 github.com/frioux/shellquote v0.0.2 h1:CvQ1aMCS/xhhyGF4JIeA49bhE3W1s5XdBkwmhH3BceQ=
@@ -45,8 +43,6 @@ github.com/mmcdole/goxpp v0.0.0-20181012175147-0068e33feabf h1:sWGE2v+hO0Nd4yFU/
 github.com/mmcdole/goxpp v0.0.0-20181012175147-0068e33feabf/go.mod h1:pasqhqstspkosTneA62Nc+2p9SOBBYAPbnmRRWPQ0V8=
 github.com/pierrec/lz4 v2.0.5+incompatible h1:2xWsjqPFWcplujydGg4WmhC/6fZqK42wMM8aXeqhl0I=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
-github.com/pkg/errors v0.8.0 h1:WdK/asTD0HN+q6hsWO3/vpuAkAr+tw6aNJNDFFf0+qw=
-github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
