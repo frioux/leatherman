@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/frioux/shellquote"
+	"github.com/frioux/leatherman/pkg/shellquote"
 	"github.com/pkg/errors"
 )
 
