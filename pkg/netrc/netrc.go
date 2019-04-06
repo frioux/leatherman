@@ -17,14 +17,13 @@ var ErrInvalidNetrc = errors.New("Invalid netrc")
 type Netrc struct {
 	Path   string
 	logins []*Login
-	tokens []string
 }
 
 // Login from the netrc file
 type Login struct {
-	Name      string
 	IsDefault bool
-	tokens    []string
+
+	Name, Login, Password, Account, Macdef string
 }
 
 // Parse the netrc file at the given path
@@ -126,10 +125,15 @@ func parse(tokens []string) (Netrc, error) {
 				machine.Name = tokens[i+2]
 			}
 		}
-		if machine == nil {
-			n.tokens = append(n.tokens, token)
-		} else {
-			machine.tokens = append(machine.tokens, token)
+		switch token {
+		case "login":
+			machine.Login = tokens[i+2]
+		case "password":
+			machine.Password = tokens[i+2]
+		case "account":
+			machine.Account = tokens[i+2]
+		case "macdef":
+			machine.Macdef = tokens[i+2]
 		}
 	}
 	return n, nil
@@ -137,17 +141,16 @@ func parse(tokens []string) (Netrc, error) {
 
 // Get a property from a machine
 func (m *Login) Get(name string) string {
-	i := 4
-	if m.IsDefault {
-		i = 2
-	}
-	for {
-		if i+2 >= len(m.tokens) {
-			return ""
-		}
-		if m.tokens[i] == name {
-			return m.tokens[i+2]
-		}
-		i = i + 4
+	switch name {
+	case "login":
+		return m.Login
+	case "password":
+		return m.Password
+	case "account":
+		return m.Account
+	case "macdef":
+		return m.Macdef
+	default:
+		return "???"
 	}
 }
