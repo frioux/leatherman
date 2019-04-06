@@ -14,7 +14,7 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/frioux/mozcookiejar"
+	"github.com/frioux/leatherman/pkg/mozcookiejar"
 	_ "github.com/mattn/go-sqlite3" // sqlite3 required
 	"github.com/pkg/errors"
 	"golang.org/x/net/publicsuffix"
