@@ -11,13 +11,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/afero"
 )
 
-var (
-	fs     = afero.NewOsFs()
-	dateRE = regexp.MustCompile(`^(\d{4})-(\d\d)-(\d\d)`)
-)
+var dateRE = regexp.MustCompile(`^(\d{4})-(\d\d)-(\d\d)`)
 
 func newFiles(dir string, files []os.FileInfo, now time.Time) ([]string, error) {
 	ret := make([]string, 0, len(files))
@@ -52,7 +48,7 @@ func newFiles(dir string, files []os.FileInfo, now time.Time) ([]string, error) 
 
 func content(paths []string, stdout io.Writer) error {
 	for _, path := range paths {
-		file, err := fs.Open(path)
+		file, err := os.Open(path)
 		if err != nil {
 			return errors.Wrap(err, "couldn't Open")
 		}
@@ -64,7 +60,7 @@ func content(paths []string, stdout io.Writer) error {
 		if err != nil {
 			return errors.Wrap(err, "couldn't Close")
 		}
-		err = fs.Remove(path)
+		err = os.Remove(path)
 		if err != nil {
 			return errors.Wrap(err, "couldn't Remove")
 		}
@@ -81,7 +77,12 @@ func Run(args []string, _ io.Reader) error {
 		os.Exit(1)
 	}
 
-	files, err := afero.Afero{Fs: fs}.ReadDir(args[1])
+	dir, err := os.Open(args[1])
+	if err != nil {
+		return errors.Wrap(err, "Couldn't Open")
+	}
+
+	files, err := dir.Readdir(-1)
 	if err != nil {
 		return errors.Wrap(err, "Couldn't ReadDir")
 	}

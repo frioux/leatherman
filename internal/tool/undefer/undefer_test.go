@@ -2,11 +2,12 @@ package undefer
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,28 +42,32 @@ func TestNewFiles(t *testing.T) {
 }
 
 func TestContent(t *testing.T) {
-	fs = afero.NewMemMapFs()
+	d, err := ioutil.TempDir("", "")
+	if err != nil {
+		t.Fatalf("Couldn't set up TempDir: %s", err)
+	}
+	defer os.RemoveAll(d)
 
-	f, err := fs.Create("x/y")
+	f, err := os.Create(filepath.Join(d, "y"))
 	if assert.NoError(t, err) {
 		_, err := f.WriteString("in output1\n")
 		assert.NoError(t, err)
 	}
 
-	f, err = fs.Create("x/z")
+	f, err = os.Create(filepath.Join(d, "z"))
 	if assert.NoError(t, err) {
 		_, err := f.WriteString("in output2\n")
 		assert.NoError(t, err)
 	}
 
-	f, err = fs.Create("x/t")
+	f, err = os.Create(filepath.Join(d, "t"))
 	if assert.NoError(t, err) {
 		_, err := f.WriteString("XXX\n")
 		assert.NoError(t, err)
 	}
 
 	w := &bytes.Buffer{}
-	err = content([]string{"x/y", "x/z"}, w)
+	err = content([]string{filepath.Join(d, "y"), filepath.Join(d, "z")}, w)
 	if assert.NoError(t, err) {
 		assert.Equal(t, "in output1\nin output2\n", string(w.Bytes()))
 	}
