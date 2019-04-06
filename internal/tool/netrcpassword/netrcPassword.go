@@ -28,8 +28,8 @@ func Run(args []string, _ io.Reader) error {
 		return errors.Wrap(err, "Couldn't parse netrc")
 	}
 
-	login := n.MachineAndLogin(args[1], args[2])
-	if login.IsZero() {
+	login, ok := n.MachineAndLogin(args[1], args[2])
+	if !ok {
 		return errors.New("Couldn't find login for " + args[2] + "@" + args[1])
 	}
 

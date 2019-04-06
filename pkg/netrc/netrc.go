@@ -23,12 +23,6 @@ type Login struct {
 	Name, Login, Password, Account, Macdef string
 }
 
-// IsZero tells whether you got a real Login or an (effectively) nil Login
-func (l Login) IsZero() bool {
-	return !l.IsDefault && l.Name == "" && l.Login == "" && l.Password == "" &&
-		l.Account == "" && l.Macdef == ""
-}
-
 // Parse the netrc file at the given path
 // It returns a Netrc instance
 func Parse(path string) (Netrc, error) {
@@ -44,23 +38,23 @@ func Parse(path string) (Netrc, error) {
 }
 
 // Machine gets a login by machine name
-func (n Netrc) Machine(name string) Login {
+func (n Netrc) Machine(name string) (Login, bool) {
 	for _, m := range n {
 		if m.Name == name {
-			return m
+			return m, true
 		}
 	}
-	return Login{}
+	return Login{}, false
 }
 
 // MachineAndLogin gets a login by machine name and login name
-func (n Netrc) MachineAndLogin(name, login string) Login {
+func (n Netrc) MachineAndLogin(name, login string) (Login, bool) {
 	for _, m := range n {
 		if m.Name == name && m.Login == login {
-			return m
+			return m, true
 		}
 	}
-	return Login{}
+	return Login{}, false
 }
 
 func lex(file io.Reader) []string {
