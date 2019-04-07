@@ -1,5 +1,5 @@
 /*
-shellquote quotes strings for shell scripts.
+Package shellquote quotes strings for shell scripts.
 
 Sometimes you get strings from the internet and need to quote them for security,
 other times you'll need to quote your own strings because doing it by hand is

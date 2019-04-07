@@ -1,5 +1,5 @@
 /*
-mozcookiejar gives access to cookies stored in SQLite by Mozilla products.
+Package mozcookiejar gives access to cookies stored in SQLite by Mozilla products.
 
 The general idea is that you can log into some website via Firefox (or whatever)
 and then have your CLI tools effectively be logged in as well.

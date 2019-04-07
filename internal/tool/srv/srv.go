@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Serve an html directory tree, with index.html being shown for dirs.
 func Serve(args []string, _ io.Reader) error {
 	dir := "."
 	if len(args) > 1 {
