@@ -1,0 +1,55 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/mern-starter
+    docker:
+      - image: circleci/golang:1.12-stretch
+    steps:
+      - checkout
+      - run:
+          name: Create Artifacts Target
+          command: 'mkdir ./artifacts/'
+      - run:
+          name: Install Deps
+          command: 'go get ./...'
+      - run:
+          name: Windows Build
+          working_directory: cmd/leatherman
+          environment:
+             GO111MODULE: "on"
+             GOOS: windows
+          command: >
+            go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'";
+            zip leatherman.zip leatherman.exe;
+            mv leatherman.zip ../../artifacts/leatherman-windows.zip
+      - run:
+          name: OSX Build
+          working_directory: cmd/leatherman
+          environment:
+             GO111MODULE: "on"
+             GOOS: darwin
+          command: >
+            go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'";
+            xz leatherman;
+            mv leatherman.xz ../../artifacts/leatherman-osx.xz
+      - run:
+          name: Linux Build
+          command: >
+            make;
+            mv cmd/leatherman/leatherman.xz artifacts/leatherman.xz
+      - run:
+          name: Install GHR
+          working_directory: ~/
+          environment:
+             GO111MODULE: "off"
+          command: >
+             go get -u github.com/tcnksm/ghr
+      - run:
+          name: Release
+          command: >
+             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} untagged-${CIRCLE_SHA1} ./artifacts/
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
