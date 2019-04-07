@@ -7,7 +7,7 @@ import (
 
 // ExportDirectory will write the JSON extracted from bamboohr to stdout.
 func ExportDirectory([]string, io.Reader) error {
-	c := newClient()
+	c := newClient(os.Getenv("BAMBOO_USER"), os.Getenv("BAMBOO_PASSWORD"))
 	if err := c.auth(); err != nil {
 		return err
 	}
@@ -18,7 +18,7 @@ func ExportDirectory([]string, io.Reader) error {
 // ExportOrgChart will write the JSON extracted from the bamboohr org chart
 // to stdout.
 func ExportOrgChart([]string, io.Reader) error {
-	c := newClient()
+	c := newClient(os.Getenv("BAMBOO_USER"), os.Getenv("BAMBOO_PASSWORD"))
 	if err := c.auth(); err != nil {
 		return err
 	}

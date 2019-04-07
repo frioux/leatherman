@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"os"
 	"regexp"
 	"strings"
 
@@ -17,14 +16,19 @@ import (
 type client struct {
 	authURL, dirURL, treeURL string
 
+	user, password string
+
 	b *browser.Browser
 }
 
-func newClient() client {
+func newClient(user, password string) client {
 	return client{
 		authURL: "https://ziprecruiter1.bamboohr.com/login.php",
 		dirURL:  "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info",
 		treeURL: "https://ziprecruiter1.bamboohr.com/employees/orgchart.php?pin",
+
+		user:     user,
+		password: password,
 	}
 }
 
@@ -40,11 +44,11 @@ func (c *client) auth() error {
 		return fmt.Errorf("auth: %s", err)
 	}
 
-	err = fm.Input("username", os.Getenv("BAMBOO_USER"))
+	err = fm.Input("username", c.user)
 	if err != nil {
 		return errors.Wrap(err, "fm.Input")
 	}
-	err = fm.Input("password", os.Getenv("BAMBOO_PASSWORD"))
+	err = fm.Input("password", c.password)
 	if err != nil {
 		return errors.Wrap(err, "fm.Input")
 	}
@@ -91,7 +95,6 @@ func (c *client) tree(w io.Writer) error {
 		if err != nil && err != io.EOF {
 			return err
 		}
-		fmt.Printf("%q\n", line)
 		if strings.Contains(line, "json = ") {
 			if m := re.FindStringSubmatch(line); len(m) > 0 {
 				_, err := fmt.Fprint(w, m[1])
