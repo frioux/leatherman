@@ -17,16 +17,23 @@ func Serve(args []string, _ io.Reader) error {
 		dir = args[1]
 	}
 
-	return serve(dir, os.Stderr)
+	ch := make(chan net.Addr)
+
+	go func() {
+		addr := <-ch
+		fmt.Fprintf(os.Stderr, "Serving %s on %s\n", dir, addr)
+	}()
+
+	return serve(dir, ch)
 }
 
-func serve(dir string, log io.Writer) error {
+func serve(dir string, log chan net.Addr) error {
 	listener, err := net.Listen("tcp", ":0")
 	if err != nil {
 		return errors.Wrap(err, "net.Listen")
 	}
 
-	fmt.Fprintf(log, "Serving %s on %s\n", dir, listener.Addr())
+	log <- listener.Addr()
 
 	return http.Serve(listener, http.FileServer(http.Dir(dir)))
 }

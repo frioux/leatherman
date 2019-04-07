@@ -1,12 +1,10 @@
 package srv
 
 import (
-	"bytes"
 	"io/ioutil"
-	"math/rand"
+	"net"
 	"net/http"
 	"os"
-	"regexp"
 	"testing"
 	"time"
 
@@ -14,29 +12,20 @@ import (
 )
 
 func TestServe(t *testing.T) {
-	buf := &bytes.Buffer{}
-	go serve(".", buf)
+	ch := make(chan net.Addr)
+	go serve(".", ch)
 
-	sock := regexp.MustCompile("^Serving . on (.+)\n")
-
-	var resp *http.Response
-	var err error
-	for i := 1; i < 11; i++ {
-		m := sock.FindStringSubmatch(buf.String())
-		if len(m) == 0 {
-			time.Sleep(time.Millisecond * time.Duration(rand.Intn(i)))
-			continue
-		}
-
-		resp, err = http.Get("http://" + m[1] + "/srv.go")
-		if err != nil {
-			t.Fatalf("Couldn't fetch srv.go: %s", err)
-		}
-		break
+	var addr net.Addr
+	timer := time.NewTimer(time.Second)
+	select {
+	case <-timer.C:
+		t.Fatalf("couldn't get response from server within timeout")
+	case addr = <-ch:
 	}
 
-	if resp == nil {
-		t.Fatalf("couldn't get response from server within timeout")
+	resp, err := http.Get("http://" + string(addr.String()) + "/srv.go")
+	if err != nil {
+		t.Fatalf("Couldn't fetch srv.go: %s", err)
 	}
 
 	f, err := os.Open("./srv.go")
