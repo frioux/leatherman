@@ -11,17 +11,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-func cat(c chan<- string, e chan<- error, quit chan<- struct{}, stdin io.Reader) {
-	scanner := bufio.NewScanner(stdin)
-	for scanner.Scan() {
-		c <- scanner.Text()
-	}
-	if err := scanner.Err(); err != nil {
-		e <- err
-	}
-	close(quit)
-}
-
 // Run debounces input from stdin to stdout
 func Run(args []string, stdin io.Reader) error {
 	var timeoutSeconds float64
@@ -65,40 +54,14 @@ func Run(args []string, stdin io.Reader) error {
 		return nil
 	}
 
-	c := make(chan string)
-	quit := make(chan struct{})
-	errchan := make(chan error)
+	b := newBouncer(!leading, os.Stdout, time.Duration(timeoutSeconds)*time.Second)
 
-	go cat(c, errchan, quit, stdin)
+	s := bufio.NewScanner(os.Stdin)
+	for s.Scan() {
+		line := s.Text()
 
-	for {
-		var x string
-		select {
-		case x = <-c:
-			if leading {
-				fmt.Println(x)
-			}
-		case x := <-errchan:
-			fmt.Fprintln(os.Stderr, "reading standard input:", x)
-		case <-quit:
-			return nil
-		}
-		timeout := time.After(time.Duration(timeoutSeconds) * time.Second)
-	InnerLoop:
-		for {
-			select {
-			case x = <-c:
-				timeout = time.After(time.Duration(timeoutSeconds) * time.Second)
-			case x := <-errchan:
-				fmt.Fprintln(os.Stderr, "reading standard input:", x)
-			case <-quit:
-				return nil
-			case <-timeout:
-				if !leading {
-					fmt.Println(x)
-				}
-				break InnerLoop
-			}
-		}
+		b.Write(time.Now(), []byte(line+"\n"))
 	}
+
+	return s.Err()
 }
