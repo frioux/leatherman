@@ -10,7 +10,6 @@ require (
 	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
 	github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f
 	github.com/icza/mighty v0.0.0-20180919140131-cfd07d671de6 // indirect
-	github.com/jeffjen/datefmt v0.0.0-20181218074549-3f3666754541
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/mmcdole/gofeed v1.0.0-beta2

@@ -7,8 +7,10 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/frioux/leatherman/pkg/datefmt"
 	"github.com/pkg/errors"
 )
 
@@ -31,6 +33,20 @@ func parseArgs(args []string) error {
 	}
 
 	return nil
+}
+
+func parseDate(format, input string) (time.Time, error) {
+	if strings.ContainsRune(format, '%') {
+		format = datefmt.TranslateFormat(format)
+	}
+	return time.Parse(format, input)
+}
+
+func formatDate(format string, date time.Time) (string, error) {
+	if strings.ContainsRune(format, '%') {
+		format = datefmt.TranslateFormat(format)
+	}
+	return date.Format(format), nil
 }
 
 // Run takes dates on stdin in format -i, will group them by format -g,
