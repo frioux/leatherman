@@ -13,12 +13,12 @@ import (
 
 // Run debounces input from stdin to stdout
 func Run(args []string, stdin io.Reader) error {
-	var timeoutSeconds float64
+	var timeout time.Duration
 	var leading, h, help bool
 
 	flags := flag.NewFlagSet("debounce", flag.ExitOnError)
 
-	flags.Float64Var(&timeoutSeconds, "lockoutTime", 1, "amount of time between output")
+	flags.DurationVar(&timeout, "lockoutTime", time.Second, "amount of time between output")
 	flags.BoolVar(&leading, "leadingEdge", false, "trigger at leading edge of cycle")
 	flags.BoolVar(&h, "h", false, "help for debounce")
 	flags.BoolVar(&help, "help", false, "help for debounce")
@@ -54,7 +54,7 @@ func Run(args []string, stdin io.Reader) error {
 		return nil
 	}
 
-	b := newBouncer(!leading, os.Stdout, time.Duration(timeoutSeconds)*time.Second)
+	b := newBouncer(!leading, os.Stdout, timeout)
 
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
