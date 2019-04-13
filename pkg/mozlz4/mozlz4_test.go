@@ -91,7 +91,6 @@ func TestCantDecompress(t *testing.T) {
 	var size uint32 = 12
 	binary.Write(w, binary.LittleEndian, size)
 	w.Write([]byte{1, 2, 3, 4})
-	t.Log(w.Bytes())
 
 	r := bytes.NewReader(w.Bytes())
 	_, err := NewReader(r)
