@@ -34,7 +34,7 @@ func newTrailingBouncer(w io.Writer, duration time.Duration) trailingBouncer {
 			case <-timeout.C:
 				w.Write(v.in)
 			case v = <-ch:
-				timeout = time.NewTimer(duration)
+				timeout.Reset(duration)
 			}
 		}
 	}()
