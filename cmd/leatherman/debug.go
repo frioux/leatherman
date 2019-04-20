@@ -31,10 +31,10 @@ func startDebug() {
 			}
 		}
 	}()
-	if os.Getenv("LMTRACE") != "" {
-		fh, err := os.Create(os.Getenv("LMTRACE"))
+	if path := os.Getenv("LMTRACE"); path != "" {
+		fh, err := os.Create(path)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't open LMTRACE (%s): %s\n", os.Getenv("LMTRACE"), err)
+			fmt.Fprintf(os.Stderr, "Couldn't open LMTRACE (%s): %s\n", path, err)
 			os.Exit(1)
 		}
 		err = trace.Start(fh)
@@ -43,10 +43,10 @@ func startDebug() {
 		}
 	}
 
-	if os.Getenv("LMPROF") != "" {
-		fh, err := os.Create(os.Getenv("LMPROF"))
+	if path := os.Getenv("LMPROF"); path != "" {
+		fh, err := os.Create(path)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't open LMPROF (%s): %s\n", os.Getenv("LMPROF"), err)
+			fmt.Fprintf(os.Stderr, "Couldn't open LMPROF (%s): %s\n", path, err)
 			os.Exit(1)
 		}
 		err = pprof.StartCPUProfile(fh)
