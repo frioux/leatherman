@@ -1,14 +1,16 @@
 package fn
 
 import (
-	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 
 	"github.com/frioux/leatherman/pkg/shellquote"
 	"github.com/pkg/errors"
 )
+
+var dir = os.Getenv("HOME") + "/code/dotfiles/bin"
 
 // Run generates shell scripts based on the args
 func Run(args []string, _ io.Reader) error {
@@ -17,7 +19,7 @@ func Run(args []string, _ io.Reader) error {
 		os.Exit(1)
 	}
 
-	script := os.Getenv("HOME") + "/code/dotfiles/bin/" + args[1]
+	script := dir + "/" + args[1]
 
 	if args[2] == "-f" {
 		os.Remove(script)
@@ -43,28 +45,8 @@ func Run(args []string, _ io.Reader) error {
 		return errors.Wrap(err, "Couldn't stat new script")
 	}
 
-	file, err := os.Create(script)
-	if err != nil {
+	if err := ioutil.WriteFile(script, []byte("#!/bin/sh\n\n"+body+"\n"), 0755); err != nil {
 		return errors.Wrap(err, "Couldn't create new script")
-	}
-
-	w := bufio.NewWriter(file)
-	_, err = w.WriteString("#!/bin/sh\n\n" + body + "\n")
-	if err != nil {
-		return errors.Wrap(err, "Couldn't write to new script")
-	}
-	err = w.Flush()
-	if err != nil {
-		return errors.Wrap(err, "Couldn't flush new script")
-	}
-
-	err = file.Close()
-	if err != nil {
-		return errors.Wrap(err, "Couldn't save new script")
-	}
-	err = os.Chmod(script, os.FileMode(0755))
-	if err != nil {
-		return errors.Wrap(err, "Couldn't chown new script")
 	}
 
 	return nil
