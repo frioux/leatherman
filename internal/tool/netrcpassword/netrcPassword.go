@@ -23,17 +23,26 @@ func Run(args []string, _ io.Reader) error {
 		return errors.Wrap(err, "Couldn't get current user")
 	}
 
-	n, err := netrc.Parse(filepath.Join(usr.HomeDir, ".netrc"))
+	password, err := run(filepath.Join(usr.HomeDir, ".netrc"), args[1], args[2])
 	if err != nil {
-		return errors.Wrap(err, "Couldn't parse netrc")
+		return errors.Wrap(err, "Couldn't load password")
 	}
 
-	login, ok := n.MachineAndLogin(args[1], args[2])
-	if !ok {
-		return errors.New("Couldn't find login for " + args[2] + "@" + args[1])
-	}
-
-	fmt.Println(login.Password)
+	fmt.Println(password)
 
 	return nil
+}
+
+func run(path, machine, user string) (string, error) {
+	n, err := netrc.Parse(path)
+	if err != nil {
+		return "", errors.Wrap(err, "Couldn't parse netrc")
+	}
+
+	login, ok := n.MachineAndLogin(machine, user)
+	if !ok {
+		return "", errors.New("Couldn't find login for " + user + "@" + machine)
+	}
+
+	return login.Password, nil
 }
