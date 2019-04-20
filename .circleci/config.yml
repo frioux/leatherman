@@ -19,6 +19,7 @@ jobs:
              GO111MODULE: "on"
              GOOS: windows
           command: >
+            go mod verify;
             go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'";
             zip leatherman.zip leatherman.exe;
             mv leatherman.zip ../../artifacts/leatherman-windows.zip
@@ -29,6 +30,7 @@ jobs:
              GO111MODULE: "on"
              GOOS: darwin
           command: >
+            go mod verify;
             go build -ldflags "-s -X 'main.version=$(git describe --abbrev=7 --dirty --always)' -X 'main.when=$(date)' -X 'main.who=$(whoami)' -X 'main.where=$(hostname -f)'";
             xz leatherman;
             mv leatherman.xz ../../artifacts/leatherman-osx.xz
