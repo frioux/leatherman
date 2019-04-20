@@ -36,8 +36,12 @@ func Run(args []string, stdin io.Reader) error {
 		pos = int(fi.Size())
 	}
 
+	return run(file, os.Stdin, pos, os.Stdout)
+}
+
+func run(history io.ReaderAt, in io.Reader, historyLength int, out io.Writer) error {
 	seen := map[string]bool{}
-	scanner := backscanner.New(file, pos)
+	scanner := backscanner.New(history, historyLength)
 	for {
 		line, _, err := scanner.Line()
 		if err == io.EOF {
@@ -53,7 +57,7 @@ func Run(args []string, stdin io.Reader) error {
 				continue
 			}
 			seen[name] = true
-			fmt.Println(name)
+			fmt.Fprintln(out, name)
 			if i > 0 {
 				fmt.Fprintln(os.Stderr, "Multiple characters on line, breaking loop")
 				break
@@ -61,14 +65,14 @@ func Run(args []string, stdin io.Reader) error {
 		}
 	}
 
-	r := bufio.NewScanner(stdin)
+	r := bufio.NewScanner(in)
 	for r.Scan() {
 		line := r.Text()
 		if seen[line] {
 			continue
 		}
 		seen[line] = true
-		fmt.Println(line)
+		fmt.Fprintln(out, line)
 	}
 
 	return nil
