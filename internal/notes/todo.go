@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"text/template"
+	"time"
 
 	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/personality"
@@ -15,10 +16,15 @@ import (
 
 var bodyTemplate *template.Template
 
+type bodyArgs struct {
+	Message, ID, At string
+}
+
 func init() {
 	var err error
 	bodyTemplate, err = template.New("xxx").Parse(`---
 title: {{.Message | printf "%q"}}
+date: "{{.At}}"
 tags: [ private, inbox ]
 guid: {{.ID}}
 ---
@@ -31,10 +37,10 @@ guid: {{.ID}}
 	}
 }
 
-func body(message, id string) io.Reader {
+func body(message, id string, at time.Time) io.Reader {
 	buf := &bytes.Buffer{}
 
-	bodyTemplate.Execute(buf, struct{ Message, ID string }{message, id})
+	bodyTemplate.Execute(buf, bodyArgs{message, id, at.Format("2006-01-02T15:04:05")})
 
 	return buf
 }
@@ -45,7 +51,7 @@ func todo(cl *http.Client, tok, message string) (string, error) {
 	id := hex.EncodeToString(sha[:])
 	path := "/notes/content/posts/todo-" + id + ".md"
 
-	buf := body(message, id)
+	buf := body(message, id, time.Now())
 
 	up := dropbox.UploadParams{Path: path, Autorename: true}
 	if err := dropbox.Create(cl, tok, up, buf); err != nil {
