@@ -64,6 +64,7 @@ func main() {
 	os.Exit(1)
 }
 
+// receiveSMS handles https://www.twilio.com/docs/sms/twiml
 func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
@@ -88,13 +89,15 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 		}
 
 		message := r.Form.Get("Body")
-		if message == "" {
+		media, _ := twilio.ExtractMedia(r.Form)
+
+		if message == "" && len(media) == 0 {
 			rw.WriteHeader(http.StatusBadRequest)
 			io.WriteString(rw, "No Message\n")
 			return
 		}
 
-		resp, err := notes.Dispatch(cl, tok, message)
+		resp, err := notes.Dispatch(cl, tok, message, media)
 		if err != nil {
 			// normally it's a really bad idea to use other values if the error is
 			// non-nil, but care has been taken to propogate cheeky responses even

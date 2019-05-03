@@ -26,7 +26,7 @@ func init() {
 func main() {
 	cl := &http.Client{}
 
-	message, err := notes.Dispatch(cl, tok, os.Args[1])
+	message, err := notes.Dispatch(cl, tok, os.Args[1], nil)
 	fmt.Println(message)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "(%s)\n", err)

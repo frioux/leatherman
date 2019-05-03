@@ -5,10 +5,14 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
+	"fmt"
 	"net/http"
+	"net/url"
 	"sort"
+	"strconv"
 
 	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 func GenerateMAC(key, url []byte, r *http.Request) []byte {
@@ -42,4 +46,29 @@ func CheckMAC(key, url []byte, r *http.Request) (bool, error) {
 		return false, errors.Wrap(err, "base64.Decode")
 	}
 	return hmac.Equal(messageMAC, expectedMAC), nil
+}
+
+type Media struct {
+	ContentType, URL string
+}
+
+func ExtractMedia(f url.Values) ([]Media, error) {
+	numMedia := f.Get("NumMedia")
+	if numMedia == "" {
+		return nil, nil
+	}
+
+	n, err := strconv.Atoi(numMedia)
+	if err != nil {
+		return nil, xerrors.Errorf("Couldn't parse NumMedia: %w", err)
+	}
+
+	ret := make([]Media, n)
+
+	for i := 0; i < n; i++ {
+		ret[i].URL = f.Get(fmt.Sprintf("MediaUrl%d", i))
+		ret[i].ContentType = f.Get(fmt.Sprintf("MediaContentType%d", i))
+	}
+
+	return ret, nil
 }

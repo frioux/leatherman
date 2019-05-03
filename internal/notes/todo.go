@@ -4,13 +4,16 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"text/template"
 	"time"
 
 	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/personality"
+	"github.com/frioux/amygdala/internal/twilio"
 	"github.com/pkg/errors"
 )
 
@@ -46,7 +49,15 @@ func body(message, id string, at time.Time) io.Reader {
 }
 
 // todo creates an item tagged inbox
-func todo(cl *http.Client, tok, message string) (string, error) {
+func todo(cl *http.Client, tok, message string, media []twilio.Media) (string, error) {
+	for i, m := range media {
+		if strings.HasPrefix(m.ContentType, "image/") {
+			message += fmt.Sprintf(` <img alt="attachment %d" src="%s" height="128" />`, i, m.URL)
+		} else {
+			message += fmt.Sprintf(" [attachment %d](%s)", i, m.URL)
+		}
+	}
+
 	sha := sha1.Sum([]byte(message))
 	id := hex.EncodeToString(sha[:])
 	path := "/notes/content/posts/todo-" + id + ".md"

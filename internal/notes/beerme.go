@@ -10,6 +10,7 @@ import (
 
 	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/personality"
+	"github.com/frioux/amygdala/internal/twilio"
 	"github.com/pkg/errors"
 )
 
@@ -42,7 +43,7 @@ func beerMe(r io.Reader) (string, error) {
 	return o[0], nil
 }
 
-func inspireMe(cl *http.Client, tok, _ string) (string, error) {
+func inspireMe(cl *http.Client, tok, _ string, _ []twilio.Media) (string, error) {
 	r, err := dropbox.Download(cl, tok, "/notes/content/posts/inspiration.md")
 	if err != nil {
 		return personality.Err(), errors.Wrap(err, "dropbox.Download")

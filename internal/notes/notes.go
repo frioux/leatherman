@@ -4,12 +4,13 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/frioux/amygdala/internal/twilio"
 	"github.com/pkg/errors"
 )
 
 type rule struct {
 	*regexp.Regexp
-	action func(*http.Client, string, string) (string, error)
+	action func(*http.Client, string, string, []twilio.Media) (string, error)
 }
 
 var rules []rule
@@ -22,12 +23,12 @@ func init() {
 	}
 }
 
-func Dispatch(cl *http.Client, tok, input string) (string, error) {
+func Dispatch(cl *http.Client, tok, input string, media []twilio.Media) (string, error) {
 	for _, r := range rules {
 		if !r.MatchString(input) {
 			continue
 		}
-		return r.action(cl, tok, input)
+		return r.action(cl, tok, input, media)
 	}
 
 	return "", errors.New("no rules matched")
