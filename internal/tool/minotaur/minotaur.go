@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 // Run watches for events on the filesystem and runs a command when they happen.
@@ -18,12 +18,12 @@ func Run(args []string, _ io.Reader) error {
 
 	c, err := parseFlags(args)
 	if err != nil {
-		return errors.Wrap(err, "parseFlags")
+		return xerrors.Errorf("parseFlags: %w", err)
 	}
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		return errors.Wrap(err, "fsnotify.NewWatcher")
+		return xerrors.Errorf("fsnotify.NewWatcher: %w", err)
 	}
 	defer watcher.Close()
 
@@ -98,10 +98,13 @@ func Run(args []string, _ io.Reader) error {
 			if c.verbose {
 				fmt.Fprintln(os.Stderr, "watching "+path)
 			}
-			return errors.Wrap(watcher.Add(path), "fsnotify.Watcher.Add")
+			if err := watcher.Add(path); err != nil {
+				return xerrors.Errorf("fsnotify.Watcher.Add: %w", err)
+			}
+			return nil
 		})
 		if err != nil {
-			return errors.Wrap(err, "filepath.Walk")
+			return xerrors.Errorf("filepath.Walk: %w", err)
 		}
 	}
 	<-done

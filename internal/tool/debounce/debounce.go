@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 // Run debounces input from stdin to stdout
@@ -25,7 +25,7 @@ func Run(args []string, stdin io.Reader) error {
 
 	err := flags.Parse(args[1:])
 	if err != nil {
-		return errors.Wrap(err, "flags.Parse")
+		return xerrors.Errorf("flags.Parse: %w", err)
 	}
 
 	if h || help {

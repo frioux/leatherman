@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -22,12 +22,12 @@ func ToJSON(_ []string, stdin io.Reader) error {
 			if err == io.EOF {
 				break
 			}
-			return errors.Wrap(err, "Couldn't decode YAML")
+			return xerrors.Errorf("Couldn't decode YAML: %w", err)
 		}
 
 		err = e.Encode(data)
 		if err != nil {
-			return errors.Wrap(err, "Couldn't encode JSON")
+			return xerrors.Errorf("Couldn't encode JSON: %w", err)
 		}
 	}
 

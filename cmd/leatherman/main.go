@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"runtime/trace"
 
-	"github.com/pkg/errors"
-
 	"github.com/frioux/leatherman/internal/tool/backlight"
 	"github.com/frioux/leatherman/internal/tool/bamboo"
 	"github.com/frioux/leatherman/internal/tool/clocks"
@@ -99,11 +97,11 @@ func main() {
 	var err error
 
 	trace.WithRegion(context.Background(), which, func() {
-		err = errors.Wrap(fn(args, os.Stdin), which)
+		err = fn(args, os.Stdin)
 	})
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
+		fmt.Fprintf(os.Stderr, "%s: %s\n", which, err)
 		stopDebug()
 		os.Exit(1)
 	}

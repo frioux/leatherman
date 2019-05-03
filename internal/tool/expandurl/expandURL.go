@@ -16,8 +16,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/frioux/leatherman/pkg/mozcookiejar"
 	_ "github.com/mattn/go-sqlite3" // sqlite3 required
-	"github.com/pkg/errors"
 	"golang.org/x/net/publicsuffix"
+	"golang.org/x/xerrors"
 )
 
 var tidyRE = regexp.MustCompile(`^\s*(.*?)\s*$`)
@@ -35,7 +35,7 @@ func run(r io.Reader, w io.Writer) error {
 
 	jar, err := cj()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", errors.Wrap(err, "loading cookiejar"))
+		fmt.Fprintf(os.Stderr, "loading cookiejar: %s\n", err)
 		jar, _ = cookiejar.New(nil)
 	}
 	ua := &http.Client{Jar: jar}
@@ -47,7 +47,7 @@ func run(r io.Reader, w io.Writer) error {
 		lines = append(lines, scanner.Text())
 	}
 	if err := scanner.Err(); err != nil {
-		return errors.Wrap(err, "reading standard input")
+		return xerrors.Errorf("reading standard input: %w", err)
 	}
 
 	// tokens limits parallelism to 10
@@ -80,50 +80,50 @@ func run(r io.Reader, w io.Writer) error {
 func cj() (*cookiejar.Jar, error) {
 	j, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to build cookies")
+		return nil, xerrors.Errorf("Failed to build cookies: %w", err)
 	}
 
 	path := os.Getenv("MOZ_COOKIEJAR")
 	if path == "" {
-		return nil, errors.New("MOZ_COOKIEJAR should be set for expand-url to work")
+		return nil, xerrors.New("MOZ_COOKIEJAR should be set for expand-url to work")
 	}
 
 	orig, err := os.Open(path)
 	if err != nil {
-		return nil, errors.Wrap(err, "os.Open for copying")
+		return nil, xerrors.Errorf("os.Open for copying: %w", err)
 	}
 
 	dest, err := ioutil.TempFile("", "")
 	if err != nil {
-		return nil, errors.Wrap(err, "ioutil.TempFile for copying")
+		return nil, xerrors.Errorf("ioutil.TempFile for copying: %w", err)
 	}
 
 	_, err = io.Copy(dest, orig)
 	if err != nil {
-		return nil, errors.Wrap(err, "io.Copy for copying")
+		return nil, xerrors.Errorf("io.Copy for copying: %w", err)
 	}
 	err = dest.Close()
 	if err != nil {
-		return nil, errors.Wrap(err, "dest.Close for copying")
+		return nil, xerrors.Errorf("dest.Close for copying: %w", err)
 	}
 	err = orig.Close()
 	if err != nil {
-		return nil, errors.Wrap(err, "orig.Close for copying")
+		return nil, xerrors.Errorf("orig.Close for copying: %w", err)
 	}
 
 	db, err := sql.Open("sqlite3", "file:"+dest.Name())
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to open db")
+		return nil, xerrors.Errorf("Failed to open db: %w", err)
 	}
 	defer db.Close()
 
 	err = mozcookiejar.LoadIntoJar(db, j)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to load cookies")
+		return nil, xerrors.Errorf("Failed to load cookies: %w", err)
 	}
 	err = os.Remove(dest.Name())
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to clean up db copy")
+		return nil, xerrors.Errorf("Failed to clean up db copy: %w", err)
 	}
 
 	return j, nil
@@ -132,16 +132,16 @@ func cj() (*cookiejar.Jar, error) {
 func urlToLink(ua *http.Client, url string) (string, error) {
 	resp, err := ua.Get(url)
 	if err != nil {
-		return "", fmt.Errorf("ua.Get: %s", err)
+		return "", xerrors.Errorf("ua.Get: %s", err)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("goquery.NewDocumentFromReader: %s", err)
+		return "", xerrors.Errorf("goquery.NewDocumentFromReader: %s", err)
 	}
 	title := tidyRE.FindStringSubmatch(doc.Find("title").Text())
 	if len(title) != 2 {
-		return "", fmt.Errorf("title is blank")
+		return "", xerrors.Errorf("title is blank")
 	}
 	return fmt.Sprintf("[%s](%s)", title[1], url), nil
 }

@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 // ToJSON converts input of CSV to JSON.
@@ -17,7 +17,7 @@ func ToJSON(_ []string, stdin io.Reader) error {
 
 	header, err := reader.Read()
 	if err != nil {
-		return errors.New("can't read header, giving up")
+		return xerrors.Errorf("can't read header, giving up")
 	}
 
 	for {
@@ -38,7 +38,7 @@ func ToJSON(_ []string, stdin io.Reader) error {
 
 		err = writer.Encode(toEncode)
 		if err != nil {
-			return errors.Wrap(err, "json.Encode")
+			return xerrors.Errorf("json.Encode: %w", err)
 		}
 	}
 

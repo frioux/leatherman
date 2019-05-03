@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/xerrors"
 )
 
 func TestParseArgs(t *testing.T) {
@@ -47,6 +47,6 @@ func TestParseArgs(t *testing.T) {
 	for i, test := range table {
 		c, err := parseFlags(test.in)
 		assert.Equal(t, test.expectedConfig, c, fmt.Sprintf("%s (%d): c", test.name, i))
-		assert.Equal(t, test.expectedErr, errors.Cause(err), fmt.Sprintf("%s (%d): err", test.name, i))
+		assert.True(t, xerrors.Is(err, test.expectedErr), fmt.Sprintf("%s (%d): err", test.name, i))
 	}
 }

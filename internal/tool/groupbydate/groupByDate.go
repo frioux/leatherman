@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/frioux/leatherman/pkg/datefmt"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 var cmdArgs struct {
@@ -29,7 +29,7 @@ func parseArgs(args []string) error {
 
 	err := flags.Parse(args[1:])
 	if err != nil {
-		return errors.Wrap(err, "flags.Parse")
+		return xerrors.Errorf("flags.Parse: %w", err)
 	}
 
 	return nil
@@ -54,7 +54,7 @@ func formatDate(format string, date time.Time) (string, error) {
 func Run(args []string, stdin io.Reader) error {
 	err := parseArgs(args)
 	if err != nil {
-		return errors.Wrap(err, "Couldn't parse args")
+		return xerrors.Errorf("Couldn't parse args: %w", err)
 	}
 	return groupByDate(stdin, os.Stdout)
 }
@@ -99,12 +99,12 @@ func groupByDate(i io.Reader, o io.Writer) error {
 		}
 		err = out.Write([]string{outDate, strconv.Itoa(val)})
 		if err != nil {
-			return errors.Wrap(err, "csv.Write")
+			return xerrors.Errorf("csv.Write: %w", err)
 		}
 	}
 	out.Flush()
 	if err := out.Error(); err != nil {
-		return errors.Wrap(err, "Failed to flush")
+		return xerrors.Errorf("Failed to flush: %w", err)
 	}
 
 	return nil

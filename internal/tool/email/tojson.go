@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 type email struct {
@@ -20,7 +20,7 @@ func toJSON(r io.Reader, w io.Writer) error {
 
 	e, err := mail.ReadMessage(r)
 	if err != nil {
-		return errors.Wrap(err, "mail.ReadMessage")
+		return xerrors.Errorf("mail.ReadMessage: %w", err)
 	}
 
 	dec := new(mime.WordDecoder)
@@ -36,7 +36,7 @@ func toJSON(r io.Reader, w io.Writer) error {
 
 	err = enc.Encode(eml)
 	if err != nil {
-		return errors.Wrap(err, "json.Encode")
+		return xerrors.Errorf("json.Encode: %w", err)
 	}
 
 	return nil
@@ -45,7 +45,7 @@ func toJSON(r io.Reader, w io.Writer) error {
 func toJSONFromFile(path string, w io.Writer) error {
 	file, err := os.Open(path)
 	if err != nil {
-		return errors.Wrap(err, "os.Open")
+		return xerrors.Errorf("os.Open: %w", err)
 	}
 	defer file.Close()
 
@@ -55,13 +55,13 @@ func toJSONFromFile(path string, w io.Writer) error {
 // ToJSON produces a JSON version of an email based on a list of globs.
 func ToJSON(args []string, stdin io.Reader) error {
 	if len(args) < 2 {
-		return errors.New("please pass one or more globs")
+		return xerrors.New("please pass one or more globs")
 	}
 
 	for _, glob := range args[1:] {
 		matches, err := filepath.Glob(glob)
 		if err != nil {
-			return errors.Wrap(err, "filepath.Glob")
+			return xerrors.Errorf("filepath.Glob: %w", err)
 		}
 
 		for _, path := range matches {

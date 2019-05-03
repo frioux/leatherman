@@ -4,13 +4,13 @@ import (
 	"flag"
 	"regexp"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 var (
-	errNoScript = errors.New("no script passed, forgot -- ?")
-	errNoDirs   = errors.New("no dirs passed")
-	errUsage    = errors.New("usage: minotaur <dir1> [dir2 dir3] -- <cmd> [args to cmd]")
+	errNoScript = xerrors.New("no script passed, forgot -- ?")
+	errNoDirs   = xerrors.New("no dirs passed")
+	errUsage    = xerrors.New("usage: minotaur <dir1> [dir2 dir3] -- <cmd> [args to cmd]")
 )
 
 type config struct {
@@ -34,7 +34,7 @@ func parseFlags(args []string) (config, error) {
 
 	err := flags.Parse(args)
 	if err != nil {
-		return config{}, errors.Wrap(err, "flags.Parse")
+		return config{}, xerrors.Errorf("flags.Parse: %w", err)
 	}
 
 	include := regexp.MustCompile(includeStr)

@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/icza/backscanner"
-	"github.com/pkg/errors"
 	"golang.org/x/text/unicode/runenames"
+	"golang.org/x/xerrors"
 )
 
 // Run reads a history file from the first argument and reproduces
@@ -24,11 +24,11 @@ func Run(args []string, stdin io.Reader) error {
 
 	file, err := os.Open(args[1])
 	if err != nil {
-		return errors.Wrap(err, "Couldn't open history file")
+		return xerrors.Errorf("Couldn't open history file: %w", err)
 	}
 	fi, err := os.Stat(args[1])
 	if err != nil && !os.IsNotExist(err) {
-		return errors.Wrap(err, "Couldn't stat history file")
+		return xerrors.Errorf("Couldn't stat history file: %w", err)
 	}
 
 	var pos int
@@ -48,7 +48,7 @@ func run(history io.ReaderAt, in io.Reader, historyLength int, out io.Writer) er
 			break
 		}
 		if err != nil {
-			return errors.Wrap(err, "Couldn't read line")
+			return xerrors.Errorf("Couldn't read line: %w", err)
 		}
 
 		for i, char := range line {

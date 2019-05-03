@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/frioux/leatherman/pkg/shellquote"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 // Run takes a command and prints how you would need to quote it for ssh to
@@ -18,7 +18,7 @@ func Run(args []string, _ io.Reader) error {
 	}
 	quoted, err := shellquote.Quote(args[1:])
 	if err != nil {
-		return errors.Wrap(err, "Couldn't quote input")
+		return xerrors.Errorf("Couldn't quote input: %w", err)
 	}
 	double, _ := shellquote.Quote([]string{"sh", "-c", quoted})
 	triple, _ := shellquote.Quote([]string{double})

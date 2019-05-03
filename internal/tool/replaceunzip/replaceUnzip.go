@@ -10,7 +10,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 var garbage = regexp.MustCompile(`(?:^__MACOSX/|/\.DS_Store$)`)
@@ -62,7 +62,7 @@ func Run(args []string, _ io.Reader) error {
 	fmt.Println("Archive:", zipName)
 	r, err := zip.OpenReader(zipName)
 	if err != nil {
-		return errors.Wrap(err, "Couldn't open zip file")
+		return xerrors.Errorf("Couldn't open zip file: %w", err)
 	}
 	defer r.Close()
 	var root string
@@ -79,7 +79,7 @@ func Run(args []string, _ io.Reader) error {
 		if err := extractMember(f); err != nil {
 			fmt.Printf("  inflating: %s\n", f.Name)
 
-			return errors.Wrap(err, "extractMember")
+			return xerrors.Errorf("extractMember: %w", err)
 		}
 	}
 	return nil
@@ -98,7 +98,7 @@ func sanitize(root string, ms []*zip.File) ([]*zip.File, error) {
 		for _, s := range segments {
 			fmt.Println(s)
 			if s == ".." {
-				return nil, errors.New(".. not allowed in member name (Name=" + m.Name + ")")
+				return nil, xerrors.New(".. not allowed in member name (Name=" + m.Name + ")")
 			}
 		}
 		m.Name = filepath.Join(append([]string{root}, segments...)...)
@@ -110,12 +110,14 @@ func sanitize(root string, ms []*zip.File) ([]*zip.File, error) {
 
 func extractMember(f *zip.File) error {
 	if f.FileInfo().IsDir() {
-		return errors.Wrap(os.Mkdir(f.Name, os.FileMode(0755)), "os.Mkdir")
+		if err := os.Mkdir(f.Name, os.FileMode(0755)); err != nil {
+			return xerrors.Errorf("os.Mkdir: %w", err)
+		}
 	}
 
 	rc, err := f.Open()
 	if err != nil {
-		return errors.Wrap(err, "Couldn't open zip file member")
+		return xerrors.Errorf("Couldn't open zip file member: %w", err)
 	}
 	defer rc.Close()
 

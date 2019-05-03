@@ -10,10 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/frioux/leatherman/pkg/lwn"
 	"github.com/frioux/leatherman/pkg/timeutil"
+	"golang.org/x/xerrors"
 )
 
 // Run writes the input that contained links to be made available in the
@@ -57,7 +56,7 @@ func run(dir string, r io.Reader, w, wErr io.Writer) error {
 
 	wg.Wait()
 	if s.Err() != nil {
-		return errors.Wrap(s.Err(), "bufio.Scanner.Scan()")
+		return xerrors.Errorf("bufio.Scanner.Scan: %w", s.Err())
 	}
 
 	return nil
@@ -65,7 +64,7 @@ func run(dir string, r io.Reader, w, wErr io.Writer) error {
 }
 
 var (
-	errNoMatch = errors.New("no matching url")
+	errNoMatch = xerrors.Errorf("no matching url")
 	linkFinder = regexp.MustCompile(`^(.*\()(https?://\S+)(\).*)$`)
 )
 
@@ -77,25 +76,25 @@ func deferLink(line, dir string) error {
 
 	page, err := url.Parse(match[2])
 	if err != nil {
-		return errors.Wrap(err, "url.Parse")
+		return xerrors.Errorf("url.Parse: %w", err)
 	}
 
 	date, err := lwn.AvailableOn(page)
 	if err != nil {
-		return errors.Wrap(err, "lwn.AvailableOn")
+		return xerrors.Errorf("lwn.AvailableOn: %w", err)
 	}
 	date = timeutil.JumpTo(date, time.Friday)
 
 	filename := dir + "/" + date.Format("2006-01-02") + "-lwn.md"
 	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, os.FileMode(0644))
 	if err != nil {
-		return errors.Wrap(err, "os.OpenFile")
+		return xerrors.Errorf("os.OpenFile: %w", err)
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(line + "\n")
 	if err != nil {
-		return errors.Wrap(err, "os.File.WriteString")
+		return xerrors.Errorf("os.File.WriteString: %w", err)
 	}
 
 	return nil

@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/frioux/leatherman/pkg/shellquote"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 var dir = os.Getenv("HOME") + "/code/dotfiles/bin"
@@ -33,20 +33,20 @@ func Run(args []string, _ io.Reader) error {
 		var err error
 		body, err = shellquote.Quote(args[2:])
 		if err != nil {
-			return errors.Wrap(err, "Couldn't quote args to script script")
+			return xerrors.Errorf("Couldn't quote args to script script: %w", err)
 		}
 	}
 
 	// If script exists or we can't stat it
 	stat, err := os.Stat(script)
 	if stat != nil {
-		return errors.Wrap(err, "Script ("+script+") already exists")
+		return xerrors.Errorf("Script ("+script+") already exists: %w", err)
 	} else if !os.IsNotExist(err) {
-		return errors.Wrap(err, "Couldn't stat new script")
+		return xerrors.Errorf("Couldn't stat new script: %w", err)
 	}
 
 	if err := ioutil.WriteFile(script, []byte("#!/bin/sh\n\n"+body+"\n"), 0755); err != nil {
-		return errors.Wrap(err, "Couldn't create new script")
+		return xerrors.Errorf("Couldn't create new script: %w", err)
 	}
 
 	return nil

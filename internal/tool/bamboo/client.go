@@ -10,7 +10,7 @@ import (
 
 	"github.com/headzoo/surf"
 	"github.com/headzoo/surf/browser"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 type client struct {
@@ -36,26 +36,26 @@ func (c *client) auth() error {
 	ua := surf.NewBrowser()
 	err := ua.Open(c.authURL)
 	if err != nil {
-		return errors.Wrap(err, "auth")
+		return xerrors.Errorf("auth: %w", err)
 	}
 
 	fm, err := ua.Form("form")
 	if err != nil {
-		return fmt.Errorf("auth: %s", err)
+		return xerrors.Errorf("auth: %s", err)
 	}
 
 	err = fm.Input("username", c.user)
 	if err != nil {
-		return errors.Wrap(err, "fm.Input")
+		return xerrors.Errorf("fm.Input: %w", err)
 	}
 	err = fm.Input("password", c.password)
 	if err != nil {
-		return errors.Wrap(err, "fm.Input")
+		return xerrors.Errorf("fm.Input: %w", err)
 	}
 
 	err = fm.Submit()
 	if err != nil {
-		return errors.Wrap(err, "auth")
+		return xerrors.Errorf("auth: %w", err)
 	}
 	c.b = ua
 
@@ -76,12 +76,12 @@ func (c *client) directory(w io.Writer) error {
 
 func (c *client) tree(w io.Writer) error {
 	if err := c.b.Open(c.treeURL); err != nil {
-		return errors.Wrap(err, "export-bamboohr-tree")
+		return xerrors.Errorf("export-bamboohr-tree: %w", err)
 	}
 	buff := &bytes.Buffer{}
 
 	if _, err := c.b.Download(buff); err != nil {
-		return errors.Wrap(err, "export-bamboohr-tree")
+		return xerrors.Errorf("export-bamboohr-tree: %w", err)
 	}
 
 	reader := bufio.NewReader(strings.NewReader(buff.String()))
@@ -103,5 +103,5 @@ func (c *client) tree(w io.Writer) error {
 		}
 	}
 
-	return errors.New("export-bamboohr-tree: couldn't find json")
+	return xerrors.New("export-bamboohr-tree: couldn't find json")
 }

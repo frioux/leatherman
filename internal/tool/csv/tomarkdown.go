@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 // ToMarkdown converts input of CSV to Markdown
@@ -16,7 +16,7 @@ func ToMarkdown(_ []string, stdin io.Reader) error {
 
 	header, err := reader.Read()
 	if err != nil {
-		return errors.New("can't read header, giving up")
+		return xerrors.Errorf("can't read header, giving up: %w", err)
 	}
 
 	fmt.Println(strings.Join(header, " | "))

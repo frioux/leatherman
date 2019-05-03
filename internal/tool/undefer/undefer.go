@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 var dateRE = regexp.MustCompile(`^(\d{4})-(\d\d)-(\d\d)`)
@@ -25,15 +25,15 @@ func newFiles(dir string, files []os.FileInfo, now time.Time) ([]string, error) 
 		}
 		year, err := strconv.Atoi(matches[1])
 		if err != nil {
-			return nil, errors.Wrap(err, "couldn't parse "+file.Name())
+			return nil, xerrors.Errorf("couldn't parse %s: %w", file.Name(), err)
 		}
 		month, err := strconv.Atoi(matches[2])
 		if err != nil {
-			return nil, errors.Wrap(err, "couldn't parse "+file.Name())
+			return nil, xerrors.Errorf("couldn't parse %s: %w", file.Name(), err)
 		}
 		day, err := strconv.Atoi(matches[3])
 		if err != nil {
-			return nil, errors.Wrap(err, "couldn't parse "+file.Name())
+			return nil, xerrors.Errorf("couldn't parse %s: %w", file.Name(), err)
 		}
 
 		then := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.Local)
@@ -50,19 +50,19 @@ func content(paths []string, stdout io.Writer) error {
 	for _, path := range paths {
 		file, err := os.Open(path)
 		if err != nil {
-			return errors.Wrap(err, "couldn't Open")
+			return xerrors.Errorf("couldn't Open: %w", err)
 		}
 		_, err = io.Copy(stdout, file)
 		if err != nil {
-			return errors.Wrap(err, "couldn't Copy")
+			return xerrors.Errorf("couldn't Copy: %w", err)
 		}
 		err = file.Close()
 		if err != nil {
-			return errors.Wrap(err, "couldn't Close")
+			return xerrors.Errorf("couldn't Close: %w", err)
 		}
 		err = os.Remove(path)
 		if err != nil {
-			return errors.Wrap(err, "couldn't Remove")
+			return xerrors.Errorf("couldn't Remove: %w", err)
 		}
 	}
 
@@ -79,21 +79,21 @@ func Run(args []string, _ io.Reader) error {
 
 	dir, err := os.Open(args[1])
 	if err != nil {
-		return errors.Wrap(err, "Couldn't Open")
+		return xerrors.Errorf("Couldn't Open: %w", err)
 	}
 
 	files, err := dir.Readdir(-1)
 	if err != nil {
-		return errors.Wrap(err, "Couldn't ReadDir")
+		return xerrors.Errorf("Couldn't ReadDir: %w", err)
 	}
 
 	paths, err := newFiles(args[1], files, time.Now())
 	if err != nil {
-		return errors.Wrap(err, "Couldn't get newFiles")
+		return xerrors.Errorf("Couldn't get newFiles: %w", err)
 	}
 	err = content(paths, os.Stdout)
 	if err != nil {
-		return errors.Wrap(err, "Couldn't write content")
+		return xerrors.Errorf("Couldn't write content: %w", err)
 	}
 
 	return nil
