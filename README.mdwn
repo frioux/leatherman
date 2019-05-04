@@ -14,7 +14,8 @@ thing and get either a response or have it do what I asked.
 
 This is the most generically useful of the tools.  Any string that doesn't match
 anything else is assumed to be a todo.  Simply creates a document tagged `inbox`
-in my Dropbox.
+in my Dropbox.  Any attachment included in the message is linked to; if the
+attachment is an image it is linked to with an `img` tag.
 
 ### `inspire me`
 
