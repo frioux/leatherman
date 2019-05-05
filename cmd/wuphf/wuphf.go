@@ -35,18 +35,25 @@ func main() {
 
 type driver func(string) error
 
+var (
+	errNoPushoverToken  = errors.New("PUSHOVER_TOKEN not set")
+	errNoPushoverUser   = errors.New("PUSHOVER_USER not set")
+	errNoPushoverDevice = errors.New("PUSHOVER_DEVICE not set")
+	errPushoverFailed   = errors.New("failed to pushover")
+)
+
 func pushover(message string) error {
 	token := os.Getenv("PUSHOVER_TOKEN")
 	if token == "" {
-		return errors.New("PUSHOVER_TOKEN not set")
+		return errNoPushoverToken
 	}
 	user := os.Getenv("PUSHOVER_USER")
 	if user == "" {
-		return errors.New("PUSHOVER_USER not set")
+		return errNoPushoverUser
 	}
 	device := os.Getenv("PUSHOVER_DEVICE")
 	if device == "" {
-		return errors.New("PUSHOVER_DEVICE not set")
+		return errNoPushoverDevice
 	}
 
 	resp, err := http.PostForm("https://api.pushover.net/1/messages.json", url.Values{
@@ -60,7 +67,7 @@ func pushover(message string) error {
 	}
 
 	if resp.StatusCode != 200 {
-		return errors.New("failed to pushover")
+		return errPushoverFailed
 	}
 
 	return nil

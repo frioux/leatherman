@@ -50,14 +50,21 @@ const (
 	KITCHEN = 1
 )
 
+var (
+	errInvalidRemind   = errors.New("invalid remind format")
+	errBlankEvent      = errors.New("blank event")
+	errInvalidDuration = errors.New("invalid duration format")
+	errImpossible      = errors.New("impossible")
+)
+
 func Parse(now time.Time, message string) (time.Time, string, error) {
 	m := remindFormat.FindStringSubmatch(message)
 	if len(m) < 4 {
-		return time.Time{}, "", &userErr{errors.New("invalid remind format")}
+		return time.Time{}, "", &userErr{errInvalidRemind}
 	}
 
 	if m[MESSAGE] == "" {
-		return time.Time{}, "", &userErr{errors.New("blank event")}
+		return time.Time{}, "", &userErr{errBlankEvent}
 	}
 
 	if m[WHEN] != "" {
@@ -70,14 +77,14 @@ func Parse(now time.Time, message string) (time.Time, string, error) {
 			}
 			return nextTime(now, clock), m[MESSAGE], nil
 		}
-		return time.Time{}, "", &userErr{errors.New("invalid remind format")}
+		return time.Time{}, "", &userErr{errInvalidRemind}
 	} else if m[DURATION] != "" {
 		d, err := time.ParseDuration(m[DURATION])
 		if err != nil {
-			return time.Time{}, "", &userErr{errors.New("invalid duration format")}
+			return time.Time{}, "", &userErr{errInvalidDuration}
 		}
 		return now.Add(d), m[MESSAGE], nil
 	}
 
-	return time.Time{}, "", errors.New("impossible")
+	return time.Time{}, "", errImpossible
 }

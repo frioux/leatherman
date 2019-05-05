@@ -2,6 +2,7 @@ package notes
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -17,6 +18,8 @@ import (
 var isItem = regexp.MustCompile(`^\s?\*\s+(.*?)\s*$`)
 var mdLink = regexp.MustCompile(`^\[(.*)\]\((.*)\)$`)
 
+var errNone = errors.New("never found anything")
+
 func beerMe(r io.Reader) (string, error) {
 	s := bufio.NewScanner(r)
 
@@ -30,7 +33,7 @@ func beerMe(r io.Reader) (string, error) {
 	}
 
 	if len(o) == 0 {
-		return "", xerrors.New("never found anything")
+		return "", errNone
 	}
 
 	rand.Shuffle(len(o), func(i, j int) { o[i], o[j] = o[j], o[i] })

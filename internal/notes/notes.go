@@ -23,6 +23,8 @@ func init() {
 	}
 }
 
+var errNoRule = errors.New("no rules matched")
+
 func Dispatch(cl *http.Client, tok, input string, media []twilio.Media) (string, error) {
 	for _, r := range rules {
 		if !r.MatchString(input) {
@@ -31,5 +33,5 @@ func Dispatch(cl *http.Client, tok, input string, media []twilio.Media) (string,
 		return r.action(cl, tok, input, media)
 	}
 
-	return "", errors.New("no rules matched")
+	return "", errNoRule
 }
