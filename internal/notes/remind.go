@@ -11,7 +11,7 @@ import (
 	"github.com/frioux/amygdala/internal/personality"
 	"github.com/frioux/amygdala/internal/reminders"
 	"github.com/frioux/amygdala/internal/twilio"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 // remind format:
@@ -34,7 +34,7 @@ func remind(cl *http.Client, tok, message string, media []twilio.Media) (string,
 
 	up := dropbox.UploadParams{Path: path, Autorename: true}
 	if err := dropbox.Create(cl, tok, up, buf); err != nil {
-		return personality.Err(), errors.Wrap(err, "dropbox.Create")
+		return personality.Err(), xerrors.Errorf("dropbox.Create: %w", err)
 	}
 
 	return personality.Ack(), nil

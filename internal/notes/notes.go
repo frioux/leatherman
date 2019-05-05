@@ -1,11 +1,11 @@
 package notes
 
 import (
+	"errors"
 	"net/http"
 	"regexp"
 
 	"github.com/frioux/amygdala/internal/twilio"
-	"github.com/pkg/errors"
 )
 
 type rule struct {

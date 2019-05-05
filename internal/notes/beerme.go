@@ -11,7 +11,7 @@ import (
 	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/personality"
 	"github.com/frioux/amygdala/internal/twilio"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 var isItem = regexp.MustCompile(`^\s?\*\s+(.*?)\s*$`)
@@ -30,7 +30,7 @@ func beerMe(r io.Reader) (string, error) {
 	}
 
 	if len(o) == 0 {
-		return "", errors.New("never found anything")
+		return "", xerrors.New("never found anything")
 	}
 
 	rand.Shuffle(len(o), func(i, j int) { o[i], o[j] = o[j], o[i] })
@@ -46,7 +46,7 @@ func beerMe(r io.Reader) (string, error) {
 func inspireMe(cl *http.Client, tok, _ string, _ []twilio.Media) (string, error) {
 	r, err := dropbox.Download(cl, tok, "/notes/content/posts/inspiration.md")
 	if err != nil {
-		return personality.Err(), errors.Wrap(err, "dropbox.Download")
+		return personality.Err(), xerrors.Errorf("dropbox.Download: %w", err)
 	}
 	n, err := beerMe(r)
 	if err != nil {

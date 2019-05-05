@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 // UploadParams maps to the parameters to file-upload, documented here:
@@ -28,7 +28,7 @@ func encodeUploadParams(up UploadParams) (string, error) {
 	e := json.NewEncoder(buf)
 	err := e.Encode(up)
 	if err != nil {
-		return "", errors.Wrap(err, "json.Encode")
+		return "", xerrors.Errorf("json.Encode: %w", err)
 	}
 
 	return strings.TrimSuffix(buf.String(), "\n"), nil
@@ -38,7 +38,7 @@ func encodeUploadParams(up UploadParams) (string, error) {
 func Create(cl *http.Client, token string, up UploadParams, body io.Reader) error {
 	req, err := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/upload", body)
 	if err != nil {
-		return errors.Wrap(err, "http.NewRequest")
+		return xerrors.Errorf("http.NewRequest: %w", err)
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -51,15 +51,15 @@ func Create(cl *http.Client, token string, up UploadParams, body io.Reader) erro
 
 	resp, err := cl.Do(req)
 	if err != nil {
-		return errors.Wrap(err, "http.Client.Do")
+		return xerrors.Errorf("http.Client.Do: %w", err)
 	}
 
 	if resp.StatusCode > 399 {
 		buf := &bytes.Buffer{}
 		if _, err := io.Copy(buf, resp.Body); err != nil {
-			return errors.Wrap(err, "io.Copy")
+			return xerrors.Errorf("io.Copy: %w", err)
 		}
-		return errors.New(buf.String())
+		return xerrors.New(buf.String())
 	}
 
 	return nil
@@ -73,7 +73,7 @@ func encodeDownloadParams(path string) (string, error) {
 		Path string `json:"path"`
 	}{path})
 	if err != nil {
-		return "", errors.Wrap(err, "json.Encode")
+		return "", xerrors.Errorf("json.Encode: %w", err)
 	}
 
 	return strings.TrimSuffix(buf.String(), "\n"), nil
@@ -83,7 +83,7 @@ func encodeDownloadParams(path string) (string, error) {
 func Download(cl *http.Client, token, path string) (io.Reader, error) {
 	req, err := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/download", &bytes.Buffer{})
 	if err != nil {
-		return nil, errors.Wrap(err, "http.NewRequest")
+		return nil, xerrors.Errorf("http.NewRequest: %w", err)
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -95,15 +95,15 @@ func Download(cl *http.Client, token, path string) (io.Reader, error) {
 
 	resp, err := cl.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "http.Client.Do")
+		return nil, xerrors.Errorf("http.Client.Do: %w", err)
 	}
 
 	if resp.StatusCode > 399 {
 		buf := &bytes.Buffer{}
 		if _, err := io.Copy(buf, resp.Body); err != nil {
-			return nil, errors.Wrap(err, "io.Copy")
+			return nil, xerrors.Errorf("io.Copy: %w", err)
 		}
-		return nil, errors.New(buf.String())
+		return nil, xerrors.New(buf.String())
 	}
 
 	return resp.Body, nil

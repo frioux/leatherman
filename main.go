@@ -13,7 +13,7 @@ import (
 	"github.com/frioux/amygdala/internal/middleware"
 	"github.com/frioux/amygdala/internal/notes"
 	"github.com/frioux/amygdala/internal/twilio"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 var (
@@ -70,14 +70,14 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 		if err := r.ParseForm(); err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			io.WriteString(rw, "Couldn't Parse Form")
-			log.Err(errors.Wrap(err, "http.Request.ParseForm"))
+			log.Err(xerrors.Errorf("http.Request.ParseForm: %w", err))
 			return
 		}
 
 		if ok, err := twilio.CheckMAC(twilioAuthToken, twilioURL, r); err != nil || !ok {
 			rw.WriteHeader(403)
 			if err != nil {
-				log.Err(errors.Wrap(err, "twilio.CheckMAC"))
+				log.Err(xerrors.Errorf("twilio.CheckMAC: %w", err))
 			}
 			return
 		}
@@ -105,7 +105,7 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 			//
 			// Note that the cheeky values won't work unless we return a 200 OK.
 			io.WriteString(rw, resp+"\n")
-			log.Err(errors.Wrap(err, "notes.Dispatch"))
+			log.Err(xerrors.Errorf("notes.Dispatch: %w", err))
 			return
 		}
 

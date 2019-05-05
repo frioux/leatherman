@@ -11,7 +11,6 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/pkg/errors"
 	"golang.org/x/xerrors"
 )
 
@@ -43,7 +42,7 @@ func CheckMAC(key, url []byte, r *http.Request) (bool, error) {
 	expectedMAC := GenerateMAC(key, url, r)
 	messageMAC, err := base64.StdEncoding.DecodeString(r.Header.Get("X-Twilio-Signature"))
 	if err != nil {
-		return false, errors.Wrap(err, "base64.Decode")
+		return false, xerrors.Errorf("base64.Decode: %w", err)
 	}
 	return hmac.Equal(messageMAC, expectedMAC), nil
 }
