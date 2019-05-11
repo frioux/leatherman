@@ -22,9 +22,14 @@ import (
 
 var tidyRE = regexp.MustCompile(`^\s*(.*?)\s*$`)
 
-// Run replaces URLs from stdin with their markdown version, using a
-// title from the actual page, loaded using cookies discovered via the
-// MOZ_COOKIEJAR env var.
+/*
+Run reads text on STDIN and writes the same text back, converting any links to
+Markdown links, with the title of the page as the title of the link.  If you set
+`MOZ_COOKIEJAR` to the path of your `cookies.sqlite` it will use those cookies
+when loading the page.
+
+Command: expand-url
+*/
 func Run(args []string, stdin io.Reader) error {
 	return run(stdin, os.Stdout)
 }

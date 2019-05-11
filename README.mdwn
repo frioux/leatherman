@@ -55,26 +55,27 @@ echo "---\nfoo: 1" | leatherman yaml2json
 
 ### `addrs`
 
+`addrs` sorts the addresses passed on stdin (in the mutt addrbook format, see
+`addrspec-to-tabs`) and sorts them based on how recently they were used, from
+the glob passed on the arguments.
+
 ``` bash
 $ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
 ```
 
-Reads emails (in the mutt addrbook format, see below) on stdin and sorts them
-based on when they were most recently sent to.
-
 ### `addrspec-to-tabs`
 
-Converts email addresses from the standard format (`"Hello Friend" <foo@bar>`)
-to the mutt (?) address book format, ie tab separated fields.
+`addrspec-to-tabs` converts email addresses from the standard format (`"Hello Friend"
+<foo@bar>`) to the mutt (?) address book format, ie tab separated fields.
 
-Note that this new version ignores the comment because, after actually auditing
-my addressbook, most comments are incorrectly recognized by all tools. (for
+Note that this version ignores the comment because, after actually auditing my
+addressbook, most comments are incorrectly recognized by all tools. (for
 example: `<5555555555@vzw.com> (555) 555-5555` should not have a comment of
 `(555)`.)
 
 ### `backlight`
 
-Faster version of `xbacklight` by directly writing to `/sys`.  Example:
+`backlight` is a faster version of `xbacklight` by directly writing to `/sys`.  Example:
 
 Increase by 10%:
 
@@ -90,37 +91,42 @@ $ backlight -10
 
 ### `clocks`
 
-My personal, digital, wall of clocks.
+`clocks` shows my personal, digital, wall of clocks.
 
 ### `csv2json`
 
-Reads CSV on stdin and writes JSON on stdout; first line of input is the header,
-and thus the keys of the JSON.
+`csv2json` reads CSV on stdin and writes JSON on stdout; first line of input is the
+header, and thus the keys of the JSON.
 
 ### `csv2md`
 
-Reads CSV on stdin and writes Markdown on stdout.
+`csv2md` reads CSV on stdin and writes Markdown on stdout.
 
 ### `debounce`
 
-Powerful tool for debouncing lines of input.
+`debounce` debounces input from stdin to stdout
 
-### `dump-mozlz4`
-
-Dump the contents of a `mozlz4` (aka `jsonlz4`) file commonly used by Firefox.
-Just takes the name of the file to dump and writes to standard out.
+The default lockout time is one second, you can override that with the
+`--lockoutTime` argument.  By default the trailing edge triggers output, so
+output is emitted after there is no input for the lockout time.  You can change
+this behavior by passing the `--leadingEdge` flag.
 
 ### `defer-lwn`
 
-Create [undefer files](#undefer) for any lines containing a markdown link to
-`LWN.` Lines will be added in no particular order.  Lines not containing links
-(or otherwise running into errors) will be printed to standard out, with errors
-going to standard error.
+`defer-lwn` creates undefer files (see `undefer`) for any lines containing a markdown
+link to `LWN.` Lines will be added in no particular order.  Lines not containing
+links (or otherwise running into errors) will be printed to standard out, with
+errors going to standard error.
+
+### `dump-mozlz4`
+
+`dump-mozlz4` dumps the contents of a `mozlz4` (aka `jsonlz4`) file commonly used by
+Firefox.  Just takes the name of the file to dump and writes to standard out.
 
 ### `email2json`
 
-Produces a JSON representation of an email from a list of globs.  Only headers
-are currently supported, patches welcome to support bodies.
+`email2json` produces a JSON representation of an email from a list of globs.  Only
+headers are currently supported, patches welcome to support bodies.
 
 ```bash
 $ email2json '/home/frew/var/mail/mitsi/cur/*' | head -1 | jq .
@@ -137,27 +143,26 @@ $ email2json '/home/frew/var/mail/mitsi/cur/*' | head -1 | jq .
     "To": "xyzzy@googlegroups.com"
   }
 }
-
 ```
 
 ### `expand-url`
 
-Reads text on STDIN and writes the same text back, converting any links to
+`expand-url` reads text on STDIN and writes the same text back, converting any links to
 Markdown links, with the title of the page as the title of the link.  If you set
 `MOZ_COOKIEJAR` to the path of your `cookies.sqlite` it will use those cookies
 when loading the page.
 
 ### `export-bamboohr`
 
-Exports entire company directory as JSON.
+`export-bamboohr` exports entire company directory as JSON.
 
 ### `export-bamboohr-tree`
 
-Exports company org chart as JSON.
+`export-bamboohr-tree` exports company org chart as JSON.
 
 ### `fn`
 
-Create persistent functions by actually writing scripts.  Example usage:
+`fn` creates persistent functions by actually writing scripts.  Example usage:
 
 ```
 fn count-users 'wc -l < /etc/passwd'
@@ -165,32 +170,19 @@ fn count-users 'wc -l < /etc/passwd'
 
 ### `gen-pass`
 
-Little tool for generating bcrypt hashes.
+`gen-pass` bcrypts the first argument with the second argument rounds.
 
 ### `group-by-date`
 
-Creates time series data by counting lines and grouping them by a given date
-format.
-
-### `noaa-proxy`
-
-Creates a proxy for https://tgftp.nws.noaa.gov, but http, and listening on 9090.
-This is because Ubuntu 18.04 ships with [taffybar]() 0.4.6, which only supports
-http for the weather widgets and has hardcoded URLs.
-
-To install, add this line to your hosts file:
-
-```
-127.0.0.1       tgftp.nws.noaa.gov
-```
-
-And run this iptables command:
-
-```
-iptables -t nat -A OUTPUT -o lo -p tcp --dport 80 -j REDIRECT --to-port 9090
-```
+`group-by-date` creates time series data by counting lines and grouping them by a given date
+format.  takes dates on stdin in format -i, will group them by format -g, and
+write them in format -o.
 
 ### `minotaur`
+
+`minotaur` watches one or more directories (before the `--`) and runs a script when
+events in those directories occur.  The script receives the events as arguments,
+so you can exit early if only irrelevant files changed.
 
 ```bash
 minotaur -include internal -ignore yaml \
@@ -198,11 +190,8 @@ minotaur -include internal -ignore yaml \
    sh -c 'go test ~/code/leatherman/...'
 ```
 
-Watches one or more directories (before the `--`) and runs a script when events
-in those directories occur.  The script receives the events as arguments, so
-you can exit early if only irrelevant files changed.  The arguments are of the
-form `$event\t$filename`; for example `CREATE	x.pl`.  As far as I know the
-valid events are;
+The arguments are of the form `$event\t$filename`; for example `CREATE	x.pl`.
+As far as I know the valid events are;
 
  * `CHMOD`
  * `CREATE`
@@ -240,9 +229,35 @@ watching.
 
 ### `netrc-password`
 
-Pass hostname and login and this will print the password for the account.
+`netrc-password` prints password for the passed hostname and login.
+
+```bash
+$ netrc-password google.com me@gmail.com
+supersecretpassword
+```
+
+### `noaa-proxy`
+
+`noaa-proxy` creates a proxy for https://tgftp.nws.noaa.gov, but http, and listening on
+9090.  This is because Ubuntu 18.04 ships with [taffybar]() 0.4.6, which only
+supports http for the weather widgets and has hardcoded URLs.
+
+To install, add this line to your hosts file:
+
+```
+127.0.0.1       tgftp.nws.noaa.gov
+```
+
+And run this iptables command:
+
+```
+iptables -t nat -A OUTPUT -o lo -p tcp --dport 80 -j REDIRECT --to-port 9090
+```
 
 ### `pomotimer`
+
+`pomotimer` starts a timer for 25m or the duration expressed in the first
+argument.
 
 ```
 pomotimer 2.5m
@@ -263,30 +278,30 @@ progress.
 
 ### `prepend-emoji-hist`
 
-```
-alluni.pl | prefix-emoji-hist ~/.uni_history
-```
-
-Prints out the deduplicated lines from the passed file, converting characters to
+`prepend-emoji-hist` prints out the deduplicated lines from the passed file, converting characters to
 unicode names, and then printing out the lines from STDIN, filtering out what's
 already been printed.  Note that `alluni.pl` is in [my
 dotfiles](https://github.com/frioux/dotfiles.)
 
+```bash
+$ alluni.pl | prefix-emoji-hist ~/.uni_history
+```
+
 ### `render-mail`
 
-Ghetto tool to render email with a Local-Date included, if Date is not already
-in local time.
+`render-mail` is a scrappy tool to render email with a Local-Date included, if Date is
+not already in local time.
 
 ### `replace-unzip`
 
-Extracts zipfiles, but does not extract `.DS_Store` or `__MACOSX/`.
+`replace-unzip` extracts zipfiles, but does not extract `.DS_Store` or `__MACOSX/`.
 Automatically extracts into a directory named after the zipfile if there is not
 a single root for all files in the zipfile.
 
 ### `rss`
 
-Minimalist rss client.  Outputs links as markdown on STDOUT.  Takes url to feed
-and path to state file. Example usage:
+`rss` is a minimalist rss client.  Outputs links as markdown on STDOUT.  Takes url
+to feed and path to state file. Example usage:
 
 ```bash
 $ rss https://blog.afoolishmanifesto.com/index.xml afm.json
@@ -299,18 +314,17 @@ $ rss https://blog.afoolishmanifesto.com/index.xml afm.json
 
 ### `sm-list`
 
-List all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
+`sm-list` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
 as json documents per line.  Here's how you might see the top ten coffees by
 rating:
 
 ```bash
 $ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
 ```
-
 ### `srv`
 
-Serve a directory over http; takes a single optional parameter which is the dir
-to serve, default is `.`:
+`srv` will serve a directory over http; takes a single optional parameter which
+is the dir to serve, default is `.`:
 
 ```bash
 $ srv ~
@@ -319,8 +333,8 @@ Serving /home/frew on [::]:21873
 
 ### `ssh-quote`
 
-Prepares the arguments such that they can be pasted into an ssh command safely.
-For example:
+`ssh-quote` prepares the arguments such that they can be pasted into an ssh command
+safely.  For example:
 
 ```bash
 $ ssh-quote ls 'f*f'
@@ -329,17 +343,18 @@ $ ssh-quote ls 'f*f'
 
 ### `toml2json`
 
+`toml2json` reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON
+on stdout.
+
+
 ```bash
 $ echo 'foo = "bar"` | toml2json
 {"foo":"bar"}
 ```
 
-Reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON on
-stdout.
-
 ### `undefer`
 
-Takes a directory argument, prints contents of each file named before the
+`undefer` takes a directory argument, prints contents of each file named before the
 current date, and then deletes the file.
 
 If the current date were `2018-06-07` the starred files would be printed and
@@ -353,16 +368,16 @@ then deleted:
 
 ### `uni`
 
+`uni` will describe the characters in the args.
+
 ```bash
 $ uni ⢾
 '⢾' @ 10430 aka BRAILLE PATTERN DOTS-234568 ( graphic | printable | symbol )
 ```
 
-Inspects the unicode characters passed as an argument.
-
 ### `yaml2json`
 
-Reads YAML on stdin and writes JSON on stdout.
+`yaml2json` reads YAML on stdin and writes JSON on stdout.
 
 ## Debugging
 

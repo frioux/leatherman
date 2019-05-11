@@ -9,7 +9,16 @@ import (
 	"golang.org/x/text/unicode/runenames"
 )
 
-// Describe the characters in the args
+/*
+Describe will describe the characters in the args.
+
+```bash
+$ uni ⢾
+'⢾' @ 10430 aka BRAILLE PATTERN DOTS-234568 ( graphic | printable | symbol )
+```
+
+Command: uni
+*/
 func Describe(args []string, _ io.Reader) error {
 	if len(args) < 2 {
 		fmt.Printf("Usage: %s <string>\n", args[0])

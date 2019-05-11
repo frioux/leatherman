@@ -11,9 +11,12 @@ import (
 
 var dateRe = regexp.MustCompile(`^Date:\s+(.*)\s*$`)
 
-// Render reads email on stdin and reproduces it on stdout, with the Date
-// header parsed and duplicated as Local-Date containing the date in the local
-// timezone.
+/*
+Render is a scrappy tool to render email with a Local-Date included, if Date is
+not already in local time.
+
+Command: render-mail
+*/
 func Render(args []string, stdin io.Reader) error {
 	scanner := bufio.NewScanner(stdin)
 	for scanner.Scan() {

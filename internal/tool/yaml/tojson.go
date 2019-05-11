@@ -9,7 +9,11 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// ToJSON reads YAML on stdin and writes JSON on stdout.
+/*
+ToJSON reads YAML on stdin and writes JSON on stdout.
+
+Command: yaml2json
+*/
 func ToJSON(_ []string, stdin io.Reader) error {
 	d := yaml.NewDecoder(stdin)
 	e := json.NewEncoder(os.Stdout)

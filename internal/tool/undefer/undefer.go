@@ -69,8 +69,21 @@ func content(paths []string, stdout io.Writer) error {
 	return nil
 }
 
-// Run prints the contents of files in the passed directory that have a
-// prefix of a date in the past, and then deletes the files.
+/*
+Run takes a directory argument, prints contents of each file named before the
+current date, and then deletes the file.
+
+If the current date were `2018-06-07` the starred files would be printed and
+then deleted:
+
+```
+ * 2018-01-01.txt
+ * 2018-06-06-awesome-file.md
+   2018-07-06.txt
+```
+
+Command: undefer
+*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) > 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s $dir\n", args[0])

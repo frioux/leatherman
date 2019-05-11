@@ -12,7 +12,23 @@ import (
 
 const path = "/sys/class/backlight/intel_backlight"
 
-// Run modifies backlight brightness, assuming first arg is a percent.
+/*
+Run is a faster version of `xbacklight` by directly writing to `/sys`.  Example:
+
+Increase by 10%:
+
+``` bash
+$ backlight 10
+```
+
+Decrease by 10%:
+
+``` bash
+$ backlight -10
+```
+
+Command: backlight
+*/
 func Run(args []string, _ io.Reader) error {
 	err := os.Chdir(path)
 	if err != nil {

@@ -10,7 +10,18 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// ToJSON will convert TOML read on STDIN to JSON on STDOUT
+/*
+ToJSON reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON
+on stdout.
+
+
+```bash
+$ echo 'foo = "bar"` | toml2json
+{"foo":"bar"}
+```
+
+Command: toml2json
+*/
 func ToJSON(_ []string, stdin io.Reader) error {
 	buf := new(bytes.Buffer)
 	if _, err := io.Copy(buf, stdin); err != nil {

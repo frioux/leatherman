@@ -18,8 +18,25 @@ func init() {
 	upstream = u
 }
 
-// Proxy starts a proxy that can pretend to be the old noaa on http while
-// actually proxying to noaa on https.
+/*
+Proxy creates a proxy for https://tgftp.nws.noaa.gov, but http, and listening on
+9090.  This is because Ubuntu 18.04 ships with [taffybar]() 0.4.6, which only
+supports http for the weather widgets and has hardcoded URLs.
+
+To install, add this line to your hosts file:
+
+```
+127.0.0.1       tgftp.nws.noaa.gov
+```
+
+And run this iptables command:
+
+```
+iptables -t nat -A OUTPUT -o lo -p tcp --dport 80 -j REDIRECT --to-port 9090
+```
+
+Command: noaa-proxy
+*/
 func Proxy(_ []string, _ io.Reader) error {
 	http.Handle("/", httputil.NewSingleHostReverseProxy(upstream))
 

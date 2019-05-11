@@ -9,8 +9,17 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// Run takes a command and prints how you would need to quote it for ssh to
-// execute it for you.
+/*
+Run prepares the arguments such that they can be pasted into an ssh command
+safely.  For example:
+
+```bash
+$ ssh-quote ls 'f*f'
+'sh -c '\''ls '\''\'"''"'f*f'\''\'\'
+```
+
+Command: ssh-quote
+*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s [some tokens to quote]\n", args[0])

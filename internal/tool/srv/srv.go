@@ -10,7 +10,17 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// Serve an html directory tree, with index.html being shown for dirs.
+/*
+Serve will serve a directory over http; takes a single optional parameter which
+is the dir to serve, default is `.`:
+
+```bash
+$ srv ~
+Serving /home/frew on [::]:21873
+```
+
+Command: srv
+*/
 func Serve(args []string, _ io.Reader) error {
 	dir := "."
 	if len(args) > 1 {

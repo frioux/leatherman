@@ -12,10 +12,18 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// Run reads a history file from the first argument and reproduces
-// it on standard out, but with the names of the characters per line instead of
-// the characters themselves.  Reproduces stdin on stdout, leaving out anything
-// already printed.
+/*
+Run prints out the deduplicated lines from the passed file, converting characters to
+unicode names, and then printing out the lines from STDIN, filtering out what's
+already been printed.  Note that `alluni.pl` is in [my
+dotfiles](https://github.com/frioux/dotfiles.)
+
+```bash
+$ alluni.pl | prefix-emoji-hist ~/.uni_history
+```
+
+Command: prepend-emoji-hist
+*/
 func Run(args []string, stdin io.Reader) error {
 	if len(args) != 2 {
 		fmt.Fprintln(os.Stderr, "you must pass a history file!")

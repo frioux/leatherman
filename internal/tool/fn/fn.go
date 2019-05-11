@@ -12,7 +12,15 @@ import (
 
 var dir = os.Getenv("HOME") + "/code/dotfiles/bin"
 
-// Run generates shell scripts based on the args
+/*
+Run creates persistent functions by actually writing scripts.  Example usage:
+
+```
+fn count-users 'wc -l < /etc/passwd'
+```
+
+Command: fn
+*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) < 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s $scriptname [-f] $command $tokens\n", args[0])

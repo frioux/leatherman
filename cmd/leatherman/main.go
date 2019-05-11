@@ -36,6 +36,8 @@ import (
 	"github.com/frioux/leatherman/internal/tool/yaml"
 )
 
+//go:generate ../../maint/generate-README
+
 // Dispatch is the dispatch table that maps command names to functions.
 var Dispatch map[string]func([]string, io.Reader) error
 

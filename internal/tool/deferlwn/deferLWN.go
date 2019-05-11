@@ -15,9 +15,14 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// Run writes the input that contained links to be made available in the
-// future on the relevant day, and otherwise prints the lines on standard
-// output.
+/*
+Run creates undefer files (see `undefer`) for any lines containing a markdown
+link to `LWN.` Lines will be added in no particular order.  Lines not containing
+links (or otherwise running into errors) will be printed to standard out, with
+errors going to standard error.
+
+Command: defer-lwn
+*/
 func Run(args []string, stdin io.Reader) error {
 	if len(args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <dir>\n", args[0])

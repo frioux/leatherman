@@ -56,7 +56,11 @@ func t(now time.Time, l string) string {
 	return day + " \t" + relativeThere.Format("15:04\t03:04 PM") + "\t" + offsetStr
 }
 
-// Run shows my personal, digital, wall of clocks.
+/*
+Run shows my personal, digital, wall of clocks.
+
+Command: clocks
+*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) > 1 && args[1] == "-h" {
 		fmt.Println("my personal, digital, wall of clocks")

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cd $(dirname $0)/..
+
+exec >README.mdwn
+
+cat maint/README_begin.md
+
+maint/generate.sh | maint/generate.pl
+
+cat maint/README_end.md

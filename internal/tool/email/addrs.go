@@ -127,8 +127,17 @@ func sortAddrMap(score frecencyMap) []addr {
 	return addrs
 }
 
-// Addrs sorts the addresses passed on stdin based on how recently they were
-// used, based on the glob passed on the arguments.
+/*
+Addrs sorts the addresses passed on stdin (in the mutt addrbook format, see
+`addrspec-to-tabs`) and sorts them based on how recently they were used, from
+the glob passed on the arguments.
+
+``` bash
+$ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
+```
+
+Command: addrs
+*/
 func Addrs(args []string, stdin io.Reader) error {
 	if len(args) != 2 {
 		return errors.New("please pass a glob")

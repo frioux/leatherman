@@ -11,7 +11,11 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// Run bcrypts the first argument with the second argument rounds.
+/*
+Run bcrypts the first argument with the second argument rounds.
+
+Command: gen-pass
+*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) < 2 {
 		fmt.Fprintf(os.Stderr, "usage: %s $password [$cost]\n", args[0])

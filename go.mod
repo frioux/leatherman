@@ -3,6 +3,7 @@ module github.com/frioux/leatherman
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/PuerkitoBio/goquery v1.5.0
+	github.com/ReconfigureIO/goblin v0.3.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/erikdubbelboer/gspt v0.0.0-20190125194910-e68493906b83
 	github.com/fsnotify/fsnotify v1.4.7

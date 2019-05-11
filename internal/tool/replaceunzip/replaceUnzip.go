@@ -48,9 +48,13 @@ func genRoot(zipName string) string {
 	return strings.TrimSuffix(file, ext)
 }
 
-// Run acts like unzip, but leaves out .DS_Store and __MACOSX files,
-// and puts all of the zip contents in a single root directory if they were not
-// already.
+/*
+Run extracts zipfiles, but does not extract `.DS_Store` or `__MACOSX/`.
+Automatically extracts into a directory named after the zipfile if there is not
+a single root for all files in the zipfile.
+
+Command: replace-unzip
+*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) != 2 {
 		fmt.Println("Usage:", args[0], "some-zip-file.zip")

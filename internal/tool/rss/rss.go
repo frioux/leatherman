@@ -12,8 +12,21 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// Run takes a feed url and a file to store state.  Then it prints links of
-// any links it hasn't already printed before.
+/*
+Run is a minimalist rss client.  Outputs links as markdown on STDOUT.  Takes url
+to feed and path to state file. Example usage:
+
+```bash
+$ rss https://blog.afoolishmanifesto.com/index.xml afm.json
+[Announcing shellquote](https://blog.afoolishmanifesto.com/posts/announcing-shellquote/)
+[Detecting who used the EC2 metadata server with BCC](https://blog.afoolishmanifesto.com/posts/detecting-who-used-ec2-metadata-server-bcc/)
+[Centralized known_hosts for ssh](https://blog.afoolishmanifesto.com/posts/centralized-known-hosts-for-ssh/)
+[Buffered Channels in Golang](https://blog.afoolishmanifesto.com/posts/buffered-channels-in-golang/)
+[C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
+```
+
+Command: rss
+*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) != 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s feedURL statefile\n", args[0])
