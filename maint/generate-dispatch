@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use autodie;
+
+no warnings 'uninitialized';
+
+use JSON::PP;
+
+my (%imports, %commands);
+
+chdir '../..';
+
+my $cmd = q(go list -f '{{$name := .Name}}{{ $import := .ImportPath}}{{$dir := .Dir}}{{range .GoFiles}}{{$name}} {{$import}} {{$dir}}/{{.}}{{"\n"}}{{end}}' ./internal/tool/...);
+
+for my $line (`$cmd`) {
+   chomp $line;
+
+   my ($name, $import, $file) = split /\s+/, $line;
+
+   $imports{$import} = 1;
+
+   my $ast = decode_json(`goblin -file $file`);
+
+   %commands = (
+      %commands,
+      map {
+         my (undef, $cmd) = ($_->{comments}[0] =~ m/^(?:\S+\s+)(.+)\s+Command:\s+(.+)\s/s);
+
+         $cmd => "$name.$_->{name}{value}";
+      }
+      grep { my @n = grep m/Command: /, @{$_->{comments}}; @n > 0 }
+      grep { $_->{type} eq 'function' }
+      @{$ast->{declarations}}
+   );
+}
+
+open my $fh, '>', 'cmd/leatherman/dispatch.go';
+
+print $fh <<'GOLANG';
+package main
+
+import (
+	"io"
+
+GOLANG
+
+print $fh qq(\t"$_"\n) for sort keys %imports;
+
+print $fh <<'GOLANG';
+)
+
+func init() {
+	Dispatch = map[string]func([]string, io.Reader) error{
+GOLANG
+
+print $fh qq(\t\t"$_": $commands{$_},\n) for sort keys %commands;
+
+print $fh <<'GOLANG';
+
+		"help":    Help,
+		"version": Version,
+		"explode": Explode,
+	}
+}
+GOLANG
+
+close $fh;
