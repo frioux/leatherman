@@ -17,7 +17,6 @@ import (
 	"github.com/frioux/leatherman/internal/tool/groupbydate"
 	"github.com/frioux/leatherman/internal/tool/minotaur"
 	"github.com/frioux/leatherman/internal/tool/netrcpassword"
-	"github.com/frioux/leatherman/internal/tool/noaa"
 	"github.com/frioux/leatherman/internal/tool/pomotimer"
 	"github.com/frioux/leatherman/internal/tool/prependemojihist"
 	"github.com/frioux/leatherman/internal/tool/replaceunzip"
@@ -51,7 +50,6 @@ func init() {
 		"group-by-date": groupbydate.Run,
 		"minotaur": minotaur.Run,
 		"netrc-password": netrcpassword.Run,
-		"noaa-proxy": noaa.Proxy,
 		"pomotimer": pomotimer.Run,
 		"prepend-emoji-hist": prependemojihist.Run,
 		"render-mail": email.Render,
