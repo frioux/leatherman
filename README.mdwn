@@ -323,6 +323,10 @@ $ ssh-quote ls 'f*f'
 'sh -c '\''ls '\''\'"''"'f*f'\''\'\'
 ```
 
+### `today`
+
+`today` shows today's agenda.
+
 ### `toml2json`
 
 `toml2json` reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON

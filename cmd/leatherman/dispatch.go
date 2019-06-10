@@ -5,6 +5,7 @@ import (
 
 	"github.com/frioux/leatherman/internal/tool/backlight"
 	"github.com/frioux/leatherman/internal/tool/bamboo"
+	"github.com/frioux/leatherman/internal/tool/cal"
 	"github.com/frioux/leatherman/internal/tool/clocks"
 	"github.com/frioux/leatherman/internal/tool/csv"
 	"github.com/frioux/leatherman/internal/tool/debounce"
@@ -58,6 +59,7 @@ func init() {
 		"sm-list": smlist.Run,
 		"srv": srv.Serve,
 		"ssh-quote": sshquote.Run,
+		"today": cal.Today,
 		"toml2json": toml.ToJSON,
 		"undefer": undefer.Run,
 		"uni": uni.Describe,
