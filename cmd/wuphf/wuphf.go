@@ -13,6 +13,7 @@ import (
 var drivers = map[string]driver{
 	"wall":     wall,
 	"pushover": pushover,
+	"notify":   notify,
 }
 
 func main() {
@@ -75,5 +76,10 @@ func pushover(message string) error {
 
 func wall(message string) error {
 	cmd := exec.Command("wall", "-t", "2", message)
+	return cmd.Run()
+}
+
+func notify(message string) error {
+	cmd := exec.Command("notify-send", "-u", "critical", "wuphf", message)
 	return cmd.Run()
 }
