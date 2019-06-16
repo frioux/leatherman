@@ -40,7 +40,6 @@ var (
 	errNoPushoverToken  = errors.New("PUSHOVER_TOKEN not set")
 	errNoPushoverUser   = errors.New("PUSHOVER_USER not set")
 	errNoPushoverDevice = errors.New("PUSHOVER_DEVICE not set")
-	errPushoverFailed   = errors.New("failed to pushover")
 )
 
 func pushover(message string) error {
@@ -68,7 +67,7 @@ func pushover(message string) error {
 	}
 
 	if resp.StatusCode != 200 {
-		return errPushoverFailed
+		return fmt.Errorf("failed to pushover: %s (%s)", err, resp.Status)
 	}
 
 	return nil
