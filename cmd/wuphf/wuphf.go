@@ -27,7 +27,7 @@ func main() {
 	for n, d := range drivers {
 		err := d(message)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s failed: %s\n", n, message)
+			fmt.Fprintf(os.Stderr, "%s failed: %s\n", n, err)
 			failures++
 		}
 	}
