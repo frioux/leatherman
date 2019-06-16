@@ -28,7 +28,8 @@ func remind(cl *http.Client, tok, message string, media []twilio.Media) (string,
 
 	sha := sha1.Sum([]byte(what))
 	id := hex.EncodeToString(sha[:])
-	path := "/notes/.alerts/" + when.Format(time.RFC3339) + "_" + id + ".txt"
+	ts := when.Format(time.RFC3339)
+	path := "/notes/.alerts/" + ts + "_" + id + ".txt"
 
 	buf := strings.NewReader(what)
 
@@ -37,5 +38,5 @@ func remind(cl *http.Client, tok, message string, media []twilio.Media) (string,
 		return personality.Err(), xerrors.Errorf("dropbox.Create: %w", err)
 	}
 
-	return personality.Ack(), nil
+	return personality.Ack() + "; will remind you @ " + ts, nil
 }
