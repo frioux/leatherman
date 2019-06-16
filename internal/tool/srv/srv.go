@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"golang.org/x/xerrors"
 )
@@ -37,6 +38,13 @@ func Serve(args []string, _ io.Reader) error {
 	return serve(dir, ch)
 }
 
+func logReqs(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(os.Stderr, time.Now(), r.URL)
+		h.ServeHTTP(rw, r)
+	})
+}
+
 func serve(dir string, log chan net.Addr) error {
 	listener, err := net.Listen("tcp", ":0")
 	if err != nil {
@@ -45,5 +53,5 @@ func serve(dir string, log chan net.Addr) error {
 
 	log <- listener.Addr()
 
-	return http.Serve(listener, http.FileServer(http.Dir(dir)))
+	return http.Serve(listener, logReqs(http.FileServer(http.Dir(dir))))
 }
