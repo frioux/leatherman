@@ -44,12 +44,6 @@ const (
 	DURATION = 3
 )
 
-var timeFormat = regexp.MustCompile(`(?i)^(?P<kitchen>\d+(?::\d+)[pa]m)$`)
-
-const (
-	KITCHEN = 1
-)
-
 var (
 	errInvalidRemind   = errors.New("invalid remind format")
 	errBlankEvent      = errors.New("blank event")

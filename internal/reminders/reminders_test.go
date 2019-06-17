@@ -12,9 +12,6 @@ func TestAssertRegexLocations(t *testing.T) {
 	assert.Equal(t, sn[MESSAGE], "message")
 	assert.Equal(t, sn[WHEN], "when")
 	assert.Equal(t, sn[DURATION], "duration")
-
-	sn = timeFormat.SubexpNames()
-	assert.Equal(t, sn[KITCHEN], "kitchen")
 }
 
 var LA *time.Location
