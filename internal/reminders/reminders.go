@@ -64,6 +64,11 @@ func Parse(now time.Time, message string) (time.Time, string, error) {
 	if m[WHEN] != "" {
 		when := strings.ToLower(m[WHEN])
 
+		if when == "noon" {
+			when = "12:00pm"
+		} else if when == "midnight" {
+			when = "12:00am"
+		}
 		for _, format := range []string{"3:04pm", "3pm"} {
 			clock, err := time.Parse(format, when)
 			if err != nil {

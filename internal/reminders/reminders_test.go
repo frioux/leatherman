@@ -54,6 +54,8 @@ func TestParse(t *testing.T) {
 		{"remind me to frioux at 10am", "frioux", now.Add(10 * time.Hour), false},
 		{"remind me to frioux at 10AM", "frioux", now.Add(10 * time.Hour), false},
 		{"remind me to frioux at 10:01am", "frioux", now.Add(10*time.Hour + time.Minute), false},
+		{"remind me to frioux at noon", "frioux", time.Date(2012, 12, 12, 12, 0, 0, 0, LA), false},
+		{"remind me to frioux at midnight", "frioux", time.Date(2012, 12, 12, 0, 0, 0, 0, LA), false},
 	}
 
 	for _, a := range assertions {
