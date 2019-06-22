@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"runtime/debug"
 	"time"
 
 	"github.com/frioux/amygdala/internal/log"
@@ -48,13 +49,38 @@ func init() {
 
 var port int
 
+var version string
+
 func init() {
 	flag.IntVar(&port, "port", 8080, "port to listen on")
+
+	if version == "" {
+		version = "unknown"
+	}
 }
 
 func main() {
 	flag.Parse()
 	cl := &http.Client{}
+
+	http.Handle("/version", http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
+		rw.Header().Set("content-type", "text/plain")
+
+		bi, ok := debug.ReadBuildInfo()
+		if !ok {
+			rw.WriteHeader(500)
+		}
+
+		fmt.Fprintln(rw, "version:", version)
+
+		for _, dep := range bi.Deps {
+			fmt.Printf("%s@%s (%s)\n", dep.Path, dep.Version, dep.Sum)
+			if dep.Replace != nil {
+				r := dep.Replace
+				fmt.Printf("   replaced by %s@%s (%s)\n", r.Path, r.Version, r.Sum)
+			}
+		}
+	}))
 
 	http.Handle("/twilio", middleware.Adapt(receiveSMS(cl, dropboxAccessToken),
 		middleware.Log(os.Stdout),
