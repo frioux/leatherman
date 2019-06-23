@@ -51,5 +51,5 @@ echo "---\nfoo: 1" | leatherman yaml2json
 {"foo":1}
 ```
 
-## Current tools
+## Tools
 
