@@ -13,7 +13,6 @@ import (
 	"github.com/frioux/leatherman/internal/tool/email"
 	"github.com/frioux/leatherman/internal/tool/expandurl"
 	"github.com/frioux/leatherman/internal/tool/fn"
-	"github.com/frioux/leatherman/internal/tool/genpass"
 	"github.com/frioux/leatherman/internal/tool/groupbydate"
 	"github.com/frioux/leatherman/internal/tool/minotaur"
 	"github.com/frioux/leatherman/internal/tool/netrcpassword"
@@ -23,7 +22,6 @@ import (
 	"github.com/frioux/leatherman/internal/tool/rss"
 	"github.com/frioux/leatherman/internal/tool/smlist"
 	"github.com/frioux/leatherman/internal/tool/srv"
-	"github.com/frioux/leatherman/internal/tool/sshquote"
 	"github.com/frioux/leatherman/internal/tool/toml"
 	"github.com/frioux/leatherman/internal/tool/undefer"
 	"github.com/frioux/leatherman/internal/tool/uni"
@@ -46,7 +44,6 @@ func init() {
 		"export-bamboohr": bamboo.ExportDirectory,
 		"export-bamboohr-tree": bamboo.ExportOrgChart,
 		"fn": fn.Run,
-		"gen-pass": genpass.Run,
 		"group-by-date": groupbydate.Run,
 		"minotaur": minotaur.Run,
 		"netrc-password": netrcpassword.Run,
@@ -57,7 +54,6 @@ func init() {
 		"rss": rss.Run,
 		"sm-list": smlist.Run,
 		"srv": srv.Serve,
-		"ssh-quote": sshquote.Run,
 		"toml2json": toml.ToJSON,
 		"undefer": undefer.Run,
 		"uni": uni.Describe,

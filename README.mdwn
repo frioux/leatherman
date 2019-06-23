@@ -168,10 +168,6 @@ when loading the page.
 fn count-users 'wc -l < /etc/passwd'
 ```
 
-### `gen-pass`
-
-`gen-pass` bcrypts the first argument with the second argument rounds.
-
 ### `group-by-date`
 
 `group-by-date` creates time series data by counting lines and grouping them by a given date
@@ -311,16 +307,6 @@ is the dir to serve, default is `.`:
 ```bash
 $ srv ~
 Serving /home/frew on [::]:21873
-```
-
-### `ssh-quote`
-
-`ssh-quote` prepares the arguments such that they can be pasted into an ssh command
-safely.  For example:
-
-```bash
-$ ssh-quote ls 'f*f'
-'sh -c '\''ls '\''\'"''"'f*f'\''\'\'
 ```
 
 ### `toml2json`
