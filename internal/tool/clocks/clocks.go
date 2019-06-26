@@ -78,8 +78,7 @@ func run(now time.Time, w io.Writer) {
 	fmt.Fprintln(w, "here : "+t(now, "Local"))
 	fmt.Fprintln(w, "L.A. : "+t(now, "America/Los_Angeles"))
 	fmt.Fprintln(w, "MS/TX: "+t(now, "America/Chicago"))
-	fmt.Fprintln(w, "rjbs : "+t(now, "America/New_York"))
-	fmt.Fprintln(w, "riba : "+t(now, "Europe/Berlin"))
-	fmt.Fprintln(w, "seo  : "+t(now, "Asia/Jerusalem"))
+	fmt.Fprintln(w, "east : "+t(now, "America/New_York"))
+	fmt.Fprintln(w, "TLV  : "+t(now, "Asia/Jerusalem"))
 	fmt.Fprintln(w, "UTC  : "+t(now, "UTC"))
 }
