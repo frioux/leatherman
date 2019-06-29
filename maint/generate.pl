@@ -1,9 +1,10 @@
-#!/usr/bin/perl -CO
+#!/usr/bin/perl
 
 use strict;
 use warnings;
 use autodie;
 
+use Encode;
 use JSON::PP;
 
 no warnings 'uninitialized';
@@ -33,9 +34,19 @@ open $fh, '<:encoding(UTF-8)', 'maint/README_end.md';
 my $end = do { local $/; <$fh> };
 close $fh;
 
+$doc{$_} = "### `$_`\n\n`$_` $doc{$_}\n" for keys %doc;
+
 my $body = $begin;
-$body .= "### `$_`\n\n`$_` $doc{$_}\n" for sort keys %doc;
+$body .= $doc{$_} for sort keys %doc;
 $body .= $end;
+
+my %offsets;
+my $offset = length $begin;
+for my $cmd (sort keys %doc) {
+   my $length = length(encode('UTF-8', $doc{$cmd}, Encode::FB_CROAK));
+   $offsets{$cmd} = "[$offset:" . ($offset + $length) . "]";
+   $offset += $length;
+}
 
 open my $readme, '>:encoding(UTF-8)', 'README.mdwn';
 print $readme $body;
@@ -45,4 +56,12 @@ close $readme;
 open my $help, '>:encoding(UTF-8)', 'cmd/leatherman/help_generated.go';
 $body =~ s/`/` + "`" + `/g;
 print $help "package main\n\n" .
-   "var readme = []byte(`$body`)"
+   "var readme = []byte(`$body`)\n\n" .
+   "var commandReadme map[string][]byte\n" .
+   "func init() {\n" .
+   "\tcommandReadme = map[string][]byte{\n";
+
+print $help qq(\t\t"$_": readme$offsets{$_},\n\n) for sort keys %offsets;
+
+print $help "\t}\n";
+print $help "}\n";

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"sort"
 
 	"golang.org/x/xerrors"
@@ -16,12 +17,25 @@ func Help(args []string, _ io.Reader) error {
 	var full bool
 	flags.BoolVar(&full, "v", false, "show full help")
 
+	var command string
+	flags.StringVar(&command, "command", "", "show help for just command")
+
 	err := flags.Parse(args[1:])
 	if err != nil {
 		return xerrors.Errorf("flags.Parse: %w", err)
 	}
 
 	if full {
+		fmt.Print(string(readme))
+		return nil
+	}
+
+	if command != "" {
+		readme, ok := commandReadme[command]
+		if !ok {
+			fmt.Fprintf(os.Stderr, "No such command: %s\n", command)
+			os.Exit(1)
+		}
 		fmt.Print(string(readme))
 		return nil
 	}
@@ -36,6 +50,7 @@ func Help(args []string, _ io.Reader) error {
 	for _, k := range tools {
 		str += " * " + k + "\n"
 	}
+	str += "\nGet more help for each tool with `leatherman help -command <tool>`, or `leatherman help -v`"
 	fmt.Println(str)
 
 	return nil

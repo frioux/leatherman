@@ -369,3 +369,65 @@ If you have a long running tool, the pprof http endpoint is exposed on
 ` + "`" + `localhost:6060/debug/pprof` + "`" + ` but picks a random port if that port is in use; the
 port can be overridden by setting ` + "`" + `LMHTTPPROF=$someport` + "`" + `.
 `)
+
+var commandReadme map[string][]byte
+func init() {
+	commandReadme = map[string][]byte{
+		"addrs": readme[1582:1870],
+
+		"addrspec-to-tabs": readme[1870:2294],
+
+		"backlight": readme[2294:2496],
+
+		"clocks": readme[2496:2564],
+
+		"csv2json": readme[2564:2704],
+
+		"csv2md": readme[2704:2778],
+
+		"debounce": readme[2778:3122],
+
+		"defer-lwn": readme[3122:3418],
+
+		"dump-mozlz4": readme[3418:3601],
+
+		"email2json": readme[3601:4316],
+
+		"expand-url": readme[4316:4606],
+
+		"export-bamboohr": readme[4606:4690],
+
+		"export-bamboohr-tree": readme[4690:4777],
+
+		"fn": readme[4777:4913],
+
+		"group-by-date": readme[4913:5131],
+
+		"minotaur": readme[5131:6731],
+
+		"netrc-password": readme[6731:6896],
+
+		"pomotimer": readme[6896:7388],
+
+		"prepend-emoji-hist": readme[7388:7759],
+
+		"render-mail": readme[7759:7893],
+
+		"replace-unzip": readme[7893:8123],
+
+		"rss": readme[8123:8871],
+
+		"sm-list": readme[8871:9147],
+
+		"srv": readme[9147:9330],
+
+		"toml2json": readme[9330:9505],
+
+		"undefer": readme[9505:9813],
+
+		"uni": readme[9813:9975],
+
+		"yaml2json": readme[9975:10052],
+
+	}
+}
