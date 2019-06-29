@@ -1,13 +1,31 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"sort"
+
+	"golang.org/x/xerrors"
 )
 
 // Help prints tool listing
-func Help(_ []string, _ io.Reader) error {
+func Help(args []string, _ io.Reader) error {
+	flags := flag.NewFlagSet("help", flag.ExitOnError)
+
+	var full bool
+	flags.BoolVar(&full, "v", false, "show full help")
+
+	err := flags.Parse(args[1:])
+	if err != nil {
+		return xerrors.Errorf("flags.Parse: %w", err)
+	}
+
+	if full {
+		fmt.Print(string(readme))
+		return nil
+	}
+
 	tools := make([]string, 0, len(Dispatch))
 	for k := range Dispatch {
 		tools = append(tools, k)

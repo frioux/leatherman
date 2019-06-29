@@ -25,15 +25,24 @@ while (<STDIN>) {
    $doc{$cmd} = $body;
 }
 
-open my $readme, '>:encoding(UTF-8)', 'README.mdwn';
-
 open my $fh, '<:encoding(UTF-8)', 'maint/README_begin.md';
-print $readme do { local $/; <$fh> };
+my $begin = do { local $/; <$fh> };
 close $fh;
-
-print $readme "### `$_`\n\n`$_` $doc{$_}\n" for sort keys %doc;
 
 open $fh, '<:encoding(UTF-8)', 'maint/README_end.md';
-print $readme do { local $/; <$fh> };
+my $end = do { local $/; <$fh> };
 close $fh;
+
+my $body = $begin;
+$body .= "### `$_`\n\n`$_` $doc{$_}\n" for sort keys %doc;
+$body .= $end;
+
+open my $readme, '>:encoding(UTF-8)', 'README.mdwn';
+print $readme $body;
+
 close $readme;
+
+open my $help, '>:encoding(UTF-8)', 'cmd/leatherman/help_generated.go';
+$body =~ s/`/` + "`" + `/g;
+print $help "package main\n\n" .
+   "var readme = []byte(`$body`)"
