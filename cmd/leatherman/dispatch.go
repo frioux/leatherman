@@ -8,7 +8,6 @@ import (
 	"github.com/frioux/leatherman/internal/tool/clocks"
 	"github.com/frioux/leatherman/internal/tool/csv"
 	"github.com/frioux/leatherman/internal/tool/debounce"
-	"github.com/frioux/leatherman/internal/tool/deferlwn"
 	"github.com/frioux/leatherman/internal/tool/dumpmozlz4"
 	"github.com/frioux/leatherman/internal/tool/email"
 	"github.com/frioux/leatherman/internal/tool/expandurl"
@@ -37,7 +36,6 @@ func init() {
 		"csv2json": csv.ToJSON,
 		"csv2md": csv.ToMarkdown,
 		"debounce": debounce.Run,
-		"defer-lwn": deferlwn.Run,
 		"dump-mozlz4": dumpmozlz4.Run,
 		"email2json": email.ToJSON,
 		"expand-url": expandurl.Run,

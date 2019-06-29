@@ -113,13 +113,6 @@ The default lockout time is one second, you can override that with the
 output is emitted after there is no input for the lockout time.  You can change
 this behavior by passing the ` + "`" + `--leadingEdge` + "`" + ` flag.
 
-### ` + "`" + `defer-lwn` + "`" + `
-
-` + "`" + `defer-lwn` + "`" + ` creates undefer files (see ` + "`" + `undefer` + "`" + `) for any lines containing a markdown
-link to ` + "`" + `LWN.` + "`" + ` Lines will be added in no particular order.  Lines not containing
-links (or otherwise running into errors) will be printed to standard out, with
-errors going to standard error.
-
 ### ` + "`" + `dump-mozlz4` + "`" + `
 
 ` + "`" + `dump-mozlz4` + "`" + ` dumps the contents of a ` + "`" + `mozlz4` + "`" + ` (aka ` + "`" + `jsonlz4` + "`" + `) file commonly used by
@@ -387,47 +380,45 @@ func init() {
 
 		"debounce": readme[2778:3122],
 
-		"defer-lwn": readme[3122:3418],
+		"dump-mozlz4": readme[3122:3305],
 
-		"dump-mozlz4": readme[3418:3601],
+		"email2json": readme[3305:4020],
 
-		"email2json": readme[3601:4316],
+		"expand-url": readme[4020:4310],
 
-		"expand-url": readme[4316:4606],
+		"export-bamboohr": readme[4310:4394],
 
-		"export-bamboohr": readme[4606:4690],
+		"export-bamboohr-tree": readme[4394:4481],
 
-		"export-bamboohr-tree": readme[4690:4777],
+		"fn": readme[4481:4617],
 
-		"fn": readme[4777:4913],
+		"group-by-date": readme[4617:4835],
 
-		"group-by-date": readme[4913:5131],
+		"minotaur": readme[4835:6435],
 
-		"minotaur": readme[5131:6731],
+		"netrc-password": readme[6435:6600],
 
-		"netrc-password": readme[6731:6896],
+		"pomotimer": readme[6600:7092],
 
-		"pomotimer": readme[6896:7388],
+		"prepend-emoji-hist": readme[7092:7463],
 
-		"prepend-emoji-hist": readme[7388:7759],
+		"render-mail": readme[7463:7597],
 
-		"render-mail": readme[7759:7893],
+		"replace-unzip": readme[7597:7827],
 
-		"replace-unzip": readme[7893:8123],
+		"rss": readme[7827:8575],
 
-		"rss": readme[8123:8871],
+		"sm-list": readme[8575:8851],
 
-		"sm-list": readme[8871:9147],
+		"srv": readme[8851:9034],
 
-		"srv": readme[9147:9330],
+		"toml2json": readme[9034:9209],
 
-		"toml2json": readme[9330:9505],
+		"undefer": readme[9209:9517],
 
-		"undefer": readme[9505:9813],
+		"uni": readme[9517:9679],
 
-		"uni": readme[9813:9975],
-
-		"yaml2json": readme[9975:10052],
+		"yaml2json": readme[9679:9756],
 
 	}
 }

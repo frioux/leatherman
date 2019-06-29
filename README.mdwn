@@ -111,13 +111,6 @@ The default lockout time is one second, you can override that with the
 output is emitted after there is no input for the lockout time.  You can change
 this behavior by passing the `--leadingEdge` flag.
 
-### `defer-lwn`
-
-`defer-lwn` creates undefer files (see `undefer`) for any lines containing a markdown
-link to `LWN.` Lines will be added in no particular order.  Lines not containing
-links (or otherwise running into errors) will be printed to standard out, with
-errors going to standard error.
-
 ### `dump-mozlz4`
 
 `dump-mozlz4` dumps the contents of a `mozlz4` (aka `jsonlz4`) file commonly used by
