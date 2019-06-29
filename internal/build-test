@@ -7,5 +7,5 @@ for arg in "$@"; do
 done | grep -E '\.go$'
 
 go test ./...
-go build ./cmd/leatherman/...
+go build
 echo "Built new leatherman at $(date)"

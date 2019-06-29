@@ -1,5 +1,3 @@
 #!/bin/sh
 
-cd $(dirname $0)/..
-
 maint/generate.sh | maint/generate.pl

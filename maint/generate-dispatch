@@ -11,8 +11,6 @@ use JSON::PP;
 
 my (%imports, %commands);
 
-chdir '../..';
-
 my $cmd = q(go list -f '{{$name := .Name}}{{ $import := .ImportPath}}{{$dir := .Dir}}{{range .GoFiles}}{{$name}} {{$import}} {{$dir}}/{{.}}{{"\n"}}{{end}}' ./internal/tool/...);
 
 for my $line (`$cmd`) {
@@ -37,7 +35,7 @@ for my $line (`$cmd`) {
    );
 }
 
-open my $fh, '>', 'cmd/leatherman/dispatch.go';
+open my $fh, '>', 'dispatch.go';
 
 print $fh <<'GOLANG';
 package main

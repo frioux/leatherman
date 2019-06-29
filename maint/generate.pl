@@ -53,7 +53,7 @@ print $readme $body;
 
 close $readme;
 
-open my $help, '>:encoding(UTF-8)', 'cmd/leatherman/help_generated.go';
+open my $help, '>:encoding(UTF-8)', 'help_generated.go';
 $body =~ s/`/` + "`" + `/g;
 print $help "package main\n\n" .
    "var readme = []byte(`$body`)\n\n" .

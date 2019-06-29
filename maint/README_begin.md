@@ -7,8 +7,8 @@ but may be instructive nonetheless.
 [I have CI/CD to build this into a single
 binary](https://github.com/frioux/leatherman/blob/master/.travis.yml) and [an
 `explode` tool that builds
-symlinks](https://github.com/frioux/leatherman/blob/master/cmd/leatherman/explode.go)
-for each tool in the busybox style.
+symlinks](https://github.com/frioux/leatherman/blob/master/explode.go) for each
+tool in the busybox style.
 
 [I have automation in my
 dotfiles](https://github.com/frioux/dotfiles/blob/bef8303c19e2cefac7dfbec420ad8d45b95415b8/install.sh#L133-L141)

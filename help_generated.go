@@ -9,8 +9,8 @@ but may be instructive nonetheless.
 [I have CI/CD to build this into a single
 binary](https://github.com/frioux/leatherman/blob/master/.travis.yml) and [an
 ` + "`" + `explode` + "`" + ` tool that builds
-symlinks](https://github.com/frioux/leatherman/blob/master/cmd/leatherman/explode.go)
-for each tool in the busybox style.
+symlinks](https://github.com/frioux/leatherman/blob/master/explode.go) for each
+tool in the busybox style.
 
 [I have automation in my
 dotfiles](https://github.com/frioux/dotfiles/blob/bef8303c19e2cefac7dfbec420ad8d45b95415b8/install.sh#L133-L141)
@@ -366,59 +366,59 @@ port can be overridden by setting ` + "`" + `LMHTTPPROF=$someport` + "`" + `.
 var commandReadme map[string][]byte
 func init() {
 	commandReadme = map[string][]byte{
-		"addrs": readme[1582:1870],
+		"addrs": readme[1567:1855],
 
-		"addrspec-to-tabs": readme[1870:2294],
+		"addrspec-to-tabs": readme[1855:2279],
 
-		"backlight": readme[2294:2496],
+		"backlight": readme[2279:2481],
 
-		"clocks": readme[2496:2564],
+		"clocks": readme[2481:2549],
 
-		"csv2json": readme[2564:2704],
+		"csv2json": readme[2549:2689],
 
-		"csv2md": readme[2704:2778],
+		"csv2md": readme[2689:2763],
 
-		"debounce": readme[2778:3122],
+		"debounce": readme[2763:3107],
 
-		"dump-mozlz4": readme[3122:3305],
+		"dump-mozlz4": readme[3107:3290],
 
-		"email2json": readme[3305:4020],
+		"email2json": readme[3290:4005],
 
-		"expand-url": readme[4020:4310],
+		"expand-url": readme[4005:4295],
 
-		"export-bamboohr": readme[4310:4394],
+		"export-bamboohr": readme[4295:4379],
 
-		"export-bamboohr-tree": readme[4394:4481],
+		"export-bamboohr-tree": readme[4379:4466],
 
-		"fn": readme[4481:4617],
+		"fn": readme[4466:4602],
 
-		"group-by-date": readme[4617:4835],
+		"group-by-date": readme[4602:4820],
 
-		"minotaur": readme[4835:6435],
+		"minotaur": readme[4820:6420],
 
-		"netrc-password": readme[6435:6600],
+		"netrc-password": readme[6420:6585],
 
-		"pomotimer": readme[6600:7092],
+		"pomotimer": readme[6585:7077],
 
-		"prepend-emoji-hist": readme[7092:7463],
+		"prepend-emoji-hist": readme[7077:7448],
 
-		"render-mail": readme[7463:7597],
+		"render-mail": readme[7448:7582],
 
-		"replace-unzip": readme[7597:7827],
+		"replace-unzip": readme[7582:7812],
 
-		"rss": readme[7827:8575],
+		"rss": readme[7812:8560],
 
-		"sm-list": readme[8575:8851],
+		"sm-list": readme[8560:8836],
 
-		"srv": readme[8851:9034],
+		"srv": readme[8836:9019],
 
-		"toml2json": readme[9034:9209],
+		"toml2json": readme[9019:9194],
 
-		"undefer": readme[9209:9517],
+		"undefer": readme[9194:9502],
 
-		"uni": readme[9517:9679],
+		"uni": readme[9502:9664],
 
-		"yaml2json": readme[9679:9756],
+		"yaml2json": readme[9664:9741],
 
 	}
 }

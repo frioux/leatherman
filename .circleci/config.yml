@@ -14,7 +14,6 @@ jobs:
           command: 'go get ./...'
       - run:
           name: Windows Build
-          working_directory: cmd/leatherman
           environment:
              GO111MODULE: "on"
              GOOS: windows
@@ -25,7 +24,6 @@ jobs:
             mv leatherman.zip ../../artifacts/leatherman-windows.zip
       - run:
           name: OSX Build
-          working_directory: cmd/leatherman
           environment:
              GO111MODULE: "on"
              GOOS: darwin
@@ -38,7 +36,7 @@ jobs:
           name: Linux Build
           command: >
             make;
-            mv cmd/leatherman/leatherman.xz artifacts/leatherman.xz
+            mv leatherman.xz artifacts/leatherman.xz
       - run:
           name: Install GHR
           working_directory: ~/
