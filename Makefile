@@ -1,7 +1,5 @@
-VERSION := $(shell git describe --abbrev=7 --dirty --always || echo $TRAVIS_COMMIT)
-WHEN := $(shell date)
-WHO := $(shell whoami)
-WHERE := $(shell hostname -f)
+VERSION := $(shell git describe --abbrev=7 --dirty --always)
+WHEN := $(shell git log -1 --pretty=%cI $(VERSION) 2>/dev/null)
 
 leatherman.xz: leatherman
 	xz --stdout leatherman > leatherman.xz
@@ -14,7 +12,7 @@ leatherman:
 	go vet ./...
 	TZ=America/Los_Angeles go test -coverprofile=cover.cover -race ./...
 	go mod verify
-	go build -ldflags "-s -X 'main.version=$(VERSION)' -X 'main.when=$(WHEN)' -X 'main.who=$(WHO)' -X 'main.where=$(WHERE)'"
+	go build -ldflags "-s -X 'github.com/frioux/leatherman/internal/version.Version=$(VERSION)' -X 'github.com/frioux/leatherman/internal/version.When=$(WHEN)'"
 	./leatherman version
 
 watch:

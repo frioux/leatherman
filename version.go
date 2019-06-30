@@ -5,14 +5,14 @@ import (
 	"io"
 	"runtime"
 	"runtime/debug"
-)
 
-var version, when, who, where string
+	"github.com/frioux/leatherman/internal/version"
+)
 
 // Version prints current version
 func Version(args []string, _ io.Reader) error {
-	fmt.Printf("Leatherman built from %s on %s by %s@%s with %s\n",
-		version, when, who, where, runtime.Version())
+	fmt.Printf("Leatherman built from %s on %s by with %s\n",
+		version.Version, version.When, runtime.Version())
 
 	bi, ok := debug.ReadBuildInfo()
 	if !ok {
