@@ -3,9 +3,9 @@ package sweetmarias // import "github.com/frioux/leatherman/pkg/sweetmarias"
 import (
 	"io"
 	"math/rand"
-	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/frioux/leatherman/internal/lmhttp"
 	"golang.org/x/xerrors"
 )
 
@@ -15,7 +15,7 @@ var errStatusCode = xerrors.New("status code error")
 
 // AllCoffees returns a list of URLs for each coffee in Sweet Maria's inventory.
 func AllCoffees() ([]string, error) {
-	res, err := http.Get(allURL)
+	res, err := lmhttp.Get(allURL)
 	if err != nil {
 		return nil, xerrors.Errorf("http.Get: %w", err)
 	}

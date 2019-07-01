@@ -2,11 +2,11 @@ package sweetmarias // import "github.com/frioux/leatherman/pkg/sweetmarias"
 
 import (
 	"log"
-	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/frioux/leatherman/internal/lmhttp"
 	"golang.org/x/xerrors"
 )
 
@@ -24,7 +24,7 @@ type Coffee struct {
 
 // LoadCoffee loads a Coffee from the passed url.
 func LoadCoffee(url string) (Coffee, error) {
-	res, err := http.Get(url)
+	res, err := lmhttp.Get(url)
 	if err != nil {
 		return Coffee{}, xerrors.Errorf("http.Get: %w", err)
 	}

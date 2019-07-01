@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/frioux/leatherman/pkg/mozcookiejar"
 	_ "github.com/mattn/go-sqlite3" // sqlite3 required
 	"golang.org/x/net/publicsuffix"
@@ -135,9 +136,9 @@ func cj() (*cookiejar.Jar, error) {
 }
 
 func urlToLink(ua *http.Client, url string) (string, error) {
-	resp, err := ua.Get(url)
+	resp, err := lmhttp.Get(url)
 	if err != nil {
-		return "", xerrors.Errorf("ua.Get: %s", err)
+		return "", xerrors.Errorf("lmhttp.Get: %s", err)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)

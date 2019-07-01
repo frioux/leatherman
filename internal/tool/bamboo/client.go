@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/headzoo/surf"
 	"github.com/headzoo/surf/browser"
 	"golang.org/x/xerrors"
@@ -34,6 +35,7 @@ func newClient(user, password string) client {
 
 func (c *client) auth() error {
 	ua := surf.NewBrowser()
+	ua.SetUserAgent(lmhttp.UserAgent)
 	err := ua.Open(c.authURL)
 	if err != nil {
 		return xerrors.Errorf("auth: %w", err)

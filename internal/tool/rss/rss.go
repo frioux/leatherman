@@ -8,6 +8,7 @@ import (
 	"os"
 	"sort"
 
+	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/mmcdole/gofeed"
 	"golang.org/x/xerrors"
 )
@@ -42,7 +43,13 @@ func run(urlString, statePath string, w io.Writer) error {
 	if err != nil {
 		return xerrors.Errorf("Couldn't parse feed url (%s): %w", feedURL, err)
 	}
-	f, err := fp.ParseURL(feedURL.String())
+
+	resp, err := lmhttp.Get(urlString)
+	if err != nil {
+		return xerrors.Errorf("Couldn't get feed: %w", err)
+	}
+
+	f, err := fp.Parse(resp.Body)
 	if err != nil {
 		return xerrors.Errorf("Couldn't fetch feed (%s): %w", feedURL, err)
 	}
