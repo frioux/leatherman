@@ -13,11 +13,12 @@ func TestRun(t *testing.T) {
 
 	at := time.Date(2012, 12, 12, 4, 12, 12, 12, time.UTC)
 	run(at, buf)
-	assert.Regexp(t, `here\s+:\s+yesterday\s+20:12\s+08:12 PM\s+-8
-L.A.\s+:\s+yesterday\s+20:12\s+08:12 PM\s+-8
-MS/TX:\s+yesterday\s+22:12\s+10:12 PM\s+-6
-east\s+:\s+yesterday\s+23:12\s+11:12 PM\s+-5
-TLV\s+:\s+today\s+06:12\s+06:12 AM\s+\+2
-UTC\s+:\s+today\s+04:12\s+04:12 AM\s+\+0
-`, buf.String())
+	assert.Equal(t, `
+                Local  yesterday  20:12   8:12 PM  -8
+  America/Los_Angeles  yesterday  20:12   8:12 PM  -8
+      America/Chicago  yesterday  22:12  10:12 PM  -6
+     America/New_York  yesterday  23:12  11:12 PM  -5
+       Asia/Jerusalem      today  06:12   6:12 AM  +2
+                  UTC      today  04:12   4:12 AM  +0
+`, "\n"+buf.String())
 }

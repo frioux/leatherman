@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"text/tabwriter"
 	"time"
 )
 
@@ -47,13 +48,15 @@ func t(now time.Time, l string) string {
 	day := "wtf"
 	switch cmpDates(relativeThere, relativeHere) {
 	case 0:
-		day = "today     "
+		day = "today"
 	case 1:
-		day = "tomorrow  "
+		day = "tomorrow"
 	case -1:
-		day = "yesterday "
+		day = "yesterday"
 	}
-	return day + " \t" + relativeThere.Format("15:04\t03:04 PM") + "\t" + offsetStr
+	// I can't figure out why I need two tabs at the end or why the final column
+	// isn't right aligned :(
+	return l + "\t" + day + "\t" + relativeThere.Format("15:04\t3:04 PM") + "\t\t" + offsetStr
 }
 
 /*
@@ -74,11 +77,13 @@ func Run(args []string, _ io.Reader) error {
 	return nil
 }
 
-func run(now time.Time, w io.Writer) {
-	fmt.Fprintln(w, "here : "+t(now, "Local"))
-	fmt.Fprintln(w, "L.A. : "+t(now, "America/Los_Angeles"))
-	fmt.Fprintln(w, "MS/TX: "+t(now, "America/Chicago"))
-	fmt.Fprintln(w, "east : "+t(now, "America/New_York"))
-	fmt.Fprintln(w, "TLV  : "+t(now, "Asia/Jerusalem"))
-	fmt.Fprintln(w, "UTC  : "+t(now, "UTC"))
+func run(now time.Time, out io.Writer) {
+	w := tabwriter.NewWriter(out, 0, 8, 2, ' ', tabwriter.AlignRight)
+	fmt.Fprintln(w, t(now, "Local"))
+	fmt.Fprintln(w, t(now, "America/Los_Angeles"))
+	fmt.Fprintln(w, t(now, "America/Chicago"))
+	fmt.Fprintln(w, t(now, "America/New_York"))
+	fmt.Fprintln(w, t(now, "Asia/Jerusalem"))
+	fmt.Fprintln(w, t(now, "UTC"))
+	w.Flush()
 }
