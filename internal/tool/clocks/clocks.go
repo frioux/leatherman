@@ -45,7 +45,7 @@ func t(now time.Time, l string) string {
 	}
 
 	day := "wtf"
-	switch cmpDates(relativeHere, relativeThere) {
+	switch cmpDates(relativeThere, relativeHere) {
 	case 0:
 		day = "today     "
 	case 1:
