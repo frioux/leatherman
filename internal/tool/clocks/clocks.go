@@ -60,7 +60,12 @@ func t(now time.Time, l string) string {
 }
 
 /*
-Run shows my personal, digital, wall of clocks.
+Run shows my personal, digital, wall of clocks.  Pass one or more timezone names
+to choose which timezones are shown.
+
+```bash
+clocks Africa/Johannesburg America/Los_Angeles Europe/Copenhagen
+```
 
 Command: clocks
 */
@@ -72,18 +77,19 @@ func Run(args []string, _ io.Reader) error {
 
 	now := time.Now().In(time.Local)
 
-	run(now, os.Stdout)
+	zones := []string{"Local", "America/Los_Angeles", "America/Chicago", "America/New_York", "Asia/Jerusalem", "UTC"}
+	if len(args) > 1 {
+		zones = args[1:]
+	}
+	run(now, zones, os.Stdout)
 
 	return nil
 }
 
-func run(now time.Time, out io.Writer) {
+func run(now time.Time, zones []string, out io.Writer) {
 	w := tabwriter.NewWriter(out, 0, 8, 2, ' ', tabwriter.AlignRight)
-	fmt.Fprintln(w, t(now, "Local"))
-	fmt.Fprintln(w, t(now, "America/Los_Angeles"))
-	fmt.Fprintln(w, t(now, "America/Chicago"))
-	fmt.Fprintln(w, t(now, "America/New_York"))
-	fmt.Fprintln(w, t(now, "Asia/Jerusalem"))
-	fmt.Fprintln(w, t(now, "UTC"))
+	for _, tz := range zones {
+		fmt.Fprintln(w, t(now, tz))
+	}
 	w.Flush()
 }

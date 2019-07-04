@@ -102,7 +102,12 @@ $ backlight -10
 
 ### ` + "`" + `clocks` + "`" + `
 
-` + "`" + `clocks` + "`" + ` shows my personal, digital, wall of clocks.
+` + "`" + `clocks` + "`" + ` shows my personal, digital, wall of clocks.  Pass one or more timezone names
+to choose which timezones are shown.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+clocks Africa/Johannesburg America/Los_Angeles Europe/Copenhagen
+` + "`" + `` + "`" + `` + "`" + `
 
 ### ` + "`" + `csv2json` + "`" + `
 
@@ -381,53 +386,53 @@ func init() {
 
 		"backlight": readme[2642:2844],
 
-		"clocks": readme[2844:2912],
+		"clocks": readme[2844:3060],
 
-		"csv2json": readme[2912:3052],
+		"csv2json": readme[3060:3200],
 
-		"csv2md": readme[3052:3126],
+		"csv2md": readme[3200:3274],
 
-		"debounce": readme[3126:3470],
+		"debounce": readme[3274:3618],
 
-		"dump-mozlz4": readme[3470:3653],
+		"dump-mozlz4": readme[3618:3801],
 
-		"email2json": readme[3653:4368],
+		"email2json": readme[3801:4516],
 
-		"expand-url": readme[4368:4658],
+		"expand-url": readme[4516:4806],
 
-		"export-bamboohr": readme[4658:4742],
+		"export-bamboohr": readme[4806:4890],
 
-		"export-bamboohr-tree": readme[4742:4829],
+		"export-bamboohr-tree": readme[4890:4977],
 
-		"fn": readme[4829:4965],
+		"fn": readme[4977:5113],
 
-		"group-by-date": readme[4965:5183],
+		"group-by-date": readme[5113:5331],
 
-		"minotaur": readme[5183:6783],
+		"minotaur": readme[5331:6931],
 
-		"netrc-password": readme[6783:6948],
+		"netrc-password": readme[6931:7096],
 
-		"pomotimer": readme[6948:7440],
+		"pomotimer": readme[7096:7588],
 
-		"prepend-emoji-hist": readme[7440:7811],
+		"prepend-emoji-hist": readme[7588:7959],
 
-		"render-mail": readme[7811:7945],
+		"render-mail": readme[7959:8093],
 
-		"replace-unzip": readme[7945:8175],
+		"replace-unzip": readme[8093:8323],
 
-		"rss": readme[8175:8923],
+		"rss": readme[8323:9071],
 
-		"sm-list": readme[8923:9199],
+		"sm-list": readme[9071:9347],
 
-		"srv": readme[9199:9382],
+		"srv": readme[9347:9530],
 
-		"toml2json": readme[9382:9557],
+		"toml2json": readme[9530:9705],
 
-		"undefer": readme[9557:9865],
+		"undefer": readme[9705:10013],
 
-		"uni": readme[9865:10027],
+		"uni": readme[10013:10175],
 
-		"yaml2json": readme[10027:10104],
+		"yaml2json": readme[10175:10252],
 
 	}
 }
