@@ -57,7 +57,10 @@ echo "---\nfoo: 1" | leatherman yaml2json
 
 `addrs` sorts the addresses passed on stdin (in the mutt addrbook format, see
 `addrspec-to-tabs`) and sorts them based on how recently they were used, from
-the glob passed on the arguments.
+the glob passed on the arguments.  The tool exists so that you can create an
+address list either with an export tool (like `goobook`), a subset of your sent
+addresses, or whatever else, and then you can sort it based on your sent mail
+folder.
 
 ``` bash
 $ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
@@ -66,12 +69,18 @@ $ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
 ### `addrspec-to-tabs`
 
 `addrspec-to-tabs` converts email addresses from the standard format (`"Hello Friend"
-<foo@bar>`) to the mutt (?) address book format, ie tab separated fields.
+<foo@bar>`) from stdin to the mutt address book format, ie tab separated fields,
+on stdout.
 
-Note that this version ignores the comment because, after actually auditing my
-addressbook, most comments are incorrectly recognized by all tools. (for
-example: `<5555555555@vzw.com> (555) 555-5555` should not have a comment of
-`(555)`.)
+``` bash
+$ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" | addrspec-to-tabs >addrbook.txt
+```
+
+This tool ignores the comment because, after actually auditing my addressbook,
+most comments are incorrectly recognized by all tools. (for example:
+`<5555555555@vzw.com> (555) 555-5555` should not have a comment of `(555)`.)
+
+It exists to be combined with `addrs` and mutt.
 
 ### `backlight`
 

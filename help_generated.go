@@ -59,7 +59,10 @@ echo "---\nfoo: 1" | leatherman yaml2json
 
 ` + "`" + `addrs` + "`" + ` sorts the addresses passed on stdin (in the mutt addrbook format, see
 ` + "`" + `addrspec-to-tabs` + "`" + `) and sorts them based on how recently they were used, from
-the glob passed on the arguments.
+the glob passed on the arguments.  The tool exists so that you can create an
+address list either with an export tool (like ` + "`" + `goobook` + "`" + `), a subset of your sent
+addresses, or whatever else, and then you can sort it based on your sent mail
+folder.
 
 ` + "`" + `` + "`" + `` + "`" + ` bash
 $ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
@@ -68,12 +71,18 @@ $ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
 ### ` + "`" + `addrspec-to-tabs` + "`" + `
 
 ` + "`" + `addrspec-to-tabs` + "`" + ` converts email addresses from the standard format (` + "`" + `"Hello Friend"
-<foo@bar>` + "`" + `) to the mutt (?) address book format, ie tab separated fields.
+<foo@bar>` + "`" + `) from stdin to the mutt address book format, ie tab separated fields,
+on stdout.
 
-Note that this version ignores the comment because, after actually auditing my
-addressbook, most comments are incorrectly recognized by all tools. (for
-example: ` + "`" + `<5555555555@vzw.com> (555) 555-5555` + "`" + ` should not have a comment of
-` + "`" + `(555)` + "`" + `.)
+` + "`" + `` + "`" + `` + "`" + ` bash
+$ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" | addrspec-to-tabs >addrbook.txt
+` + "`" + `` + "`" + `` + "`" + `
+
+This tool ignores the comment because, after actually auditing my addressbook,
+most comments are incorrectly recognized by all tools. (for example:
+` + "`" + `<5555555555@vzw.com> (555) 555-5555` + "`" + ` should not have a comment of ` + "`" + `(555)` + "`" + `.)
+
+It exists to be combined with ` + "`" + `addrs` + "`" + ` and mutt.
 
 ### ` + "`" + `backlight` + "`" + `
 
@@ -366,59 +375,59 @@ port can be overridden by setting ` + "`" + `LMHTTPPROF=$someport` + "`" + `.
 var commandReadme map[string][]byte
 func init() {
 	commandReadme = map[string][]byte{
-		"addrs": readme[1567:1855],
+		"addrs": readme[1567:2064],
 
-		"addrspec-to-tabs": readme[1855:2279],
+		"addrspec-to-tabs": readme[2064:2642],
 
-		"backlight": readme[2279:2481],
+		"backlight": readme[2642:2844],
 
-		"clocks": readme[2481:2549],
+		"clocks": readme[2844:2912],
 
-		"csv2json": readme[2549:2689],
+		"csv2json": readme[2912:3052],
 
-		"csv2md": readme[2689:2763],
+		"csv2md": readme[3052:3126],
 
-		"debounce": readme[2763:3107],
+		"debounce": readme[3126:3470],
 
-		"dump-mozlz4": readme[3107:3290],
+		"dump-mozlz4": readme[3470:3653],
 
-		"email2json": readme[3290:4005],
+		"email2json": readme[3653:4368],
 
-		"expand-url": readme[4005:4295],
+		"expand-url": readme[4368:4658],
 
-		"export-bamboohr": readme[4295:4379],
+		"export-bamboohr": readme[4658:4742],
 
-		"export-bamboohr-tree": readme[4379:4466],
+		"export-bamboohr-tree": readme[4742:4829],
 
-		"fn": readme[4466:4602],
+		"fn": readme[4829:4965],
 
-		"group-by-date": readme[4602:4820],
+		"group-by-date": readme[4965:5183],
 
-		"minotaur": readme[4820:6420],
+		"minotaur": readme[5183:6783],
 
-		"netrc-password": readme[6420:6585],
+		"netrc-password": readme[6783:6948],
 
-		"pomotimer": readme[6585:7077],
+		"pomotimer": readme[6948:7440],
 
-		"prepend-emoji-hist": readme[7077:7448],
+		"prepend-emoji-hist": readme[7440:7811],
 
-		"render-mail": readme[7448:7582],
+		"render-mail": readme[7811:7945],
 
-		"replace-unzip": readme[7582:7812],
+		"replace-unzip": readme[7945:8175],
 
-		"rss": readme[7812:8560],
+		"rss": readme[8175:8923],
 
-		"sm-list": readme[8560:8836],
+		"sm-list": readme[8923:9199],
 
-		"srv": readme[8836:9019],
+		"srv": readme[9199:9382],
 
-		"toml2json": readme[9019:9194],
+		"toml2json": readme[9382:9557],
 
-		"undefer": readme[9194:9502],
+		"undefer": readme[9557:9865],
 
-		"uni": readme[9502:9664],
+		"uni": readme[9865:10027],
 
-		"yaml2json": readme[9664:9741],
+		"yaml2json": readme[10027:10104],
 
 	}
 }
