@@ -74,10 +74,10 @@ func main() {
 		fmt.Fprintln(rw, "version:", version)
 
 		for _, dep := range bi.Deps {
-			fmt.Printf("%s@%s (%s)\n", dep.Path, dep.Version, dep.Sum)
+			fmt.Fprintf(rw, "%s@%s (%s)\n", dep.Path, dep.Version, dep.Sum)
 			if dep.Replace != nil {
 				r := dep.Replace
-				fmt.Printf("   replaced by %s@%s (%s)\n", r.Path, r.Version, r.Sum)
+				fmt.Fprintf(rw, "   replaced by %s@%s (%s)\n", r.Path, r.Version, r.Sum)
 			}
 		}
 	}))
