@@ -63,7 +63,9 @@ func main() {
 	flag.Parse()
 	cl := &http.Client{}
 
-	http.Handle("/version", http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
+	mux := http.NewServeMux()
+
+	mux.Handle("/version", http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 		rw.Header().Set("content-type", "text/plain")
 
 		bi, ok := debug.ReadBuildInfo()
@@ -82,11 +84,10 @@ func main() {
 		}
 	}))
 
-	http.Handle("/twilio", middleware.Adapt(receiveSMS(cl, dropboxAccessToken),
-		middleware.Log(os.Stdout),
-	))
+	mux.Handle("/twilio", receiveSMS(cl, dropboxAccessToken))
 
-	log.Err(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
+	h := middleware.Adapt(mux, middleware.Log(os.Stdout))
+	log.Err(http.ListenAndServe(fmt.Sprintf(":%d", port), h))
 	os.Exit(1)
 }
 
