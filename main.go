@@ -28,7 +28,7 @@ func init() {
 
 	dropboxAccessToken = os.Getenv("DROPBOX_ACCESS_TOKEN")
 	if dropboxAccessToken == "" {
-		panic("dropbox token is missing")
+		panic("DROPBOX_ACCESS_TOKEN is missing")
 	}
 
 	myCell = os.Getenv("MY_CELL")
