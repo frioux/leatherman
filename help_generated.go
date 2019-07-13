@@ -299,6 +299,15 @@ $ rss https://blog.afoolishmanifesto.com/index.xml afm.json
 [C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `slack-deaddrop` + "`" + `
+
+` + "`" + `slack-deaddrop` + "`" + ` allows sending messages to a slack channel without looking at slack.
+Typical usage is probably something like:
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ slack-deaddrop -channel general -text 'good morning!'
+` + "`" + `` + "`" + `` + "`" + `
+
 ### ` + "`" + `sm-list` + "`" + `
 
 ` + "`" + `sm-list` + "`" + ` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
@@ -422,17 +431,19 @@ func init() {
 
 		"rss": readme[8323:9071],
 
-		"sm-list": readme[9071:9347],
+		"slack-deaddrop": readme[9071:9291],
 
-		"srv": readme[9347:9530],
+		"sm-list": readme[9291:9567],
 
-		"toml2json": readme[9530:9705],
+		"srv": readme[9567:9750],
 
-		"undefer": readme[9705:10013],
+		"toml2json": readme[9750:9925],
 
-		"uni": readme[10013:10175],
+		"undefer": readme[9925:10233],
 
-		"yaml2json": readme[10175:10252],
+		"uni": readme[10233:10395],
+
+		"yaml2json": readme[10395:10472],
 
 	}
 }

@@ -297,6 +297,15 @@ $ rss https://blog.afoolishmanifesto.com/index.xml afm.json
 [C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
 ```
 
+### `slack-deaddrop`
+
+`slack-deaddrop` allows sending messages to a slack channel without looking at slack.
+Typical usage is probably something like:
+
+```bash
+$ slack-deaddrop -channel general -text 'good morning!'
+```
+
 ### `sm-list`
 
 `sm-list` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees

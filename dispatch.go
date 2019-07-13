@@ -19,6 +19,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/prependemojihist"
 	"github.com/frioux/leatherman/internal/tool/replaceunzip"
 	"github.com/frioux/leatherman/internal/tool/rss"
+	"github.com/frioux/leatherman/internal/tool/slack"
 	"github.com/frioux/leatherman/internal/tool/smlist"
 	"github.com/frioux/leatherman/internal/tool/srv"
 	"github.com/frioux/leatherman/internal/tool/toml"
@@ -50,6 +51,7 @@ func init() {
 		"render-mail": email.Render,
 		"replace-unzip": replaceunzip.Run,
 		"rss": rss.Run,
+		"slack-deaddrop": slack.Deaddrop,
 		"sm-list": smlist.Run,
 		"srv": srv.Serve,
 		"toml2json": toml.ToJSON,
