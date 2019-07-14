@@ -46,11 +46,15 @@ func Deaddrop(args []string, _ io.Reader) error {
 	flags.Parse(args[1:])
 
 	if channel == "" {
-		return errors.New("-channel is required")
+		fmt.Fprint(os.Stderr, "-channel is required\n\n")
+		flags.Usage()
+		os.Exit(2)
 	}
 
 	if text == "" {
-		return errors.New("-text is required")
+		fmt.Fprint(os.Stderr, "-text is required\n\n")
+		flags.Usage()
+		os.Exit(2)
 	}
 
 	req, err := listConversations(listConversationsInput{
