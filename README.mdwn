@@ -17,6 +17,12 @@ anything else is assumed to be a todo.  Simply creates a document tagged `inbox`
 in my Dropbox.  Any attachment included in the message is linked to; if the
 attachment is an image it is linked to with an `img` tag.
 
+### `defer til`
+
+A command matching the following general pattern "defer til 2019-01-01" or
+"defer some message til 2019-01-01" will enqueue messages to be
+[undefered](https://github.com/frioux/leatherman#undefer) later.
+
 ### `inspire me`
 
 The string `inspire me` will repy with [a random inspirational
