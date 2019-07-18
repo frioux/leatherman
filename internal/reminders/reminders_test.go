@@ -59,14 +59,16 @@ func TestParse(t *testing.T) {
 	}
 
 	for _, a := range assertions {
-		when, mess, err := Parse(now, a.in)
-		assert.Equal(t, a.t, when)
-		assert.Equal(t, a.message, mess)
-		if a.err {
-			assert.Error(t, err)
-		} else {
-			assert.NoError(t, err)
-		}
+		t.Run(a.in, func(t *testing.T) {
+			when, mess, err := Parse(now, a.in)
+			if a.err {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, a.t, when)
+			assert.Equal(t, a.message, mess)
+		})
 	}
 
 	// deferred
