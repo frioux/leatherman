@@ -2,7 +2,9 @@ package reminders
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -78,12 +80,68 @@ func Parse(now time.Time, message string) (time.Time, string, error) {
 		}
 		return time.Time{}, "", &userErr{errInvalidRemind}
 	} else if m[DURATION] != "" {
-		d, err := time.ParseDuration(m[DURATION])
-		if err != nil {
+		d := parseDuration(m[DURATION])
+		if d == time.Duration(0) {
 			return time.Time{}, "", &userErr{errInvalidDuration}
 		}
 		return now.Add(d), m[MESSAGE], nil
 	}
 
 	return time.Time{}, "", errImpossible
+}
+
+// an hour, two hours, 2 hours, etc
+var lazy = regexp.MustCompile(`^(\d+|a|an|one|two|three|four|five|six|seven|eight|nine)\s+(hours?|minutes?|days?)$`)
+
+func parseDuration(s string) time.Duration {
+	// beware, atypical Go; no success rail :(
+	if d, err := time.ParseDuration(s); err == nil {
+		return d
+	}
+
+	var count int
+	if m := lazy.FindStringSubmatch(s); len(m) > 0 {
+		fmt.Println("HERE")
+		switch m[1] {
+		case "a", "an", "one", "1":
+			count = 1
+		case "two", "2":
+			count = 2
+		case "three", "3":
+			count = 3
+		case "four", "4":
+			count = 4
+		case "five", "5":
+			count = 5
+		case "six", "6":
+			count = 6
+		case "seven", "7":
+			count = 7
+		case "eight", "8":
+			count = 8
+		case "nine", "9":
+			count = 9
+		case "ten", "10":
+			count = 10
+		default:
+			var err error
+			count, err = strconv.Atoi(m[1])
+			if err != nil {
+				return time.Duration(0)
+			}
+		}
+
+		switch m[2] {
+		case "hour", "hours":
+			return time.Duration(count) * time.Hour
+		case "minute", "minutes":
+			return time.Duration(count) * time.Minute
+		case "day", "days":
+			return time.Duration(count) * time.Hour * 24
+		default:
+			panic("impossible condition reached via " + s)
+		}
+	}
+
+	return time.Duration(0)
 }

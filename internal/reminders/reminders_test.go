@@ -50,6 +50,7 @@ func TestParse(t *testing.T) {
 
 	assertions := []assertion{
 		{"", "", time.Time{}, true},
+		{"remind me to frew in an hour", "frew", now.Add(time.Hour), false},
 		{"remind me to frew in 10m", "frew", now.Add(10 * time.Minute), false},
 		{"remind me to frioux at 10am", "frioux", now.Add(10 * time.Hour), false},
 		{"remind me to frioux at 10AM", "frioux", now.Add(10 * time.Hour), false},
