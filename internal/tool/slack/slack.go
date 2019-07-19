@@ -57,12 +57,13 @@ func Deaddrop(args []string, _ io.Reader) error {
 		os.Exit(2)
 	}
 
-	req, err := listConversations(listConversationsInput{
+	in := listConversationsInput{
 		token:           token,
-		limit:           1000,
+		limit:           200,
 		excludeArchived: true,
 		types:           conversationType,
-	})
+	}
+	req, err := listConversations(in)
 	if err != nil {
 		return err
 	}
@@ -82,6 +83,34 @@ func Deaddrop(args []string, _ io.Reader) error {
 		return errors.New("list conversations failed: " + resp.Status)
 	}
 
+	channels := cs.Channels
+
+	for cs.ResponseMetadata.NextCursor != "" {
+		in.cursor = cs.ResponseMetadata.NextCursor
+
+		// zero the struct, otherwise we get spooky action on channels
+		cs = listConversationsOutput{}
+		req, err := listConversations(in)
+		if err != nil {
+			return err
+		}
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return err
+		}
+
+		d := json.NewDecoder(resp.Body)
+		if err := d.Decode(&cs); err != nil {
+			return err
+		}
+
+		if resp.StatusCode != 200 {
+			return errors.New("list conversations failed: " + resp.Status)
+		}
+		channels = append(channels, cs.Channels...)
+	}
+
 	if !cs.OK {
 		return errors.New("list conversations failed: " + cs.Error)
 	}
@@ -95,7 +124,7 @@ func Deaddrop(args []string, _ io.Reader) error {
 		}
 	}
 	matched := make([]slackConversation, 0, 1)
-	for _, c := range cs.Channels {
+	for _, c := range channels {
 		if !exact && channelMatches.MatchString(c.Name) {
 			matched = append(matched, c)
 		}
@@ -179,16 +208,21 @@ type slackConversation struct {
 }
 
 type listConversationsOutput struct {
-	OK       bool
-	Error    string // only set if OK is false
-	Channels []slackConversation
+	OK               bool
+	Error            string // only set if OK is false
+	Channels         []slackConversation
+	ResponseMetadata struct {
+		NextCursor string `json:"next_cursor"`
+	} `json:"response_metadata"`
 }
 
 // https://api.slack.com/methods/conversations.list
 func listConversations(i listConversationsInput) (*http.Request, error) {
 	v := url.Values{}
 	v.Set("token", i.token)
-	// v.Set("cursor", i.token)
+	if i.cursor != "" {
+		v.Set("cursor", i.cursor)
+	}
 	v.Set("types", i.types)
 	if i.excludeArchived {
 		v.Set("exclude_archived", "true")
