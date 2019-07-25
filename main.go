@@ -21,7 +21,7 @@ func main() {
 	which := filepath.Base(os.Args[0])
 	args := os.Args
 
-	if which == "leatherman" && len(args) > 1 {
+	if _, ok := Dispatch[which]; !ok && len(args) > 1 {
 		args = args[1:]
 		which = args[0]
 	}
