@@ -73,6 +73,7 @@ func TestSanitizeSecure(t *testing.T) {
 		"a":      []byte("a"),
 		"b/../c": []byte("b"),
 	})
+	assert.NoError(t, err)
 
 	_, err = sanitize("", zt.File)
 	assert.Error(t, err) // No .. segments
@@ -82,6 +83,7 @@ func TestSanitizeSetRoot(t *testing.T) {
 	zt, err := buildZip(map[string][]byte{
 		"a": []byte("a"),
 	})
+	assert.NoError(t, err)
 
 	ms, err := sanitize("c", zt.File)
 	assert.NoError(t, err)
@@ -91,6 +93,7 @@ func TestSanitizeSetRoot(t *testing.T) {
 	zt, err = buildZip(map[string][]byte{
 		"a": []byte("a"),
 	})
+	assert.NoError(t, err)
 
 	ms, err = sanitize("", zt.File)
 	assert.NoError(t, err)

@@ -16,8 +16,11 @@ func Example() {
 	}
 
 	r, err := mozlz4.NewReader(file)
-	_, err = io.Copy(os.Stdout, r)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't create reader: %s\n", err)
+		os.Exit(1)
+	}
+	if _, err = io.Copy(os.Stdout, r); err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't copy: %s\n", err)
 		os.Exit(1)
 	}

@@ -155,6 +155,9 @@ func Deaddrop(args []string, _ io.Reader) error {
 		asUser:  true,
 		text:    text,
 	})
+	if err != nil {
+		return err
+	}
 
 	resp, err = http.DefaultClient.Do(req)
 	if err != nil {
