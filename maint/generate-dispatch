@@ -66,3 +66,5 @@ print $fh <<'GOLANG';
 GOLANG
 
 close $fh;
+
+system 'go', 'fmt';

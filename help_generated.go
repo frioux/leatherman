@@ -387,6 +387,7 @@ port can be overridden by setting ` + "`" + `LMHTTPPROF=$someport` + "`" + `.
 `)
 
 var commandReadme map[string][]byte
+
 func init() {
 	commandReadme = map[string][]byte{
 		"addrs": readme[1567:2064],
@@ -444,6 +445,5 @@ func init() {
 		"uni": readme[10233:10395],
 
 		"yaml2json": readme[10395:10472],
-
 	}
 }

@@ -65,3 +65,5 @@ print $help qq(\t\t"$_": readme$offsets{$_},\n\n) for sort keys %offsets;
 
 print $help "\t}\n";
 print $help "}\n";
+
+system 'go', 'fmt';
