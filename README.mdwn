@@ -64,6 +64,12 @@ All of these are used by `wuphf` to send notifications to my phone:
 
 Used by `amygdala` to validate that requests actually came from Twilio.
 
+### `TWILIO_URL`
+
+Also used by `amygdala` to validate that requests actually came from Twilio.  In
+theory this could be inferred from the request, but due to http proxies it must
+be configured instead.
+
 ## Design
 
 As mentioned before, this project is a few distinct tools.  Simplicity is a
