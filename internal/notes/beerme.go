@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
-	"net/http"
 	"regexp"
 
 	"github.com/frioux/amygdala/internal/dropbox"
@@ -46,14 +45,16 @@ func beerMe(r io.Reader) (string, error) {
 	return o[0], nil
 }
 
-func inspireMe(cl *http.Client, tok, _ string, _ []twilio.Media) (string, error) {
-	r, err := dropbox.Download(cl, tok, "/notes/content/posts/inspiration.md")
-	if err != nil {
-		return personality.Err(), xerrors.Errorf("dropbox.Download: %w", err)
+func inspireMe(cl dropbox.Client) func(_ string, _ []twilio.Media) (string, error) {
+	return func(_ string, _ []twilio.Media) (string, error) {
+		r, err := cl.Download("/notes/content/posts/inspiration.md")
+		if err != nil {
+			return personality.Err(), xerrors.Errorf("dropbox.Download: %w", err)
+		}
+		n, err := beerMe(r)
+		if err != nil {
+			return personality.Err(), err
+		}
+		return n, nil
 	}
-	n, err := beerMe(r)
-	if err != nil {
-		return personality.Err(), err
-	}
-	return n, nil
 }

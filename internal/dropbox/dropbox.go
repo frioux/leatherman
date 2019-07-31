@@ -3,12 +3,32 @@ package dropbox
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
 
 	"golang.org/x/xerrors"
 )
+
+// Client gives access to the Dropbox API
+type Client struct {
+	Token string
+	*http.Client
+}
+
+// NewClient returns a fully created Client value
+func NewClient(cl Client) (Client, error) {
+	if cl.Token == "" {
+		return Client{}, errors.New("Token is required")
+	}
+
+	if cl.Client == nil {
+		cl.Client = &http.Client{}
+	}
+
+	return cl, nil
+}
 
 // UploadParams maps to the parameters to file-upload, documented here:
 // https://www.dropbox.com/developers/documentation/http/documentation#files-upload
@@ -35,13 +55,13 @@ func encodeUploadParams(up UploadParams) (string, error) {
 }
 
 // Create writes the body to path.
-func Create(cl *http.Client, token string, up UploadParams, body io.Reader) error {
+func (cl Client) Create(up UploadParams, body io.Reader) error {
 	req, err := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/upload", body)
 	if err != nil {
 		return xerrors.Errorf("http.NewRequest: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Authorization", "Bearer "+cl.Token)
 	req.Header.Set("Content-Type", "application/octet-stream")
 	apiArg, err := encodeUploadParams(up)
 	if err != nil {
@@ -80,13 +100,13 @@ func encodeDownloadParams(path string) (string, error) {
 }
 
 // Download a file
-func Download(cl *http.Client, token, path string) (io.Reader, error) {
+func (cl Client) Download(path string) (io.Reader, error) {
 	req, err := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/download", &bytes.Buffer{})
 	if err != nil {
 		return nil, xerrors.Errorf("http.NewRequest: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Authorization", "Bearer "+cl.Token)
 	apiArg, err := encodeDownloadParams(path)
 	if err != nil {
 		return nil, err

@@ -2,36 +2,43 @@ package notes
 
 import (
 	"errors"
-	"net/http"
 	"regexp"
 
+	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/twilio"
 )
 
 type rule struct {
 	*regexp.Regexp
-	action func(*http.Client, string, string, []twilio.Media) (string, error)
+	action func(string, []twilio.Media) (string, error)
 }
 
-var rules []rule
+// Rules has an ordered list of regexp+callback rules
+type Rules []rule
 
-func init() {
-	rules = []rule{
-		{Regexp: regexp.MustCompile(`(?i)^\s*inspire\s+me\s*$`), action: inspireMe},
-		{Regexp: regexp.MustCompile(`(?i)^\s*remind\s+me\s*`), action: remind},
-		{Regexp: deferPattern, action: deferMessage},
-		{Regexp: regexp.MustCompile(``), action: todo},
+// NewRules creates default rule set
+func NewRules(token string) (Rules, error) {
+	cl, err := dropbox.NewClient(dropbox.Client{Token: token})
+	if err != nil {
+		return nil, err
 	}
+	return []rule{
+		{Regexp: regexp.MustCompile(`(?i)^\s*inspire\s+me\s*$`), action: inspireMe(cl)},
+		{Regexp: regexp.MustCompile(`(?i)^\s*remind\s+me\s*`), action: remind(cl)},
+		{Regexp: deferPattern, action: deferMessage(cl)},
+		{Regexp: regexp.MustCompile(``), action: todo(cl)},
+	}, nil
 }
 
 var errNoRule = errors.New("no rules matched")
 
-func Dispatch(cl *http.Client, tok, input string, media []twilio.Media) (string, error) {
+// Dispatch selects and runs rules based on input
+func (rules Rules) Dispatch(input string, media []twilio.Media) (string, error) {
 	for _, r := range rules {
 		if !r.MatchString(input) {
 			continue
 		}
-		return r.action(cl, tok, input, media)
+		return r.action(input, media)
 	}
 
 	return "", errNoRule

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"net/http"
 	"os"
 	"time"
 
@@ -24,9 +23,13 @@ func init() {
 }
 
 func main() {
-	cl := &http.Client{}
+	rules, err := notes.NewRules(tok)
+	if err != nil {
+		fmt.Printf("Couldn't create rules: %s\n", err)
+		os.Exit(1)
+	}
 
-	message, err := notes.Dispatch(cl, tok, os.Args[1], nil)
+	message, err := rules.Dispatch(os.Args[1], nil)
 	fmt.Println(message)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "(%s)\n", err)

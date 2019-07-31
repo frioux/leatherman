@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"net/http"
 	"strings"
 	"text/template"
 	"time"
@@ -49,25 +48,27 @@ func body(message, id string, at time.Time) io.Reader {
 }
 
 // todo creates an item tagged inbox
-func todo(cl *http.Client, tok, message string, media []twilio.Media) (string, error) {
-	for i, m := range media {
-		if strings.HasPrefix(m.ContentType, "image/") {
-			message += fmt.Sprintf(` <img alt="attachment %d" src="%s" height="128" />`, i, m.URL)
-		} else {
-			message += fmt.Sprintf(" [attachment %d](%s)", i, m.URL)
+func todo(cl dropbox.Client) func(message string, media []twilio.Media) (string, error) {
+	return func(message string, media []twilio.Media) (string, error) {
+		for i, m := range media {
+			if strings.HasPrefix(m.ContentType, "image/") {
+				message += fmt.Sprintf(` <img alt="attachment %d" src="%s" height="128" />`, i, m.URL)
+			} else {
+				message += fmt.Sprintf(" [attachment %d](%s)", i, m.URL)
+			}
 		}
+
+		sha := sha1.Sum([]byte(message))
+		id := hex.EncodeToString(sha[:])
+		path := "/notes/content/posts/todo-" + id + ".md"
+
+		buf := body(message, id, time.Now())
+
+		up := dropbox.UploadParams{Path: path, Autorename: true}
+		if err := cl.Create(up, buf); err != nil {
+			return personality.Err(), xerrors.Errorf("dropbox.Create: %w", err)
+		}
+
+		return personality.Ack(), nil
 	}
-
-	sha := sha1.Sum([]byte(message))
-	id := hex.EncodeToString(sha[:])
-	path := "/notes/content/posts/todo-" + id + ".md"
-
-	buf := body(message, id, time.Now())
-
-	up := dropbox.UploadParams{Path: path, Autorename: true}
-	if err := dropbox.Create(cl, tok, up, buf); err != nil {
-		return personality.Err(), xerrors.Errorf("dropbox.Create: %w", err)
-	}
-
-	return personality.Ack(), nil
 }
