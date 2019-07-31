@@ -14,8 +14,8 @@ import (
 	"golang.org/x/xerrors"
 )
 
-func GenerateMAC(key []byte, r *http.Request) []byte {
-	buf := bytes.NewBuffer([]byte(r.URL.String()))
+func GenerateMAC(key, url []byte, r *http.Request) []byte {
+	buf := bytes.NewBuffer(url)
 
 	keys := make(sort.StringSlice, 0, len(r.PostForm))
 	for k := range r.PostForm {
@@ -36,8 +36,8 @@ func GenerateMAC(key []byte, r *http.Request) []byte {
 	return mac.Sum(nil)
 }
 
-func CheckMAC(key []byte, r *http.Request) (bool, error) {
-	expectedMAC := GenerateMAC(key, r)
+func CheckMAC(key, url []byte, r *http.Request) (bool, error) {
+	expectedMAC := GenerateMAC(key, url, r)
 	messageMAC, err := base64.StdEncoding.DecodeString(r.Header.Get("X-Twilio-Signature"))
 	if err != nil {
 		return false, xerrors.Errorf("base64.Decode: %w", err)
