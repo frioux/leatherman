@@ -37,7 +37,7 @@ func main() {
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.ParseForm()
-	sig := twilio.GenerateMAC([]byte(auth), []byte(endpoint), req)
+	sig := twilio.GenerateMAC([]byte(auth), req)
 	encodedSignature := base64.StdEncoding.EncodeToString(sig)
 
 	req.Header.Set("X-Twilio-Signature", encodedSignature)

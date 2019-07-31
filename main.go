@@ -21,7 +21,7 @@ var (
 	dropboxAccessToken, myCell string
 )
 
-var twilioAuthToken, twilioURL []byte
+var twilioAuthToken []byte
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -39,11 +39,6 @@ func init() {
 	twilioAuthToken = []byte(os.Getenv("TWILIO_AUTH_TOKEN"))
 	if len(twilioAuthToken) == 0 {
 		twilioAuthToken = []byte("xyzzy")
-	}
-
-	twilioURL = []byte(os.Getenv("TWILIO_URL"))
-	if len(twilioURL) == 0 {
-		twilioURL = []byte("http://localhost:8080/twilio")
 	}
 }
 
@@ -106,7 +101,7 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 			return
 		}
 
-		if ok, err := twilio.CheckMAC(twilioAuthToken, twilioURL, r); err != nil || !ok {
+		if ok, err := twilio.CheckMAC(twilioAuthToken, r); err != nil || !ok {
 			rw.WriteHeader(403)
 			if err != nil {
 				log.Err(xerrors.Errorf("twilio.CheckMAC: %w", err))
