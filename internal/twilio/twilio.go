@@ -15,9 +15,7 @@ import (
 )
 
 func GenerateMAC(key, url []byte, r *http.Request) []byte {
-	var buf bytes.Buffer
-
-	buf.Write(url)
+	buf := bytes.NewBuffer(url)
 
 	keys := make(sort.StringSlice, 0, len(r.PostForm))
 	for k := range r.PostForm {
