@@ -59,54 +59,21 @@ func Deaddrop(args []string, _ io.Reader) error {
 
 	var channels []slackConversation
 	if conversationType == "im" {
-		in := usersListInput{limit: 200}
-		cs, err := cl.usersList(in)
+		var err error
+		channels, err = cl.autopageUsersList(usersListInput{limit: 200})
 		if err != nil {
 			return err
 		}
-
-		channels = cs.Members
-
-		for cs.ResponseMetadata.NextCursor != "" {
-			in.cursor = cs.ResponseMetadata.NextCursor
-
-			// zero the struct, otherwise we get spooky action on channels
-			cs = usersListOutput{}
-			cs, err = cl.usersList(in)
-			if err != nil {
-				return err
-			}
-
-			channels = append(channels, cs.Members...)
-		}
-
 	} else {
-		in := conversationsListInput{
+		var err error
+		channels, err = cl.autopageConversationsList(conversationsListInput{
 			limit:           200,
 			excludeArchived: true,
 			types:           conversationType,
-		}
-		cs, err := cl.conversationsList(in)
+		})
 		if err != nil {
 			return err
 		}
-
-		channels = cs.Channels
-
-		for cs.ResponseMetadata.NextCursor != "" {
-			in.cursor = cs.ResponseMetadata.NextCursor
-
-			// zero the struct, otherwise we get spooky action on channels
-			cs = conversationsListOutput{}
-
-			cs, err := cl.conversationsList(in)
-			if err != nil {
-				return err
-			}
-
-			channels = append(channels, cs.Channels...)
-		}
-
 	}
 
 	var channelMatches *regexp.Regexp

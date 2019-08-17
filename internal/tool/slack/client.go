@@ -71,6 +71,31 @@ func (c client) usersList(i usersListInput) (usersListOutput, error) {
 	return cs, nil
 }
 
+func (c client) autopageUsersList(i usersListInput) ([]slackConversation, error) {
+	var channels []slackConversation
+	cs, err := c.usersList(i)
+	if err != nil {
+		return nil, err
+	}
+
+	channels = cs.Members
+
+	for cs.ResponseMetadata.NextCursor != "" {
+		i.cursor = cs.ResponseMetadata.NextCursor
+
+		// zero the struct, otherwise we get spooky action on channels
+		cs = usersListOutput{}
+		cs, err = c.usersList(i)
+		if err != nil {
+			return nil, err
+		}
+
+		channels = append(channels, cs.Members...)
+	}
+
+	return channels, nil
+}
+
 type conversationsListInput struct {
 	cursor, types   string
 	excludeArchived bool
@@ -124,6 +149,32 @@ func (c client) conversationsList(i conversationsListInput) (conversationsListOu
 	}
 
 	return cs, nil
+}
+
+func (c client) autopageConversationsList(i conversationsListInput) ([]slackConversation, error) {
+	var channels []slackConversation
+	cs, err := c.conversationsList(i)
+	if err != nil {
+		return nil, err
+	}
+
+	channels = cs.Channels
+
+	for cs.ResponseMetadata.NextCursor != "" {
+		i.cursor = cs.ResponseMetadata.NextCursor
+
+		// zero the struct, otherwise we get spooky action on channels
+		cs = conversationsListOutput{}
+
+		cs, err := c.conversationsList(i)
+		if err != nil {
+			return nil, err
+		}
+
+		channels = append(channels, cs.Channels...)
+	}
+
+	return channels, nil
 }
 
 type chatPostMessageInput struct {
