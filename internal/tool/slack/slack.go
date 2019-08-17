@@ -1,20 +1,15 @@
 package slack
 
 import (
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
-
-	"github.com/frioux/leatherman/internal/lmhttp"
 )
 
 /*
@@ -32,6 +27,11 @@ func Deaddrop(args []string, _ io.Reader) error {
 	token := os.Getenv("SLACK_TOKEN")
 	if token == "" {
 		return errors.New("SLACK_TOKEN is required")
+	}
+
+	cl := client{
+		Token:  token,
+		Client: &http.Client{},
 	}
 
 	var channel, text, conversationType string
@@ -59,28 +59,10 @@ func Deaddrop(args []string, _ io.Reader) error {
 
 	var channels []slackConversation
 	if conversationType == "im" {
-		in := listUsersInput{
-			token: token,
-			limit: 200,
-		}
-		req, err := listUsers(in)
+		in := usersListInput{limit: 200}
+		cs, err := cl.usersList(in)
 		if err != nil {
 			return err
-		}
-
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return err
-		}
-
-		d := json.NewDecoder(resp.Body)
-		var cs listUsersOutput
-		if err := d.Decode(&cs); err != nil {
-			return err
-		}
-
-		if resp.StatusCode != 200 {
-			return errors.New("list conversations failed: " + resp.Status)
 		}
 
 		channels = cs.Members
@@ -89,56 +71,24 @@ func Deaddrop(args []string, _ io.Reader) error {
 			in.cursor = cs.ResponseMetadata.NextCursor
 
 			// zero the struct, otherwise we get spooky action on channels
-			cs = listUsersOutput{}
-			req, err := listUsers(in)
+			cs = usersListOutput{}
+			cs, err = cl.usersList(in)
 			if err != nil {
 				return err
 			}
 
-			resp, err := http.DefaultClient.Do(req)
-			if err != nil {
-				return err
-			}
-
-			d := json.NewDecoder(resp.Body)
-			if err := d.Decode(&cs); err != nil {
-				return err
-			}
-
-			if resp.StatusCode != 200 {
-				return errors.New("list conversations failed: " + resp.Status)
-			}
 			channels = append(channels, cs.Members...)
 		}
 
-		if !cs.OK {
-			return errors.New("list conversations failed: " + cs.Error)
-		}
 	} else {
-		in := listConversationsInput{
-			token:           token,
+		in := conversationsListInput{
 			limit:           200,
 			excludeArchived: true,
 			types:           conversationType,
 		}
-		req, err := listConversations(in)
+		cs, err := cl.conversationsList(in)
 		if err != nil {
 			return err
-		}
-
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return err
-		}
-
-		d := json.NewDecoder(resp.Body)
-		var cs listConversationsOutput
-		if err := d.Decode(&cs); err != nil {
-			return err
-		}
-
-		if resp.StatusCode != 200 {
-			return errors.New("list conversations failed: " + resp.Status)
 		}
 
 		channels = cs.Channels
@@ -147,31 +97,16 @@ func Deaddrop(args []string, _ io.Reader) error {
 			in.cursor = cs.ResponseMetadata.NextCursor
 
 			// zero the struct, otherwise we get spooky action on channels
-			cs = listConversationsOutput{}
-			req, err := listConversations(in)
+			cs = conversationsListOutput{}
+
+			cs, err := cl.conversationsList(in)
 			if err != nil {
 				return err
 			}
 
-			resp, err := http.DefaultClient.Do(req)
-			if err != nil {
-				return err
-			}
-
-			d := json.NewDecoder(resp.Body)
-			if err := d.Decode(&cs); err != nil {
-				return err
-			}
-
-			if resp.StatusCode != 200 {
-				return errors.New("list conversations failed: " + resp.Status)
-			}
 			channels = append(channels, cs.Channels...)
 		}
 
-		if !cs.OK {
-			return errors.New("list conversations failed: " + cs.Error)
-		}
 	}
 
 	var channelMatches *regexp.Regexp
@@ -209,8 +144,7 @@ func Deaddrop(args []string, _ io.Reader) error {
 		return nil
 	}
 	fmt.Fprintf(os.Stderr, "Sending «%s» to #%s...\n", text, matched[0].Name)
-	req, err := postMessage(postMessageInput{
-		token:   token,
+	resp, err := cl.chatPostMessage(chatPostMessageInput{
 		channel: matched[0].ID,
 		asUser:  true,
 		text:    text,
@@ -219,110 +153,9 @@ func Deaddrop(args []string, _ io.Reader) error {
 		return err
 	}
 
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
 	defer resp.Body.Close()
 	io.Copy(os.Stdout, resp.Body)
 	fmt.Println("")
 
 	return nil
-}
-
-type postMessageInput struct {
-	token, channel, text string
-	asUser               bool
-}
-
-// https://api.slack.com/methods/chat.postMessage
-func postMessage(i postMessageInput) (*http.Request, error) {
-	v := url.Values{}
-	v.Set("token", i.token)
-	v.Set("channel", i.channel)
-	v.Set("text", i.text)
-	if i.asUser {
-		v.Set("as_user", "true")
-	}
-
-	req, err := lmhttp.NewRequest("POST", "https://slack.com/api/chat.postMessage", strings.NewReader(v.Encode()))
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	return req, nil
-}
-
-type listConversationsInput struct {
-	token, cursor, types string
-	excludeArchived      bool
-	limit                int
-}
-
-type slackConversation struct {
-	ID   string
-	Name string
-}
-
-type listConversationsOutput struct {
-	OK               bool
-	Error            string // only set if OK is false
-	Channels         []slackConversation
-	ResponseMetadata struct {
-		NextCursor string `json:"next_cursor"`
-	} `json:"response_metadata"`
-}
-
-// https://api.slack.com/methods/conversations.list
-func listConversations(i listConversationsInput) (*http.Request, error) {
-	v := url.Values{}
-	v.Set("token", i.token)
-	if i.cursor != "" {
-		v.Set("cursor", i.cursor)
-	}
-	v.Set("types", i.types)
-	if i.excludeArchived {
-		v.Set("exclude_archived", "true")
-	}
-	v.Set("limit", strconv.Itoa(i.limit))
-
-	req, err := lmhttp.NewRequest("GET", "https://slack.com/api/conversations.list?"+v.Encode(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-type listUsersInput struct {
-	token, cursor string
-	limit         int
-}
-
-type listUsersOutput struct {
-	OK               bool
-	Error            string // only set if OK is false
-	Members          []slackConversation
-	ResponseMetadata struct {
-		NextCursor string `json:"next_cursor"`
-	} `json:"response_metadata"`
-}
-
-// https://api.slack.com/methods/users.list
-func listUsers(i listUsersInput) (*http.Request, error) {
-	v := url.Values{}
-	v.Set("token", i.token)
-	if i.cursor != "" {
-		v.Set("cursor", i.cursor)
-	}
-	v.Set("limit", strconv.Itoa(i.limit))
-
-	req, err := lmhttp.NewRequest("GET", "https://slack.com/api/users.list?"+v.Encode(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
 }
