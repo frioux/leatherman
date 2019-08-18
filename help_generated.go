@@ -308,6 +308,14 @@ Typical usage is probably something like:
 $ slack-deaddrop -channel general -text 'good morning!'
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `slack-open` + "`" + `
+
+` + "`" + `slack-open` + "`" + ` opens a channel, group message, or direct message by name:
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ slack-open -channel general
+` + "`" + `` + "`" + `` + "`" + `
+
 ### ` + "`" + `sm-list` + "`" + `
 
 ` + "`" + `sm-list` + "`" + ` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
@@ -434,16 +442,18 @@ func init() {
 
 		"slack-deaddrop": readme[9071:9291],
 
-		"sm-list": readme[9291:9567],
+		"slack-open": readme[9291:9425],
 
-		"srv": readme[9567:9750],
+		"sm-list": readme[9425:9701],
 
-		"toml2json": readme[9750:9925],
+		"srv": readme[9701:9884],
 
-		"undefer": readme[9925:10233],
+		"toml2json": readme[9884:10059],
 
-		"uni": readme[10233:10395],
+		"undefer": readme[10059:10367],
 
-		"yaml2json": readme[10395:10472],
+		"uni": readme[10367:10529],
+
+		"yaml2json": readme[10529:10606],
 	}
 }

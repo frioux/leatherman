@@ -306,6 +306,14 @@ Typical usage is probably something like:
 $ slack-deaddrop -channel general -text 'good morning!'
 ```
 
+### `slack-open`
+
+`slack-open` opens a channel, group message, or direct message by name:
+
+```bash
+$ slack-open -channel general
+```
+
 ### `sm-list`
 
 `sm-list` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees

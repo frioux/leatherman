@@ -151,6 +151,45 @@ func (c client) conversationsList(i conversationsListInput) (conversationsListOu
 	return cs, nil
 }
 
+// https://api.slack.com/methods/team.info
+func (c client) teamInfo(team string) (string, error) {
+	v := url.Values{}
+	v.Set("token", c.Token)
+	if team != "" {
+		v.Set("team", team)
+	}
+
+	req, err := lmhttp.NewRequest("GET", "https://slack.com/api/team.info?"+v.Encode(), nil)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := c.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	if resp.StatusCode != 200 {
+		return "", errors.New("list conversations failed: " + resp.Status)
+	}
+
+	d := json.NewDecoder(resp.Body)
+	var out struct {
+		OK    bool
+		Error string
+		Team  struct{ ID string }
+	}
+	if err := d.Decode(&out); err != nil {
+		return "", err
+	}
+
+	if !out.OK {
+		return "", errors.New("list conversations failed: " + out.Error)
+	}
+
+	return out.Team.ID, nil
+}
+
 func (c client) autopageConversationsList(i conversationsListInput) ([]slackConversation, error) {
 	var channels []slackConversation
 	cs, err := c.conversationsList(i)

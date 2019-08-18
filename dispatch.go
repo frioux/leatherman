@@ -52,6 +52,7 @@ func init() {
 		"replace-unzip":        replaceunzip.Run,
 		"rss":                  rss.Run,
 		"slack-deaddrop":       slack.Deaddrop,
+		"slack-open":           slack.Open,
 		"sm-list":              smlist.Run,
 		"srv":                  srv.Serve,
 		"toml2json":            toml.ToJSON,
