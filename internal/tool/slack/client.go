@@ -107,8 +107,6 @@ func (c client) autopageUsersList(i usersListInput) ([]slackConversation, error)
 	for cs.ResponseMetadata.NextCursor != "" {
 		i.cursor = cs.ResponseMetadata.NextCursor
 
-		// zero the struct, otherwise we get spooky action on channels
-		cs = usersListOutput{}
 		cs, err = c.usersList(i)
 		if err != nil {
 			return nil, err
@@ -226,10 +224,7 @@ func (c client) autopageConversationsList(i conversationsListInput) ([]slackConv
 	for cs.ResponseMetadata.NextCursor != "" {
 		i.cursor = cs.ResponseMetadata.NextCursor
 
-		// zero the struct, otherwise we get spooky action on channels
-		cs = conversationsListOutput{}
-
-		cs, err := c.conversationsList(i)
+		cs, err = c.conversationsList(i)
 		if err != nil {
 			return nil, err
 		}
