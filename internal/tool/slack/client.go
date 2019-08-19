@@ -3,8 +3,11 @@ package slack
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 
@@ -19,6 +22,27 @@ type slackConversation struct {
 type client struct {
 	Token string
 	*http.Client
+	debug bool
+}
+
+func (c client) Do(r *http.Request) (*http.Response, error) {
+	resp, err := c.Client.Do(r)
+
+	if c.debug {
+		out, err := httputil.DumpRequest(r, true)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Fprintln(os.Stderr, string(out))
+
+		out, err = httputil.DumpResponse(resp, true)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Fprintln(os.Stderr, string(out))
+	}
+
+	return resp, err
 }
 
 type usersListInput struct {

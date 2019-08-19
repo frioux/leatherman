@@ -29,13 +29,8 @@ func Deaddrop(args []string, _ io.Reader) error {
 		return errors.New("SLACK_TOKEN is required")
 	}
 
-	cl := client{
-		Token:  token,
-		Client: &http.Client{},
-	}
-
 	var channel, text, conversationType string
-	var exact, dryRun bool
+	var debug, exact, dryRun bool
 
 	flags := flag.NewFlagSet("slack-deaddrop", flag.ExitOnError)
 	flags.StringVar(&channel, "channel", "", "Channel to send to")
@@ -43,7 +38,14 @@ func Deaddrop(args []string, _ io.Reader) error {
 	flags.StringVar(&text, "text", "", "Text to send")
 	flags.BoolVar(&exact, "exact", false, "Set to disable regexp based channel matching")
 	flags.BoolVar(&dryRun, "dry-run", false, "Set to not actually send message")
+	flags.BoolVar(&debug, "debug", false, "Print full HTTP conversation")
 	flags.Parse(args[1:])
+
+	cl := client{
+		Token:  token,
+		Client: &http.Client{},
+		debug:  debug,
+	}
 
 	if channel == "" {
 		fmt.Fprint(os.Stderr, "-channel is required\n\n")
