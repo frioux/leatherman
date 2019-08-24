@@ -6,8 +6,6 @@ import (
 	"io"
 	"os"
 	"strings"
-
-	"golang.org/x/xerrors"
 )
 
 /*
@@ -20,7 +18,7 @@ func ToMarkdown(_ []string, stdin io.Reader) error {
 
 	header, err := reader.Read()
 	if err != nil {
-		return xerrors.Errorf("can't read header, giving up: %w", err)
+		return fmt.Errorf("can't read header, giving up: %w", err)
 	}
 
 	fmt.Println(strings.Join(header, " | "))

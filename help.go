@@ -6,8 +6,6 @@ import (
 	"io"
 	"os"
 	"sort"
-
-	"golang.org/x/xerrors"
 )
 
 // Help prints tool listing
@@ -22,7 +20,7 @@ func Help(args []string, _ io.Reader) error {
 
 	err := flags.Parse(args[1:])
 	if err != nil {
-		return xerrors.Errorf("flags.Parse: %w", err)
+		return fmt.Errorf("flags.Parse: %w", err)
 	}
 
 	if full {

@@ -3,11 +3,11 @@ package csv
 import (
 	"encoding/csv"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
-
-	"golang.org/x/xerrors"
 )
 
 /*
@@ -22,7 +22,7 @@ func ToJSON(_ []string, stdin io.Reader) error {
 
 	header, err := reader.Read()
 	if err != nil {
-		return xerrors.Errorf("can't read header, giving up")
+		return errors.New("can't read header, giving up")
 	}
 
 	for {
@@ -43,7 +43,7 @@ func ToJSON(_ []string, stdin io.Reader) error {
 
 		err = writer.Encode(toEncode)
 		if err != nil {
-			return xerrors.Errorf("json.Encode: %w", err)
+			return fmt.Errorf("json.Encode: %w", err)
 		}
 	}
 
