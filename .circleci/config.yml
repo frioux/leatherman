@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/mern-starter
     docker:
-      - image: circleci/golang:1.12-stretch
+      - image: circleci/golang:1.13-stretch
     steps:
       - checkout
       - run:
@@ -15,7 +15,6 @@ jobs:
       - run:
           name: Windows Build
           environment:
-             GO111MODULE: "on"
              GOOS: windows
           command: >
             go mod verify;
@@ -25,7 +24,6 @@ jobs:
       - run:
           name: OSX Build
           environment:
-             GO111MODULE: "on"
              GOOS: darwin
           command: >
             go mod verify;
@@ -41,7 +39,6 @@ jobs:
           name: Install GHR
           working_directory: ~/
           environment:
-             GO111MODULE: "off"
           command: >
              go get -u github.com/tcnksm/ghr
       - run:
