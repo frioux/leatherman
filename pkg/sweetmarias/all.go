@@ -1,27 +1,28 @@
 package sweetmarias // import "github.com/frioux/leatherman/pkg/sweetmarias"
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"math/rand"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/frioux/leatherman/internal/lmhttp"
-	"golang.org/x/xerrors"
 )
 
 const allURL = "https://www.sweetmarias.com/green-coffee.html?product_list_limit=all&sm_status=1"
 
-var errStatusCode = xerrors.New("status code error")
+var errStatusCode = errors.New("status code error")
 
 // AllCoffees returns a list of URLs for each coffee in Sweet Maria's inventory.
 func AllCoffees() ([]string, error) {
 	res, err := lmhttp.Get(allURL)
 	if err != nil {
-		return nil, xerrors.Errorf("http.Get: %w", err)
+		return nil, fmt.Errorf("http.Get: %w", err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return nil, xerrors.Errorf("%d %s: %w", res.StatusCode, res.Status, errStatusCode)
+		return nil, fmt.Errorf("%d %s: %w", res.StatusCode, res.Status, errStatusCode)
 	}
 
 	return allCoffees(res.Body)
@@ -30,7 +31,7 @@ func AllCoffees() ([]string, error) {
 func allCoffees(r io.Reader) ([]string, error) {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
-		return nil, xerrors.Errorf("goquery.NewDocumentFromReader: %w", err)
+		return nil, fmt.Errorf("goquery.NewDocumentFromReader: %w", err)
 	}
 
 	coffees := []string{}

@@ -9,19 +9,20 @@ package mozlz4
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 
 	"github.com/pierrec/lz4"
-	"golang.org/x/xerrors"
 )
 
 const magicHeader = "mozLz40\x00"
 
 // Errors
 var (
-	ErrWrongHeader = xerrors.New("no mozLz4 header")
-	ErrWrongSize   = xerrors.New("header size incorrect")
+	ErrWrongHeader = errors.New("no mozLz4 header")
+	ErrWrongSize   = errors.New("header size incorrect")
 )
 
 // NewReader returns an io.Reader that decompresses the data from r.
@@ -29,7 +30,7 @@ func NewReader(r io.Reader) (io.Reader, error) {
 	header := make([]byte, len(magicHeader))
 	_, err := r.Read(header)
 	if err != nil {
-		return nil, xerrors.Errorf("couldn't read header: %w", err)
+		return nil, fmt.Errorf("couldn't read header: %w", err)
 	}
 	if string(header) != magicHeader {
 		return nil, ErrWrongHeader
@@ -38,23 +39,23 @@ func NewReader(r io.Reader) (io.Reader, error) {
 	var size uint32
 	err = binary.Read(r, binary.LittleEndian, &size)
 	if err != nil {
-		return nil, xerrors.Errorf("couldn't read size: %w", err)
+		return nil, fmt.Errorf("couldn't read size: %w", err)
 	}
 
 	src, err := ioutil.ReadAll(r)
 	if err != nil {
-		return nil, xerrors.Errorf("couldn't read compressed data: %w", err)
+		return nil, fmt.Errorf("couldn't read compressed data: %w", err)
 	}
 
 	out := make([]byte, size)
 	sz, err := lz4.UncompressBlock(src, out)
 
 	if err != nil {
-		return nil, xerrors.Errorf("couldn't decompress data: %w", err)
+		return nil, fmt.Errorf("couldn't decompress data: %w", err)
 	}
 	// This could maybe be a warning or ignored entirely
 	if sz != int(size) {
-		return nil, xerrors.Errorf("Header size %d, got %d: %w", size, sz, ErrWrongSize)
+		return nil, fmt.Errorf("Header size %d, got %d: %w", size, sz, ErrWrongSize)
 	}
 
 	return bytes.NewReader(out), nil

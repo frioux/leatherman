@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/frioux/leatherman/pkg/datefmt"
-	"golang.org/x/xerrors"
 )
 
 var cmdArgs struct {
@@ -29,7 +28,7 @@ func parseArgs(args []string) error {
 
 	err := flags.Parse(args[1:])
 	if err != nil {
-		return xerrors.Errorf("flags.Parse: %w", err)
+		return fmt.Errorf("flags.Parse: %w", err)
 	}
 
 	return nil
@@ -59,7 +58,7 @@ Command: group-by-date
 func Run(args []string, stdin io.Reader) error {
 	err := parseArgs(args)
 	if err != nil {
-		return xerrors.Errorf("Couldn't parse args: %w", err)
+		return fmt.Errorf("Couldn't parse args: %w", err)
 	}
 	return groupByDate(stdin, os.Stdout)
 }
@@ -104,12 +103,12 @@ func groupByDate(i io.Reader, o io.Writer) error {
 		}
 		err = out.Write([]string{outDate, strconv.Itoa(val)})
 		if err != nil {
-			return xerrors.Errorf("csv.Write: %w", err)
+			return fmt.Errorf("csv.Write: %w", err)
 		}
 	}
 	out.Flush()
 	if err := out.Error(); err != nil {
-		return xerrors.Errorf("Failed to flush: %w", err)
+		return fmt.Errorf("Failed to flush: %w", err)
 	}
 
 	return nil

@@ -3,6 +3,8 @@ package mozlz4
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -10,7 +12,6 @@ import (
 
 	"github.com/pierrec/lz4"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/xerrors"
 )
 
 func errHasPrefix(t *testing.T, err error, prefix string) bool {
@@ -64,7 +65,7 @@ func TestWrongLength(t *testing.T) {
 	}
 
 	_, err = NewReader(w)
-	assert.True(t, xerrors.Is(err, ErrWrongSize))
+	assert.True(t, errors.Is(err, ErrWrongSize))
 }
 
 func TestCantReadHeader(t *testing.T) {
@@ -76,7 +77,7 @@ func TestCantReadHeader(t *testing.T) {
 func TestWrongHeader(t *testing.T) {
 	r := bytes.NewReader([]byte("lol"))
 	_, err := NewReader(r)
-	assert.True(t, xerrors.Is(err, ErrWrongHeader))
+	assert.True(t, errors.Is(err, ErrWrongHeader))
 }
 
 func TestCantReadSize(t *testing.T) {
@@ -118,7 +119,7 @@ type ErrReader struct {
 
 func (r *ErrReader) Read(p []byte) (int, error) {
 	if r.errAfter == 0 {
-		return 0, xerrors.New("faked io error")
+		return 0, errors.New("faked io error")
 	}
 	r.errAfter--
 	return r.Reader.Read(p)
@@ -127,28 +128,28 @@ func (r *ErrReader) Read(p []byte) (int, error) {
 func compress(src io.Reader, dst io.Writer, intendedSize int) error {
 	_, err := dst.Write([]byte(magicHeader))
 	if err != nil {
-		return xerrors.Errorf("couldn't Write header: %w", err)
+		return fmt.Errorf("couldn't Write header: %w", err)
 	}
 	b, err := ioutil.ReadAll(src)
 	if err != nil {
-		return xerrors.Errorf("couldn't ReadAll to Compress: %w", err)
+		return fmt.Errorf("couldn't ReadAll to Compress: %w", err)
 	}
 
 	err = binary.Write(dst, binary.LittleEndian, uint32(intendedSize))
 	if err != nil {
-		return xerrors.Errorf("couldn't encode length: %w", err)
+		return fmt.Errorf("couldn't encode length: %w", err)
 	}
 	dstBytes := make([]byte, 10*len(b))
 	sz, err := lz4.CompressBlockHC(b, dstBytes, -1)
 	if err != nil {
-		return xerrors.Errorf("couldn't CompressBlock: %w", err)
+		return fmt.Errorf("couldn't CompressBlock: %w", err)
 	}
 	if sz == 0 {
-		return xerrors.New("data incompressible")
+		return errors.New("data incompressible")
 	}
 	_, err = dst.Write(dstBytes[:sz])
 	if err != nil {
-		return xerrors.Errorf("couldn't Write compressed data: %w", err)
+		return fmt.Errorf("couldn't Write compressed data: %w", err)
 	}
 
 	return nil

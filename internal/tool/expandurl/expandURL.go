@@ -3,6 +3,7 @@ package expandurl
 import (
 	"bufio"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -18,7 +19,6 @@ import (
 	"github.com/frioux/leatherman/pkg/mozcookiejar"
 	_ "github.com/mattn/go-sqlite3" // sqlite3 required
 	"golang.org/x/net/publicsuffix"
-	"golang.org/x/xerrors"
 )
 
 var tidyRE = regexp.MustCompile(`^\s*(.*?)\s*$`)
@@ -53,7 +53,7 @@ func run(r io.Reader, w io.Writer) error {
 		lines = append(lines, scanner.Text())
 	}
 	if err := scanner.Err(); err != nil {
-		return xerrors.Errorf("reading standard input: %w", err)
+		return fmt.Errorf("reading standard input: %w", err)
 	}
 
 	// tokens limits parallelism to 10
@@ -86,50 +86,50 @@ func run(r io.Reader, w io.Writer) error {
 func cj() (*cookiejar.Jar, error) {
 	j, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
-		return nil, xerrors.Errorf("Failed to build cookies: %w", err)
+		return nil, fmt.Errorf("Failed to build cookies: %w", err)
 	}
 
 	path := os.Getenv("MOZ_COOKIEJAR")
 	if path == "" {
-		return nil, xerrors.New("MOZ_COOKIEJAR should be set for expand-url to work")
+		return nil, errors.New("MOZ_COOKIEJAR should be set for expand-url to work")
 	}
 
 	orig, err := os.Open(path)
 	if err != nil {
-		return nil, xerrors.Errorf("os.Open for copying: %w", err)
+		return nil, fmt.Errorf("os.Open for copying: %w", err)
 	}
 
 	dest, err := ioutil.TempFile("", "")
 	if err != nil {
-		return nil, xerrors.Errorf("ioutil.TempFile for copying: %w", err)
+		return nil, fmt.Errorf("ioutil.TempFile for copying: %w", err)
 	}
 
 	_, err = io.Copy(dest, orig)
 	if err != nil {
-		return nil, xerrors.Errorf("io.Copy for copying: %w", err)
+		return nil, fmt.Errorf("io.Copy for copying: %w", err)
 	}
 	err = dest.Close()
 	if err != nil {
-		return nil, xerrors.Errorf("dest.Close for copying: %w", err)
+		return nil, fmt.Errorf("dest.Close for copying: %w", err)
 	}
 	err = orig.Close()
 	if err != nil {
-		return nil, xerrors.Errorf("orig.Close for copying: %w", err)
+		return nil, fmt.Errorf("orig.Close for copying: %w", err)
 	}
 
 	db, err := sql.Open("sqlite3", "file:"+dest.Name())
 	if err != nil {
-		return nil, xerrors.Errorf("Failed to open db: %w", err)
+		return nil, fmt.Errorf("Failed to open db: %w", err)
 	}
 	defer db.Close()
 
 	err = mozcookiejar.LoadIntoJar(db, j)
 	if err != nil {
-		return nil, xerrors.Errorf("Failed to load cookies: %w", err)
+		return nil, fmt.Errorf("Failed to load cookies: %w", err)
 	}
 	err = os.Remove(dest.Name())
 	if err != nil {
-		return nil, xerrors.Errorf("Failed to clean up db copy: %w", err)
+		return nil, fmt.Errorf("Failed to clean up db copy: %w", err)
 	}
 
 	return j, nil
@@ -138,16 +138,16 @@ func cj() (*cookiejar.Jar, error) {
 func urlToLink(ua *http.Client, url string) (string, error) {
 	resp, err := lmhttp.Get(url)
 	if err != nil {
-		return "", xerrors.Errorf("lmhttp.Get: %s", err)
+		return "", fmt.Errorf("lmhttp.Get: %s", err)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		return "", xerrors.Errorf("goquery.NewDocumentFromReader: %s", err)
+		return "", fmt.Errorf("goquery.NewDocumentFromReader: %s", err)
 	}
 	title := tidyRE.FindStringSubmatch(doc.Find("title").Text())
 	if len(title) != 2 {
-		return "", xerrors.Errorf("title is blank")
+		return "", fmt.Errorf("title is blank")
 	}
 	return fmt.Sprintf("[%s](%s)", title[1], url), nil
 }

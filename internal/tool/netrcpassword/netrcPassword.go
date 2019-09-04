@@ -1,6 +1,7 @@
 package netrcpassword
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -8,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/frioux/leatherman/pkg/netrc"
-	"golang.org/x/xerrors"
 )
 
 /*
@@ -29,12 +29,12 @@ func Run(args []string, _ io.Reader) error {
 
 	usr, err := user.Current()
 	if err != nil {
-		return xerrors.Errorf("Couldn't get current user: %w", err)
+		return fmt.Errorf("Couldn't get current user: %w", err)
 	}
 
 	password, err := run(filepath.Join(usr.HomeDir, ".netrc"), args[1], args[2])
 	if err != nil {
-		return xerrors.Errorf("Couldn't load password: %w", err)
+		return fmt.Errorf("Couldn't load password: %w", err)
 	}
 
 	fmt.Println(password)
@@ -45,12 +45,12 @@ func Run(args []string, _ io.Reader) error {
 func run(path, machine, user string) (string, error) {
 	n, err := netrc.Parse(path)
 	if err != nil {
-		return "", xerrors.Errorf("Couldn't parse netrc: %w", err)
+		return "", fmt.Errorf("Couldn't parse netrc: %w", err)
 	}
 
 	login, ok := n.MachineAndLogin(machine, user)
 	if !ok {
-		return "", xerrors.New("Couldn't find login for " + user + "@" + machine)
+		return "", errors.New("Couldn't find login for " + user + "@" + machine)
 	}
 
 	return login.Password, nil

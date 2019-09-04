@@ -7,8 +7,6 @@ import (
 	"io"
 	"os"
 	"time"
-
-	"golang.org/x/xerrors"
 )
 
 /*
@@ -34,7 +32,7 @@ func Run(args []string, stdin io.Reader) error {
 
 	err := flags.Parse(args[1:])
 	if err != nil {
-		return xerrors.Errorf("flags.Parse: %w", err)
+		return fmt.Errorf("flags.Parse: %w", err)
 	}
 
 	if h || help {

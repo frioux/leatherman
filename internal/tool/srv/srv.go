@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"golang.org/x/xerrors"
 )
 
 /*
@@ -48,7 +46,7 @@ func logReqs(h http.Handler) http.Handler {
 func serve(dir string, log chan net.Addr) error {
 	listener, err := net.Listen("tcp", ":0")
 	if err != nil {
-		return xerrors.Errorf("net.Listen: %w", err)
+		return fmt.Errorf("net.Listen: %w", err)
 	}
 
 	log <- listener.Addr()

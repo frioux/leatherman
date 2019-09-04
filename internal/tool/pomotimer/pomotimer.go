@@ -7,8 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"time"
-
-	"golang.org/x/xerrors"
 )
 
 const clear = "\r\x1b[J"
@@ -50,12 +48,12 @@ func Run(args []string, stdin io.Reader) error {
 	// disable input buffering
 	err := exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
 	if err != nil {
-		return xerrors.Errorf("couldn't disable input buffering: %w", err)
+		return fmt.Errorf("couldn't disable input buffering: %w", err)
 	}
 	// do not display entered characters on the screen
 	err = exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
 	if err != nil {
-		return xerrors.Errorf("couldn't hide input: %w", err)
+		return fmt.Errorf("couldn't hide input: %w", err)
 	}
 
 	// restore the echoing state when exiting

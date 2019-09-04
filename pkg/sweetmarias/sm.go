@@ -1,13 +1,13 @@
 package sweetmarias // import "github.com/frioux/leatherman/pkg/sweetmarias"
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/frioux/leatherman/internal/lmhttp"
-	"golang.org/x/xerrors"
 )
 
 // Coffee has all the details of a Sweet Marias coffee.
@@ -26,7 +26,7 @@ type Coffee struct {
 func LoadCoffee(url string) (Coffee, error) {
 	res, err := lmhttp.Get(url)
 	if err != nil {
-		return Coffee{}, xerrors.Errorf("http.Get: %w", err)
+		return Coffee{}, fmt.Errorf("http.Get: %w", err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
@@ -35,7 +35,7 @@ func LoadCoffee(url string) (Coffee, error) {
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		return Coffee{}, xerrors.Errorf("goquery.NewDocumentFromReader: %w", err)
+		return Coffee{}, fmt.Errorf("goquery.NewDocumentFromReader: %w", err)
 	}
 
 	c := Coffee{URL: url}
@@ -60,7 +60,7 @@ func LoadCoffee(url string) (Coffee, error) {
 	if scoreStr := doc.Find("h5.score-value").Text(); scoreStr != "" {
 		score, err := strconv.ParseFloat(scoreStr, 32)
 		if err != nil {
-			return Coffee{}, xerrors.Errorf("strconv.ParseFloat: %w", err)
+			return Coffee{}, fmt.Errorf("strconv.ParseFloat: %w", err)
 		}
 		c.Score = float32(score)
 	}

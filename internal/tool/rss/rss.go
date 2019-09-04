@@ -10,7 +10,6 @@ import (
 
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/mmcdole/gofeed"
-	"golang.org/x/xerrors"
 )
 
 /*
@@ -41,23 +40,23 @@ func run(urlString, statePath string, w io.Writer) error {
 	fp := gofeed.NewParser()
 	feedURL, err := url.Parse(urlString)
 	if err != nil {
-		return xerrors.Errorf("Couldn't parse feed url (%s): %w", feedURL, err)
+		return fmt.Errorf("Couldn't parse feed url (%s): %w", feedURL, err)
 	}
 
 	resp, err := lmhttp.Get(urlString)
 	if err != nil {
-		return xerrors.Errorf("Couldn't get feed: %w", err)
+		return fmt.Errorf("Couldn't get feed: %w", err)
 	}
 
 	f, err := fp.Parse(resp.Body)
 	if err != nil {
-		return xerrors.Errorf("Couldn't fetch feed (%s): %w", feedURL, err)
+		return fmt.Errorf("Couldn't fetch feed (%s): %w", feedURL, err)
 	}
 	fixItems(feedURL, f.Items)
 
 	seen, err := syncRead(statePath, f.Items)
 	if err != nil {
-		return xerrors.Errorf("Couldn't sync read (%s): %w", feedURL, err)
+		return fmt.Errorf("Couldn't sync read (%s): %w", feedURL, err)
 	}
 
 	items := newItems(seen, f.Items)
@@ -66,7 +65,7 @@ func run(urlString, statePath string, w io.Writer) error {
 
 	err = os.Rename(statePath+".tmp", statePath)
 	if err != nil {
-		return xerrors.Errorf("Couldn't rename state file (%s): %w", feedURL, err)
+		return fmt.Errorf("Couldn't rename state file (%s): %w", feedURL, err)
 	}
 
 	return nil
@@ -116,7 +115,7 @@ func syncRead(state string, items []*gofeed.Item) (map[string]bool, error) {
 
 	guids, err := readState(state)
 	if err != nil {
-		return nil, xerrors.Errorf("couldn't read state: %w", err)
+		return nil, fmt.Errorf("couldn't read state: %w", err)
 	}
 
 	for _, g := range guids {
@@ -141,7 +140,7 @@ func syncRead(state string, items []*gofeed.Item) (map[string]bool, error) {
 
 	err = writeState(state, toStore)
 	if err != nil {
-		return nil, xerrors.Errorf("couldn't write state: %w", err)
+		return nil, fmt.Errorf("couldn't write state: %w", err)
 	}
 	return ret, nil
 }
@@ -149,7 +148,7 @@ func syncRead(state string, items []*gofeed.Item) (map[string]bool, error) {
 func readState(state string) ([]string, error) {
 	file, err := os.Open(state)
 	if err != nil && !os.IsNotExist(err) {
-		return nil, xerrors.Errorf("couldn't open state file: %w", err)
+		return nil, fmt.Errorf("couldn't open state file: %w", err)
 	}
 
 	var guids []string
@@ -158,7 +157,7 @@ func readState(state string) ([]string, error) {
 		decoder := json.NewDecoder(file)
 		err = decoder.Decode(&guids)
 		if err != nil && !os.IsNotExist(err) {
-			return nil, xerrors.Errorf("couldn't decode state file: %w", err)
+			return nil, fmt.Errorf("couldn't decode state file: %w", err)
 		}
 	}
 
@@ -168,17 +167,17 @@ func readState(state string) ([]string, error) {
 func writeState(state string, guids []string) error {
 	tmp, err := os.Create(state + ".tmp")
 	if err != nil {
-		return xerrors.Errorf("couldn't create state file: %w", err)
+		return fmt.Errorf("couldn't create state file: %w", err)
 	}
 	encoder := json.NewEncoder(tmp)
 	encoder.SetIndent("", "\t")
 	err = encoder.Encode(guids)
 	if err != nil {
-		return xerrors.Errorf("couldn't encode state file: %w", err)
+		return fmt.Errorf("couldn't encode state file: %w", err)
 	}
 	err = tmp.Close()
 	if err != nil {
-		return xerrors.Errorf("couldn't write state file: %w", err)
+		return fmt.Errorf("couldn't write state file: %w", err)
 	}
 	return nil
 }

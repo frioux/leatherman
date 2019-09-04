@@ -9,7 +9,6 @@ import (
 
 	"github.com/icza/backscanner"
 	"golang.org/x/text/unicode/runenames"
-	"golang.org/x/xerrors"
 )
 
 /*
@@ -32,11 +31,11 @@ func Run(args []string, stdin io.Reader) error {
 
 	file, err := os.Open(args[1])
 	if err != nil {
-		return xerrors.Errorf("Couldn't open history file: %w", err)
+		return fmt.Errorf("Couldn't open history file: %w", err)
 	}
 	fi, err := os.Stat(args[1])
 	if err != nil && !os.IsNotExist(err) {
-		return xerrors.Errorf("Couldn't stat history file: %w", err)
+		return fmt.Errorf("Couldn't stat history file: %w", err)
 	}
 
 	var pos int
@@ -56,7 +55,7 @@ func run(history io.ReaderAt, in io.Reader, historyLength int, out io.Writer) er
 			break
 		}
 		if err != nil {
-			return xerrors.Errorf("Couldn't read line: %w", err)
+			return fmt.Errorf("Couldn't read line: %w", err)
 		}
 
 		for i, char := range line {

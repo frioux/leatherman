@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/frioux/leatherman/pkg/sweetmarias"
-	"golang.org/x/xerrors"
 )
 
 /*
@@ -27,7 +26,7 @@ func Run(_ []string, _ io.Reader) error {
 
 	coffees, err := sweetmarias.AllCoffees()
 	if err != nil {
-		return xerrors.Errorf("sweetmarias.AllCoffees: %w", err)
+		return fmt.Errorf("sweetmarias.AllCoffees: %w", err)
 	}
 
 	e := json.NewEncoder(os.Stdout)
@@ -40,12 +39,12 @@ func Run(_ []string, _ io.Reader) error {
 			defer func() { wg.Done(); <-tokens }()
 			c, err := sweetmarias.LoadCoffee(url)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, xerrors.Errorf("sweetmarias.LoadCoffee: %w", err))
+				fmt.Fprintln(os.Stderr, fmt.Errorf("sweetmarias.LoadCoffee: %w", err))
 				return
 			}
 			err = e.Encode(c)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, xerrors.Errorf("json.Encode: %w", err))
+				fmt.Fprintln(os.Stderr, fmt.Errorf("json.Encode: %w", err))
 				return
 			}
 		}()

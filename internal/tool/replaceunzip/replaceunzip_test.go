@@ -3,13 +3,13 @@ package replaceunzip
 import (
 	"archive/zip"
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/xerrors"
 )
 
 func TestExtractMember(t *testing.T) {
@@ -136,14 +136,14 @@ func buildZip(files map[string][]byte) (*zip.Reader, error) {
 	for name, contents := range files {
 		w, err := zw.Create(name)
 		if err != nil {
-			return nil, xerrors.Errorf("zip.Create: %w", err)
+			return nil, fmt.Errorf("zip.Create: %w", err)
 		}
 		if _, err := w.Write(contents); err != nil {
-			return nil, xerrors.Errorf("zipmember.Write: %w", err)
+			return nil, fmt.Errorf("zipmember.Write: %w", err)
 		}
 	}
 	if err := zw.Close(); err != nil {
-		return nil, xerrors.Errorf("zr.Close: %w", err)
+		return nil, fmt.Errorf("zr.Close: %w", err)
 	}
 
 	return zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))

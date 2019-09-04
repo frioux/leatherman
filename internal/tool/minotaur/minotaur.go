@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"golang.org/x/xerrors"
 )
 
 /*
@@ -67,12 +66,12 @@ func Run(args []string, _ io.Reader) error {
 
 	c, err := parseFlags(args)
 	if err != nil {
-		return xerrors.Errorf("parseFlags: %w", err)
+		return fmt.Errorf("parseFlags: %w", err)
 	}
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		return xerrors.Errorf("fsnotify.NewWatcher: %w", err)
+		return fmt.Errorf("fsnotify.NewWatcher: %w", err)
 	}
 	defer watcher.Close()
 
@@ -148,12 +147,12 @@ func Run(args []string, _ io.Reader) error {
 				fmt.Fprintln(os.Stderr, "watching "+path)
 			}
 			if err := watcher.Add(path); err != nil {
-				return xerrors.Errorf("fsnotify.Watcher.Add: %w", err)
+				return fmt.Errorf("fsnotify.Watcher.Add: %w", err)
 			}
 			return nil
 		})
 		if err != nil {
-			return xerrors.Errorf("filepath.Walk: %w", err)
+			return fmt.Errorf("filepath.Walk: %w", err)
 		}
 	}
 	<-done
