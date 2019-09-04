@@ -3,6 +3,7 @@ package notes
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"fmt"
 	"strings"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/frioux/amygdala/internal/personality"
 	"github.com/frioux/amygdala/internal/reminders"
 	"github.com/frioux/amygdala/internal/twilio"
-	"golang.org/x/xerrors"
 )
 
 // remind format:
@@ -35,7 +35,7 @@ func remind(cl dropbox.Client) func(string, []twilio.Media) (string, error) {
 
 		up := dropbox.UploadParams{Path: path, Autorename: true}
 		if err := cl.Create(up, buf); err != nil {
-			return personality.Err(), xerrors.Errorf("dropbox.Create: %w", err)
+			return personality.Err(), fmt.Errorf("dropbox.Create: %w", err)
 		}
 
 		return personality.Ack() + "; will remind you @ " + ts, nil

@@ -11,7 +11,6 @@ import (
 	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/personality"
 	"github.com/frioux/amygdala/internal/twilio"
-	"golang.org/x/xerrors"
 )
 
 var isItem = regexp.MustCompile(`^\s?\*\s+(.*?)\s*$`)
@@ -49,7 +48,7 @@ func inspireMe(cl dropbox.Client) func(_ string, _ []twilio.Media) (string, erro
 	return func(_ string, _ []twilio.Media) (string, error) {
 		r, err := cl.Download("/notes/content/posts/inspiration.md")
 		if err != nil {
-			return personality.Err(), xerrors.Errorf("dropbox.Download: %w", err)
+			return personality.Err(), fmt.Errorf("dropbox.Download: %w", err)
 		}
 		n, err := beerMe(r)
 		if err != nil {

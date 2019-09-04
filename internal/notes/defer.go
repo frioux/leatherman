@@ -12,7 +12,6 @@ import (
 	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/personality"
 	"github.com/frioux/amygdala/internal/twilio"
-	"golang.org/x/xerrors"
 )
 
 // jumpTo starts at the start and jumps to dest.
@@ -76,7 +75,7 @@ func deferMessage(cl dropbox.Client) func(string, []twilio.Media) (string, error
 
 		up := dropbox.UploadParams{Path: path, Autorename: true}
 		if err := cl.Create(up, strings.NewReader(" * "+message+"\n")); err != nil {
-			return personality.Err(), xerrors.Errorf("dropbox.Create: %w", err)
+			return personality.Err(), fmt.Errorf("dropbox.Create: %w", err)
 		}
 
 		return personality.Ack(), nil

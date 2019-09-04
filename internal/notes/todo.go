@@ -13,7 +13,6 @@ import (
 	"github.com/frioux/amygdala/internal/dropbox"
 	"github.com/frioux/amygdala/internal/personality"
 	"github.com/frioux/amygdala/internal/twilio"
-	"golang.org/x/xerrors"
 )
 
 var bodyTemplate *template.Template
@@ -66,7 +65,7 @@ func todo(cl dropbox.Client) func(message string, media []twilio.Media) (string,
 
 		up := dropbox.UploadParams{Path: path, Autorename: true}
 		if err := cl.Create(up, buf); err != nil {
-			return personality.Err(), xerrors.Errorf("dropbox.Create: %w", err)
+			return personality.Err(), fmt.Errorf("dropbox.Create: %w", err)
 		}
 
 		return personality.Ack(), nil
