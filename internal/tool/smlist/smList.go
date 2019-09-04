@@ -39,12 +39,12 @@ func Run(_ []string, _ io.Reader) error {
 			defer func() { wg.Done(); <-tokens }()
 			c, err := sweetmarias.LoadCoffee(url)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, fmt.Errorf("sweetmarias.LoadCoffee: %w", err))
+				fmt.Fprintf(os.Stderr, "sweetmarias.LoadCoffee: %s\n", err)
 				return
 			}
 			err = e.Encode(c)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, fmt.Errorf("json.Encode: %w", err))
+				fmt.Fprintf(os.Stderr, "json.Encode: %s\n", err)
 				return
 			}
 		}()
