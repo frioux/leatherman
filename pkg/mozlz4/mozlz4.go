@@ -14,7 +14,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/pierrec/lz4"
+	"github.com/pierrec/lz4/v3"
 )
 
 const magicHeader = "mozLz40\x00"
