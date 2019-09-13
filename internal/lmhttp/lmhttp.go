@@ -3,12 +3,20 @@ package lmhttp
 import (
 	"io"
 	"net/http"
-
-	"github.com/frioux/leatherman/internal/version"
+	"runtime/debug"
 )
 
 // UserAgent is the canonical UserAgent string for the leatherman.
-var UserAgent = "leatherman/" + version.Version
+var UserAgent = "leatherman/"
+
+func init() {
+	bi, ok := debug.ReadBuildInfo()
+	if ok {
+		UserAgent += bi.Main.Version
+	} else {
+		UserAgent += "devel"
+	}
+}
 
 // NewRequest returns an *http.Request with the UserAgent header properly set.
 func NewRequest(method, url string, body io.Reader) (*http.Request, error) {
