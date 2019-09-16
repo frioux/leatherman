@@ -25,7 +25,10 @@ func Describe(args []string, _ io.Reader) error {
 		return nil
 	}
 
-	for _, arg := range args[1:] {
+	for i, arg := range args[1:] {
+		if i != 0 {
+			fmt.Println()
+		}
 		for _, r := range arg {
 			fmt.Println(describe(r))
 		}
