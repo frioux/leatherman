@@ -4,6 +4,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/PuerkitoBio/goquery v1.5.0
 	github.com/erikdubbelboer/gspt v0.0.0-20190125194910-e68493906b83
+	github.com/frioux/yaml v0.0.0-20181016190607-99e7b284ccac
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/headzoo/surf v1.0.0
 	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
@@ -18,9 +19,6 @@ require (
 	golang.org/x/sys v0.0.0-20190904005037-43c01164e931 // indirect
 	golang.org/x/text v0.3.2
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
-	gopkg.in/yaml.v2 v2.2.2
 )
-
-replace gopkg.in/yaml.v2 => github.com/frioux/yaml v0.0.0-20180422015826-390d32f04db5
 
 go 1.13

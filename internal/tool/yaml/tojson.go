@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	yaml "gopkg.in/yaml.v2"
+	"github.com/frioux/yaml"
 )
 
 /*
