@@ -13,6 +13,8 @@ import (
 )
 
 func TestRun(t *testing.T) {
+	t.Parallel()
+
 	f, err := ioutil.TempFile("", "*.js")
 	if err != nil {
 		t.Fatal(err)

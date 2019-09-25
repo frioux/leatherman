@@ -13,6 +13,8 @@ import (
 )
 
 func TestExtractMember(t *testing.T) {
+	t.Parallel()
+
 	zt, err := buildZip(map[string][]byte{
 		"a": []byte("a"),
 	})
@@ -53,6 +55,8 @@ func TestExtractMember(t *testing.T) {
 }
 
 func TestSanitizeFilter(t *testing.T) {
+	t.Parallel()
+
 	zt, err := buildZip(map[string][]byte{
 		"a":            []byte("a"),
 		"__MACOSX/foo": []byte(""),
@@ -69,6 +73,8 @@ func TestSanitizeFilter(t *testing.T) {
 }
 
 func TestSanitizeSecure(t *testing.T) {
+	t.Parallel()
+
 	zt, err := buildZip(map[string][]byte{
 		"a":      []byte("a"),
 		"b/../c": []byte("b"),
@@ -80,6 +86,8 @@ func TestSanitizeSecure(t *testing.T) {
 }
 
 func TestSanitizeSetRoot(t *testing.T) {
+	t.Parallel()
+
 	zt, err := buildZip(map[string][]byte{
 		"a": []byte("a"),
 	})
@@ -102,6 +110,8 @@ func TestSanitizeSetRoot(t *testing.T) {
 }
 
 func TestHasRoot(t *testing.T) {
+	t.Parallel()
+
 	zt, err := buildZip(map[string][]byte{
 		"a": []byte("a"),
 		"b": []byte("b"),
@@ -125,6 +135,8 @@ func TestHasRoot(t *testing.T) {
 }
 
 func TestGenRoot(t *testing.T) {
+	t.Parallel()
+
 	assert.Equal(t, "foo", genRoot("foo.zip"))
 	assert.Equal(t, "bar", genRoot("bar"))
 }
@@ -150,6 +162,8 @@ func buildZip(files map[string][]byte) (*zip.Reader, error) {
 }
 
 func TestBuildZip(t *testing.T) {
+	t.Parallel()
+
 	zr, err := buildZip(map[string][]byte{
 		"frew": []byte("frew"),
 		"bar":  []byte("bar"),

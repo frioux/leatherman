@@ -9,6 +9,8 @@ import (
 )
 
 func TestLeading(t *testing.T) {
+	t.Parallel()
+
 	buf := &bytes.Buffer{}
 
 	l := newBouncer(false, buf, time.Millisecond)

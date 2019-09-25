@@ -14,6 +14,8 @@ import (
 var update = flag.Bool("update", false, "update golden files")
 
 func TestToJSON(t *testing.T) {
+	t.Parallel()
+
 	tests := []string{"basic"}
 
 	for _, name := range tests {

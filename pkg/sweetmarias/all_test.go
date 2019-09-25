@@ -8,6 +8,8 @@ import (
 )
 
 func TestAllCoffees(t *testing.T) {
+	t.Parallel()
+
 	f, err := os.Open("./testdata/all.html")
 	if err != nil {
 		t.Fatalf("Couldn't open all.html: %s", err)

@@ -10,6 +10,8 @@ import (
 )
 
 func TestRun(t *testing.T) {
+	t.Parallel()
+
 	historyPath := "./testdata/hist.txt"
 	history, err := os.Open(historyPath)
 	if err != nil {

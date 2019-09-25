@@ -15,6 +15,8 @@ func test(t *testing.T, in []string, expected string) {
 }
 
 func TestShellQuote(t *testing.T) {
+	t.Parallel()
+
 	test(t, []string{""}, `''`)
 	test(t, []string{"foo"}, `foo`)
 	test(t, []string{"foo", "bar"}, `foo bar`)

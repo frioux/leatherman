@@ -7,6 +7,8 @@ import (
 )
 
 func TestRun(t *testing.T) {
+	t.Parallel()
+
 	pass, err := run("./testdata/basic.netrc", "foo", "bar")
 	if err != nil {
 		t.Fatalf("Failed to call run: %s", err)

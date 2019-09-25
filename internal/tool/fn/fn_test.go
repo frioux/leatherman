@@ -16,6 +16,8 @@ type runTest struct {
 }
 
 func TestRun(t *testing.T) {
+	t.Parallel()
+
 	var err error
 	dir, err = ioutil.TempDir("", "")
 	if err != nil {

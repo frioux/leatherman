@@ -8,6 +8,8 @@ import (
 )
 
 func TestJumpTo(t *testing.T) {
+	t.Parallel()
+
 	assert.Equal(t,
 		time.Date(2018, 9, 28, 0, 0, 0, 0, time.UTC),
 		JumpTo(time.Date(2018, 9, 23, 0, 0, 0, 0, time.UTC), time.Friday),

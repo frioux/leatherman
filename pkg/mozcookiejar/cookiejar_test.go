@@ -56,6 +56,8 @@ func urlFromString(t *testing.T, urlStr string) *url.URL {
 }
 
 func TestBasic(t *testing.T) {
+	t.Parallel()
+
 	db, jar := freshDBAndJar(t)
 	insert(t, db, "a", "b", "www.foo.com", "/frew", year3018, 1)
 	insert(t, db, "c", "d", "www.bar.com", "/frioux", year3018, 0)
@@ -86,6 +88,8 @@ func TestBasic(t *testing.T) {
 }
 
 func TestMutli(t *testing.T) {
+	t.Parallel()
+
 	db, jar := freshDBAndJar(t)
 	insert(t, db, "a", "b", "www.foo.com", "/frew", year3018, 1)
 	insert(t, db, "c", "d", "www.foo.com", "/frew", year3018, 1)
@@ -117,6 +121,8 @@ func TestMutli(t *testing.T) {
 }
 
 func TestInvalidDB(t *testing.T) {
+	t.Parallel()
+
 	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		t.Fatalf("Couldn't create db: %s", err)
@@ -141,6 +147,8 @@ func TestInvalidDB(t *testing.T) {
 }
 
 func TestInvalidData(t *testing.T) {
+	t.Parallel()
+
 	db, jar := freshDBAndJar(t)
 	_, err := db.Exec(
 		`INSERT INTO moz_cookies

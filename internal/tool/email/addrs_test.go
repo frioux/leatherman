@@ -10,6 +10,8 @@ import (
 )
 
 func TestAllAddrs(t *testing.T) {
+	t.Parallel()
+
 	message, err := mail.ReadMessage(strings.NewReader(`To: "A B" <a.b@c.com>
 Date: Sat, 21 Dec 2012 00:59:51 +0000
 Subject: Station
@@ -27,6 +29,8 @@ Foo bar`))
 	}
 }
 func TestScoreEmail(t *testing.T) {
+	t.Parallel()
+
 	message, err := mail.ReadMessage(strings.NewReader(`To: "A B" <a.b@c.com>
 Date: Sat, 21 Dec 2012 00:59:51 +0000
 Subject: Station
@@ -49,6 +53,8 @@ Foo bar`))
 }
 
 func TestBuildAddrMap(t *testing.T) {
+	t.Parallel()
+
 	m := buildAddrMap(strings.NewReader("\n" +
 		"frew@me.com\tFrew\n" +
 		"frew@me.com\tFrew2\n",
@@ -66,6 +72,8 @@ func TestBuildAddrMap(t *testing.T) {
 }
 
 func TestSortAddrMap(t *testing.T) {
+	t.Parallel()
+
 	m := newFrecencyMap()
 	m["a@b.com"] = &addr{name: "a", addr: "a@b.com", score: 1}
 	m["b@b.com"] = &addr{name: "b", addr: "b@b.com", score: -1}
@@ -82,6 +90,8 @@ func TestSortAddrMap(t *testing.T) {
 }
 
 func TestAddrString(t *testing.T) {
+	t.Parallel()
+
 	a := &addr{name: "frew", addr: "a@b.com"}
 	assert.Equal(t, "a@b.com\tfrew", a.String())
 }

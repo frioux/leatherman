@@ -22,6 +22,8 @@ func (f mf) IsDir() bool        { return false }
 func (f mf) Sys() interface{}   { return nil }
 
 func TestNewFiles(t *testing.T) {
+	t.Parallel()
+
 	f, err := newFiles("foo", []os.FileInfo{mf("bar")}, time.Now())
 
 	if assert.NoError(t, err) {
@@ -42,6 +44,8 @@ func TestNewFiles(t *testing.T) {
 }
 
 func TestContent(t *testing.T) {
+	t.Parallel()
+
 	d, err := ioutil.TempDir("", "")
 	if err != nil {
 		t.Fatalf("Couldn't set up TempDir: %s", err)

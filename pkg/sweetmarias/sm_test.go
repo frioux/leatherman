@@ -12,6 +12,8 @@ import (
 )
 
 func TestLoadCoffee(t *testing.T) {
+	t.Parallel()
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 		f, err := os.Open("./testdata/sm.html")

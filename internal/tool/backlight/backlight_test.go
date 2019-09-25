@@ -39,6 +39,8 @@ func runAndCheck(t *testing.T, change, newBrightness int) {
 }
 
 func TestRun(t *testing.T) {
+	t.Parallel()
+
 	d, err := ioutil.TempDir("", "")
 	if err != nil {
 		t.Fatalf("Couldn't create TempDir: %s", err)

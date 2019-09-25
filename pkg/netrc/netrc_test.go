@@ -7,6 +7,8 @@ import (
 )
 
 func TestLogin(t *testing.T) {
+	t.Parallel()
+
 	f, err := Parse("./testdata/login.netrc")
 	assert.Nil(t, err)
 	heroku, _ := f.Machine("api.heroku.com")
@@ -19,6 +21,8 @@ func TestLogin(t *testing.T) {
 }
 
 func TestSampleMulti(t *testing.T) {
+	t.Parallel()
+
 	f, err := Parse("./testdata/sample_multi.netrc")
 	assert.Nil(t, err)
 	m, _ := f.Machine("m")
@@ -30,6 +34,8 @@ func TestSampleMulti(t *testing.T) {
 }
 
 func TestSampleMultiWithDefault(t *testing.T) {
+	t.Parallel()
+
 	f, err := Parse("./testdata/sample_multi_with_default.netrc")
 	assert.Nil(t, err)
 
@@ -42,6 +48,8 @@ func TestSampleMultiWithDefault(t *testing.T) {
 }
 
 func TestNewlineless(t *testing.T) {
+	t.Parallel()
+
 	f, err := Parse("./testdata/newlineless.netrc")
 	assert.Nil(t, err)
 	m, _ := f.Machine("m")
@@ -50,6 +58,8 @@ func TestNewlineless(t *testing.T) {
 }
 
 func TestBadDefaultOrder(t *testing.T) {
+	t.Parallel()
+
 	f, err := Parse("./testdata/bad_default_order.netrc")
 	assert.Nil(t, err)
 	g, _ := f.Machine("mail.google.com")
@@ -61,6 +71,8 @@ func TestBadDefaultOrder(t *testing.T) {
 }
 
 func TestDefaultOnly(t *testing.T) {
+	t.Parallel()
+
 	f, err := Parse("./testdata/default_only.netrc")
 	assert.Nil(t, err)
 	d, _ := f.Machine("default")
@@ -69,6 +81,8 @@ func TestDefaultOnly(t *testing.T) {
 }
 
 func TestGood(t *testing.T) {
+	t.Parallel()
+
 	f, err := Parse("./testdata/good.netrc")
 	assert.Nil(t, err)
 	g, _ := f.Machine("mail.google.com")
@@ -78,6 +92,8 @@ func TestGood(t *testing.T) {
 }
 
 func TestPassword(t *testing.T) {
+	t.Parallel()
+
 	f, err := Parse("./testdata/password.netrc")
 	assert.Nil(t, err)
 	m, _ := f.Machine("m")
@@ -85,6 +101,8 @@ func TestPassword(t *testing.T) {
 }
 
 func TestPermissive(t *testing.T) {
+	t.Parallel()
+
 	f, err := Parse("./testdata/permissive.netrc")
 	assert.Nil(t, err)
 	m, _ := f.Machine("m")

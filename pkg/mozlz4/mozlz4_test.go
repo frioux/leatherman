@@ -24,6 +24,8 @@ func errHasPrefix(t *testing.T, err error, prefix string) bool {
 }
 
 func TestHappyPath(t *testing.T) {
+	t.Parallel()
+
 	str := "abcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyz"
 	r := strings.NewReader(str)
 	w := &bytes.Buffer{}
@@ -53,6 +55,8 @@ func TestHappyPath(t *testing.T) {
 }
 
 func TestWrongLength(t *testing.T) {
+	t.Parallel()
+
 	str := "abcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyzabcdefghijklmnopqrstuvzxyz"
 	r := strings.NewReader(str)
 	w := &bytes.Buffer{}
@@ -69,24 +73,32 @@ func TestWrongLength(t *testing.T) {
 }
 
 func TestCantReadHeader(t *testing.T) {
+	t.Parallel()
+
 	r := bytes.NewReader(nil)
 	_, err := NewReader(r)
 	errHasPrefix(t, err, "couldn't read header")
 }
 
 func TestWrongHeader(t *testing.T) {
+	t.Parallel()
+
 	r := bytes.NewReader([]byte("lol"))
 	_, err := NewReader(r)
 	assert.True(t, errors.Is(err, ErrWrongHeader))
 }
 
 func TestCantReadSize(t *testing.T) {
+	t.Parallel()
+
 	r := bytes.NewReader([]byte(magicHeader + "x"))
 	_, err := NewReader(r)
 	errHasPrefix(t, err, "couldn't read size")
 }
 
 func TestCantDecompress(t *testing.T) {
+	t.Parallel()
+
 	w := &bytes.Buffer{}
 	w.Write([]byte(magicHeader))
 	var size uint32 = 12
@@ -100,6 +112,8 @@ func TestCantDecompress(t *testing.T) {
 }
 
 func TestCantReadAll(t *testing.T) {
+	t.Parallel()
+
 	w := &bytes.Buffer{}
 	w.Write([]byte(magicHeader))
 	var size uint32 = 12

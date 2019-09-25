@@ -9,6 +9,8 @@ import (
 )
 
 func TestTrailing(t *testing.T) {
+	t.Parallel()
+
 	t.Skip("flaky test")
 
 	buf := &bytes.Buffer{}

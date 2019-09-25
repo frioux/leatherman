@@ -8,6 +8,8 @@ import (
 )
 
 func TestTree(t *testing.T) {
+	t.Parallel()
+
 	cl, cleanup := testClientAndServer()
 	defer cleanup()
 
@@ -24,6 +26,8 @@ func TestTree(t *testing.T) {
 }
 
 func TestDir(t *testing.T) {
+	t.Parallel()
+
 	cl, cleanup := testClientAndServer()
 	defer cleanup()
 

@@ -10,6 +10,8 @@ import (
 )
 
 func TestParseArgs(t *testing.T) {
+	t.Parallel()
+
 	type row struct {
 		name string
 

@@ -12,6 +12,8 @@ import (
 )
 
 func TestServe(t *testing.T) {
+	t.Parallel()
+
 	ch := make(chan net.Addr)
 	go serve(".", ch)
 

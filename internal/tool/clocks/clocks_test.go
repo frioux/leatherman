@@ -9,6 +9,8 @@ import (
 )
 
 func TestRun(t *testing.T) {
+	t.Parallel()
+
 	buf := &bytes.Buffer{}
 
 	at := time.Date(2012, 12, 12, 4, 12, 12, 12, time.UTC)
