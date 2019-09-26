@@ -3,7 +3,6 @@ module github.com/frioux/leatherman
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/PuerkitoBio/goquery v1.5.0
-	github.com/erikdubbelboer/gspt v0.0.0-20190125194910-e68493906b83
 	github.com/frioux/yaml v0.0.0-20181016190607-99e7b284ccac
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/headzoo/surf v1.0.0

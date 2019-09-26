@@ -59,7 +59,7 @@ func Run(args []string, stdin io.Reader) error {
 	// restore the echoing state when exiting
 	defer func() {
 		_ = exec.Command("stty", "-F", "/dev/tty", "echo").Run()
-		_ = exec.Command("tmux", "setw", "automatic-rename", "on").Run()
+		setProcessName("")
 	}()
 
 	ticker := time.NewTicker(time.Second)
@@ -129,4 +129,8 @@ func kbChan(keys chan<- rune, stdin io.Reader) {
 func formatTime(r time.Duration) string {
 	s := int(math.Round(r.Seconds())) - 1
 	return fmt.Sprintf("%02d:%02d", s/60, s%60)
+}
+
+func setProcessName(name string) {
+	fmt.Print("\033k" + name + "\033\\")
 }
