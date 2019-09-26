@@ -84,7 +84,7 @@ LOOP:
 				fmt.Println(clear + "Take a break!\a")
 				break LOOP
 			}
-			if int(math.Round(remaining.Seconds()))%30 == 0 {
+			if int(math.Round(remaining.Seconds()))%30 == 1 {
 				setProcessName("PT" + formatTime(remaining))
 			}
 			fmt.Print(clear+formatTime(remaining), " remaining")
