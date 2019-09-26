@@ -157,9 +157,7 @@ $ email2json '/home/frew/var/mail/mitsi/cur/*' | head -1 | jq .
 ### ` + "`" + `expand-url` + "`" + `
 
 ` + "`" + `expand-url` + "`" + ` reads text on STDIN and writes the same text back, converting any links to
-Markdown links, with the title of the page as the title of the link.  If you set
-` + "`" + `MOZ_COOKIEJAR` + "`" + ` to the path of your ` + "`" + `cookies.sqlite` + "`" + ` it will use those cookies
-when loading the page.
+Markdown links, with the title of the page as the title of the link.
 
 ### ` + "`" + `export-bamboohr` + "`" + `
 
@@ -416,44 +414,44 @@ func init() {
 
 		"email2json": readme[3801:4516],
 
-		"expand-url": readme[4516:4806],
+		"expand-url": readme[4516:4692],
 
-		"export-bamboohr": readme[4806:4890],
+		"export-bamboohr": readme[4692:4776],
 
-		"export-bamboohr-tree": readme[4890:4977],
+		"export-bamboohr-tree": readme[4776:4863],
 
-		"fn": readme[4977:5113],
+		"fn": readme[4863:4999],
 
-		"group-by-date": readme[5113:5331],
+		"group-by-date": readme[4999:5217],
 
-		"minotaur": readme[5331:6931],
+		"minotaur": readme[5217:6817],
 
-		"netrc-password": readme[6931:7096],
+		"netrc-password": readme[6817:6982],
 
-		"pomotimer": readme[7096:7588],
+		"pomotimer": readme[6982:7474],
 
-		"prepend-emoji-hist": readme[7588:7959],
+		"prepend-emoji-hist": readme[7474:7845],
 
-		"render-mail": readme[7959:8093],
+		"render-mail": readme[7845:7979],
 
-		"replace-unzip": readme[8093:8323],
+		"replace-unzip": readme[7979:8209],
 
-		"rss": readme[8323:9071],
+		"rss": readme[8209:8957],
 
-		"slack-deaddrop": readme[9071:9291],
+		"slack-deaddrop": readme[8957:9177],
 
-		"slack-open": readme[9291:9425],
+		"slack-open": readme[9177:9311],
 
-		"sm-list": readme[9425:9701],
+		"sm-list": readme[9311:9587],
 
-		"srv": readme[9701:9884],
+		"srv": readme[9587:9770],
 
-		"toml2json": readme[9884:10059],
+		"toml2json": readme[9770:9945],
 
-		"undefer": readme[10059:10367],
+		"undefer": readme[9945:10253],
 
-		"uni": readme[10367:10529],
+		"uni": readme[10253:10415],
 
-		"yaml2json": readme[10529:10606],
+		"yaml2json": readme[10415:10492],
 	}
 }

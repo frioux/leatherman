@@ -155,9 +155,7 @@ $ email2json '/home/frew/var/mail/mitsi/cur/*' | head -1 | jq .
 ### `expand-url`
 
 `expand-url` reads text on STDIN and writes the same text back, converting any links to
-Markdown links, with the title of the page as the title of the link.  If you set
-`MOZ_COOKIEJAR` to the path of your `cookies.sqlite` it will use those cookies
-when loading the page.
+Markdown links, with the title of the page as the title of the link.
 
 ### `export-bamboohr`
 
