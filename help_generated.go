@@ -84,6 +84,29 @@ most comments are incorrectly recognized by all tools. (for example:
 
 It exists to be combined with ` + "`" + `addrs` + "`" + ` and mutt.
 
+### ` + "`" + `alluni` + "`" + `
+
+` + "`" + `alluni` + "`" + ` prints all unicode character names.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ alluni | grep DENTISTRY
+DENTISTRY SYMBOL LIGHT VERTICAL AND TOP RIGHT
+DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM RIGHT
+DENTISTRY SYMBOL LIGHT VERTICAL WITH CIRCLE
+DENTISTRY SYMBOL LIGHT DOWN AND HORIZONTAL WITH CIRCLE
+DENTISTRY SYMBOL LIGHT UP AND HORIZONTAL WITH CIRCLE
+DENTISTRY SYMBOL LIGHT VERTICAL WITH TRIANGLE
+DENTISTRY SYMBOL LIGHT DOWN AND HORIZONTAL WITH TRIANGLE
+DENTISTRY SYMBOL LIGHT UP AND HORIZONTAL WITH TRIANGLE
+DENTISTRY SYMBOL LIGHT VERTICAL AND WAVE
+DENTISTRY SYMBOL LIGHT DOWN AND HORIZONTAL WITH WAVE
+DENTISTRY SYMBOL LIGHT UP AND HORIZONTAL WITH WAVE
+DENTISTRY SYMBOL LIGHT DOWN AND HORIZONTAL
+DENTISTRY SYMBOL LIGHT UP AND HORIZONTAL
+DENTISTRY SYMBOL LIGHT VERTICAL AND TOP LEFT
+DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM LEFT
+` + "`" + `` + "`" + `` + "`" + `
+
 ### ` + "`" + `backlight` + "`" + `
 
 ` + "`" + `backlight` + "`" + ` is a faster version of ` + "`" + `xbacklight` + "`" + ` by directly writing to ` + "`" + `/sys` + "`" + `.  Example:
@@ -400,58 +423,60 @@ func init() {
 
 		"addrspec-to-tabs": readme[2064:2642],
 
-		"backlight": readme[2642:2844],
+		"alluni": readme[2642:3468],
 
-		"clocks": readme[2844:3060],
+		"backlight": readme[3468:3670],
 
-		"csv2json": readme[3060:3200],
+		"clocks": readme[3670:3886],
 
-		"csv2md": readme[3200:3274],
+		"csv2json": readme[3886:4026],
 
-		"debounce": readme[3274:3618],
+		"csv2md": readme[4026:4100],
 
-		"dump-mozlz4": readme[3618:3801],
+		"debounce": readme[4100:4444],
 
-		"email2json": readme[3801:4516],
+		"dump-mozlz4": readme[4444:4627],
 
-		"expand-url": readme[4516:4692],
+		"email2json": readme[4627:5342],
 
-		"export-bamboohr": readme[4692:4776],
+		"expand-url": readme[5342:5518],
 
-		"export-bamboohr-tree": readme[4776:4863],
+		"export-bamboohr": readme[5518:5602],
 
-		"fn": readme[4863:4999],
+		"export-bamboohr-tree": readme[5602:5689],
 
-		"group-by-date": readme[4999:5217],
+		"fn": readme[5689:5825],
 
-		"minotaur": readme[5217:6817],
+		"group-by-date": readme[5825:6043],
 
-		"netrc-password": readme[6817:6982],
+		"minotaur": readme[6043:7643],
 
-		"pomotimer": readme[6982:7474],
+		"netrc-password": readme[7643:7808],
 
-		"prepend-emoji-hist": readme[7474:7845],
+		"pomotimer": readme[7808:8300],
 
-		"render-mail": readme[7845:7979],
+		"prepend-emoji-hist": readme[8300:8671],
 
-		"replace-unzip": readme[7979:8209],
+		"render-mail": readme[8671:8805],
 
-		"rss": readme[8209:8957],
+		"replace-unzip": readme[8805:9035],
 
-		"slack-deaddrop": readme[8957:9177],
+		"rss": readme[9035:9783],
 
-		"slack-open": readme[9177:9311],
+		"slack-deaddrop": readme[9783:10003],
 
-		"sm-list": readme[9311:9587],
+		"slack-open": readme[10003:10137],
 
-		"srv": readme[9587:9770],
+		"sm-list": readme[10137:10413],
 
-		"toml2json": readme[9770:9945],
+		"srv": readme[10413:10596],
 
-		"undefer": readme[9945:10253],
+		"toml2json": readme[10596:10771],
 
-		"uni": readme[10253:10415],
+		"undefer": readme[10771:11079],
 
-		"yaml2json": readme[10415:10492],
+		"uni": readme[11079:11241],
+
+		"yaml2json": readme[11241:11318],
 	}
 }

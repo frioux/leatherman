@@ -32,6 +32,7 @@ func init() {
 	Dispatch = map[string]func([]string, io.Reader) error{
 		"addrs":                email.Addrs,
 		"addrspec-to-tabs":     email.ToTabs,
+		"alluni":               uni.All,
 		"backlight":            backlight.Run,
 		"clocks":               clocks.Run,
 		"csv2json":             csv.ToJSON,
