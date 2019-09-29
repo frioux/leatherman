@@ -253,6 +253,11 @@ empty, so matches everything, and ` + "`" + `-ignore` + "`" + ` matches ` + "`" 
 ` + "`" + `-verbose` + "`" + ` to include output about minotaur itself, like which directories it's
 watching.
 
+### ` + "`" + `name2rune` + "`" + `
+
+` + "`" + `name2rune` + "`" + ` takes the name of a unicode character and prints out any found
+characters.
+
 ### ` + "`" + `netrc-password` + "`" + `
 
 ` + "`" + `netrc-password` + "`" + ` prints password for the passed hostname and login.
@@ -451,32 +456,34 @@ func init() {
 
 		"minotaur": readme[6043:7643],
 
-		"netrc-password": readme[7643:7808],
+		"name2rune": readme[7643:7748],
 
-		"pomotimer": readme[7808:8300],
+		"netrc-password": readme[7748:7913],
 
-		"prepend-emoji-hist": readme[8300:8671],
+		"pomotimer": readme[7913:8405],
 
-		"render-mail": readme[8671:8805],
+		"prepend-emoji-hist": readme[8405:8776],
 
-		"replace-unzip": readme[8805:9035],
+		"render-mail": readme[8776:8910],
 
-		"rss": readme[9035:9783],
+		"replace-unzip": readme[8910:9140],
 
-		"slack-deaddrop": readme[9783:10003],
+		"rss": readme[9140:9888],
 
-		"slack-open": readme[10003:10137],
+		"slack-deaddrop": readme[9888:10108],
 
-		"sm-list": readme[10137:10413],
+		"slack-open": readme[10108:10242],
 
-		"srv": readme[10413:10596],
+		"sm-list": readme[10242:10518],
 
-		"toml2json": readme[10596:10771],
+		"srv": readme[10518:10701],
 
-		"undefer": readme[10771:11079],
+		"toml2json": readme[10701:10876],
 
-		"uni": readme[11079:11241],
+		"undefer": readme[10876:11184],
 
-		"yaml2json": readme[11241:11318],
+		"uni": readme[11184:11346],
+
+		"yaml2json": readme[11346:11423],
 	}
 }

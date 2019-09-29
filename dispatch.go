@@ -46,6 +46,7 @@ func init() {
 		"fn":                   fn.Run,
 		"group-by-date":        groupbydate.Run,
 		"minotaur":             minotaur.Run,
+		"name2rune":            uni.ToRune,
 		"netrc-password":       netrcpassword.Run,
 		"pomotimer":            pomotimer.Run,
 		"prepend-emoji-hist":   prependemojihist.Run,

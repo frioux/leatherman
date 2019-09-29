@@ -251,6 +251,11 @@ empty, so matches everything, and `-ignore` matches `.git`.  You can also pass
 `-verbose` to include output about minotaur itself, like which directories it's
 watching.
 
+### `name2rune`
+
+`name2rune` takes the name of a unicode character and prints out any found
+characters.
+
 ### `netrc-password`
 
 `netrc-password` prints password for the passed hostname and login.
