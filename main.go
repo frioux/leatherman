@@ -21,6 +21,7 @@ func main() {
 	which := filepath.Base(os.Args[0])
 	args := os.Args
 
+	Dispatch["xyzzy"] = func([]string, io.Reader) error { fmt.Println("nothing happens"); return nil }
 	if _, ok := Dispatch[which]; !ok && len(args) > 1 {
 		args = args[1:]
 		which = args[0]
