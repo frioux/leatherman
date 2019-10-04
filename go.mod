@@ -3,7 +3,6 @@ module github.com/frioux/leatherman
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/PuerkitoBio/goquery v1.5.0
-	github.com/dvyukov/go-fuzz v0.0.0-00010101000000-000000000000 // indirect
 	github.com/frioux/yaml v0.0.0-20181016190607-99e7b284ccac
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/headzoo/surf v1.0.0
@@ -21,5 +20,3 @@ require (
 )
 
 go 1.13
-
-replace github.com/dvyukov/go-fuzz => github.com/thepudds/go-fuzz v0.0.0-20190808141544-193030f1cb16
