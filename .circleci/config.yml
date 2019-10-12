@@ -23,7 +23,7 @@ jobs:
           environment:
              GO111MODULE: "on"
           command: >
-             go get -v -mod=readonly -ldflags="-s -w" github.com/frioux/leatherman@${CIRCLE_SHA1};
+             go get -v -mod=readonly github.com/frioux/leatherman@${CIRCLE_SHA1};
              xz --stdout "$(go env GOPATH)/bin/leatherman" > ./artifacts/leatherman.xz
       - run:
           name: Windows Build
@@ -31,7 +31,7 @@ jobs:
              GOOS: windows
              GO111MODULE: "on"
           command: >
-             go get -v -mod=readonly -ldflags="-s -w" github.com/frioux/leatherman@${CIRCLE_SHA1};
+             go get -v -mod=readonly github.com/frioux/leatherman@${CIRCLE_SHA1};
              zip ./artifacts/leatherman.zip "$(go env GOPATH)/bin/windows_amd64/leatherman.exe"
       - run:
           name: OSX Build
@@ -39,7 +39,7 @@ jobs:
              GOOS: darwin
              GO111MODULE: "on"
           command: >
-             go get -v -mod=readonly -x -ldflags="-s -w" github.com/frioux/leatherman@${CIRCLE_SHA1};
+             go get -v -mod=readonly -x github.com/frioux/leatherman@${CIRCLE_SHA1};
              xz --stdout "$(go env GOPATH)/bin/leatherman" > ./artifacts/leatherman-osx.xz
       - run:
           name: Install GHR
