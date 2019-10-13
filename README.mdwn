@@ -287,15 +287,13 @@ progress.
 [1]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique/
 [2]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique-three-years-later/
 
-### `prepend-emoji-hist`
+### `prepend-hist`
 
-`prepend-emoji-hist` prints out the deduplicated lines from the passed file, converting characters to
-unicode names, and then printing out the lines from STDIN, filtering out what's
-already been printed.  Note that `alluni.pl` is in [my
-dotfiles](https://github.com/frioux/dotfiles.)
+`prepend-hist` prints out deduplicated lines from the history file in reverse order and
+then prints out the lines from STDIN, filtering out what's already been printed.
 
 ```bash
-$ alluni.pl | prefix-emoji-hist ~/.uni_history
+$ alluni | prefix-hist ~/.uni_history
 ```
 
 ### `render-mail`

@@ -24,10 +24,10 @@ func TestRun(t *testing.T) {
 
 	pos := int(fi.Size())
 
-	in := strings.NewReader(`white star
-rabbit
-beer mug
-skull and crossbones
+	in := strings.NewReader(`WHITE STAR
+RABBIT
+BEER MUG
+SKULL AND CROSSBONES
 `)
 	out := &bytes.Buffer{}
 
@@ -35,5 +35,5 @@ skull and crossbones
 		t.Fatalf("Couldn't run `run`: %s", err)
 	}
 
-	assert.Equal(t, "skull and crossbones\nbeer mug\nwhite star\nrabbit\n", out.String())
+	assert.Equal(t, "SKULL AND CROSSBONES\nBEER MUG\nWHITE STAR\nRABBIT\n", out.String())
 }

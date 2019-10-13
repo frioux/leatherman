@@ -16,7 +16,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/minotaur"
 	"github.com/frioux/leatherman/internal/tool/netrcpassword"
 	"github.com/frioux/leatherman/internal/tool/pomotimer"
-	"github.com/frioux/leatherman/internal/tool/prependemojihist"
+	"github.com/frioux/leatherman/internal/tool/prependhist"
 	"github.com/frioux/leatherman/internal/tool/replaceunzip"
 	"github.com/frioux/leatherman/internal/tool/rss"
 	"github.com/frioux/leatherman/internal/tool/slack"
@@ -49,7 +49,7 @@ func init() {
 		"name2rune":            uni.ToRune,
 		"netrc-password":       netrcpassword.Run,
 		"pomotimer":            pomotimer.Run,
-		"prepend-emoji-hist":   prependemojihist.Run,
+		"prepend-hist":         prependemojihist.Run,
 		"render-mail":          email.Render,
 		"replace-unzip":        replaceunzip.Run,
 		"rss":                  rss.Run,

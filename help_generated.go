@@ -289,15 +289,13 @@ progress.
 [1]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique/
 [2]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique-three-years-later/
 
-### ` + "`" + `prepend-emoji-hist` + "`" + `
+### ` + "`" + `prepend-hist` + "`" + `
 
-` + "`" + `prepend-emoji-hist` + "`" + ` prints out the deduplicated lines from the passed file, converting characters to
-unicode names, and then printing out the lines from STDIN, filtering out what's
-already been printed.  Note that ` + "`" + `alluni.pl` + "`" + ` is in [my
-dotfiles](https://github.com/frioux/dotfiles.)
+` + "`" + `prepend-hist` + "`" + ` prints out deduplicated lines from the history file in reverse order and
+then prints out the lines from STDIN, filtering out what's already been printed.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-$ alluni.pl | prefix-emoji-hist ~/.uni_history
+$ alluni | prefix-hist ~/.uni_history
 ` + "`" + `` + "`" + `` + "`" + `
 
 ### ` + "`" + `render-mail` + "`" + `
@@ -462,28 +460,28 @@ func init() {
 
 		"pomotimer": readme[7913:8405],
 
-		"prepend-emoji-hist": readme[8405:8776],
+		"prepend-hist": readme[8405:8646],
 
-		"render-mail": readme[8776:8910],
+		"render-mail": readme[8646:8780],
 
-		"replace-unzip": readme[8910:9140],
+		"replace-unzip": readme[8780:9010],
 
-		"rss": readme[9140:9888],
+		"rss": readme[9010:9758],
 
-		"slack-deaddrop": readme[9888:10108],
+		"slack-deaddrop": readme[9758:9978],
 
-		"slack-open": readme[10108:10242],
+		"slack-open": readme[9978:10112],
 
-		"sm-list": readme[10242:10518],
+		"sm-list": readme[10112:10388],
 
-		"srv": readme[10518:10701],
+		"srv": readme[10388:10571],
 
-		"toml2json": readme[10701:10876],
+		"toml2json": readme[10571:10746],
 
-		"undefer": readme[10876:11184],
+		"undefer": readme[10746:11054],
 
-		"uni": readme[11184:11346],
+		"uni": readme[11054:11216],
 
-		"yaml2json": readme[11346:11423],
+		"yaml2json": readme[11216:11293],
 	}
 }
