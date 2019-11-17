@@ -10,6 +10,10 @@ thing and get either a response or have it do what I asked.
 
 ## Commands
 
+### cmd
+
+Explains all the commands online.
+
 ### todo
 
 This is the most generically useful of the tools.  Any string that doesn't match
