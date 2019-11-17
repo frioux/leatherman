@@ -14,7 +14,7 @@ var tok string
 func init() {
 	tok = os.Getenv("DROPBOX_ACCESS_TOKEN")
 	if tok == "" {
-		panic("dropbox token is missing")
+		panic("DROPBOX_ACCESS_TOKEN is unset")
 	}
 }
 
@@ -29,6 +29,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	if len(os.Args) < 2 {
+		fmt.Fprintf(os.Stderr, "usage: %s <cmd>\n", os.Args[0])
+		os.Exit(1)
+	}
 	message, err := rules.Dispatch(os.Args[1], nil)
 	fmt.Println(message)
 	if err != nil {
