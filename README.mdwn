@@ -116,6 +116,22 @@ Currently this tool sends alerts via both `wall` and
 [pushover](https://pushover.net).  All arguments are concatenated to produce the
 sent message.
 
+## Development
+
+Here's a list of places to look when you need to add functionality:
+
+ * [NewRules](https://godoc.org/github.com/frioux/amygdala/internal/notes#NewRules)
+   is where you can create a new command.
+ * [Dropbox package](https://godoc.org/github.com/frioux/amygdala/internal/dropbox)
+ * [Twilio package](https://godoc.org/github.com/frioux/amygdala/internal/twilio)
+
+It's always wise to run `go test ./...` before pushing any changes.  After
+that, using `cmd/brain-stem` to verify changes without needing the full stack
+is useful.  If you want more, you can run the main app (`amygdala`) and poke at
+it with `cmd/twilio`.  There's no dropbox mock yet so you'll need to actually
+use the real dropbox token, but other than that you should be able to develop
+almost 100% locally.
+
 ## History
 
 This is meant to be a simpler replacement to [my lizard
