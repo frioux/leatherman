@@ -1,13 +1,9 @@
 package bamboo
 
 import (
-	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
-	"regexp"
-	"strings"
 
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/headzoo/surf"
@@ -80,30 +76,12 @@ func (c *client) tree(w io.Writer) error {
 	if err := c.b.Open(c.treeURL); err != nil {
 		return fmt.Errorf("export-bamboohr-tree: %w", err)
 	}
-	buff := &bytes.Buffer{}
 
-	if _, err := c.b.Download(buff); err != nil {
-		return fmt.Errorf("export-bamboohr-tree: %w", err)
+	s := c.b.Find("#orgchart__data_json")
+	if s.Length() == 0 {
+		return errors.New("export-bamboohr-tree: couldn't find json")
 	}
 
-	reader := bufio.NewReader(strings.NewReader(buff.String()))
-	re := regexp.MustCompile("json = (.*);")
-
-	var err error
-
-	for err == nil {
-		var line string
-		line, err = reader.ReadString('\n')
-		if err != nil && err != io.EOF {
-			return err
-		}
-		if strings.Contains(line, "json = ") {
-			if m := re.FindStringSubmatch(line); len(m) > 0 {
-				_, err := fmt.Fprint(w, m[1])
-				return err
-			}
-		}
-	}
-
-	return errors.New("export-bamboohr-tree: couldn't find json")
+	_, err := w.Write([]byte(s.Text()))
+	return err
 }

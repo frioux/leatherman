@@ -46,7 +46,14 @@ func treeHandler(pass string) http.HandlerFunc {
 			return
 		}
 
-		rw.Write([]byte(`json = {"tree":1};` + "\n"))
+		f, err := os.Open("./testdata/tree.html")
+		if err != nil {
+			panic("Couldn't load testdata: " + err.Error())
+		}
+
+		if _, err := io.Copy(rw, f); err != nil {
+			panic("Couldn't copy testdata: " + err.Error())
+		}
 	}
 }
 
