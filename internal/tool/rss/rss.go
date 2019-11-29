@@ -1,23 +1,24 @@
 package rss
 
 import (
-	"encoding/json"
+	"context"
+	"flag"
 	"fmt"
 	"io"
 	"net/url"
 	"os"
-	"sort"
 
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/mmcdole/gofeed"
+	"golang.org/x/sync/errgroup"
 )
 
 /*
-Run is a minimalist rss client.  Outputs links as markdown on STDOUT.  Takes url
-to feed and path to state file. Example usage:
+Run is a minimalist rss client.  Outputs links as markdown on STDOUT.  Takes urls
+to feeds and path to state file. Example usage:
 
 ```bash
-$ rss https://blog.afoolishmanifesto.com/index.xml afm.json
+$ rss -state feed.json https://blog.afoolishmanifesto.com/index.xml
 [Announcing shellquote](https://blog.afoolishmanifesto.com/posts/announcing-shellquote/)
 [Detecting who used the EC2 metadata server with BCC](https://blog.afoolishmanifesto.com/posts/detecting-who-used-ec2-metadata-server-bcc/)
 [Centralized known_hosts for ssh](https://blog.afoolishmanifesto.com/posts/centralized-known-hosts-for-ssh/)
@@ -28,44 +29,102 @@ $ rss https://blog.afoolishmanifesto.com/index.xml afm.json
 Command: rss
 */
 func Run(args []string, _ io.Reader) error {
-	if len(args) != 3 {
-		fmt.Fprintf(os.Stderr, "Usage: %s feedURL statefile\n", args[0])
+	flags := flag.NewFlagSet("rss", flag.ExitOnError)
+
+	var statePath string
+
+	flags.StringVar(&statePath, "state", "", "location to store state")
+	if err := flags.Parse(args[1:]); err != nil {
+		return fmt.Errorf("flags.Parse: %w", err)
+	}
+
+	if len(flags.Args()) == 0 {
+		fmt.Fprintf(os.Stderr, "Usage: %s -state rss.json <url> [<url>...]\n", args[0])
 		os.Exit(1)
 	}
 
-	return run(args[1], args[2], os.Stdout)
+	if statePath == "" {
+		fmt.Fprintln(os.Stderr, "-state is required")
+		os.Exit(1)
+	}
+
+	return run(statePath, flags.Args(), os.Stdout)
 }
 
-func run(urlString, statePath string, w io.Writer) error {
-	fp := gofeed.NewParser()
+func loadFeed(fp *gofeed.Parser, urlString string) ([]*gofeed.Item, error) {
 	feedURL, err := url.Parse(urlString)
 	if err != nil {
-		return fmt.Errorf("Couldn't parse feed url (%s): %w", feedURL, err)
+		return nil, fmt.Errorf("Couldn't parse feed url (%s): %w", urlString, err)
 	}
 
 	resp, err := lmhttp.Get(urlString)
 	if err != nil {
-		return fmt.Errorf("Couldn't get feed: %w", err)
+		return nil, fmt.Errorf("Couldn't get feed: %w", err)
 	}
 
 	f, err := fp.Parse(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Couldn't fetch feed (%s): %w", feedURL, err)
+		return nil, fmt.Errorf("Couldn't fetch feed (%s): %w", feedURL, err)
 	}
 	fixItems(feedURL, f.Items)
 
-	seen, err := syncRead(statePath, f.Items)
-	if err != nil {
-		return fmt.Errorf("Couldn't sync read (%s): %w", feedURL, err)
+	return f.Items, nil
+}
+
+func syncFeed(state indexedStates, items []*gofeed.Item, urlString string, w io.Writer) error {
+	if state[urlString] == nil {
+		state[urlString] = make(map[string]bool, len(items))
 	}
 
-	items := newItems(seen, f.Items)
+	items = newItems(state[urlString], items)
+
+	for _, i := range items {
+		state[urlString][i.GUID] = true
+	}
 
 	renderItems(w, items)
 
-	err = os.Rename(statePath+".tmp", statePath)
+	return nil
+}
+
+func run(statePath string, urls []string, w io.Writer) error {
+	state, err := readState(statePath)
 	if err != nil {
-		return fmt.Errorf("Couldn't rename state file (%s): %w", feedURL, err)
+		return fmt.Errorf("couldn't read state: %w", err)
+	}
+	fp := gofeed.NewParser()
+
+	results := make([][]*gofeed.Item, len(urls))
+	g, _ := errgroup.WithContext(context.Background())
+
+	for i, urlString := range urls {
+		i, urlString := i, urlString
+		g.Go(func() error { // O(n) goroutines
+			items, err := loadFeed(fp, urlString)
+			if err != nil {
+				return err
+			}
+			results[i] = items
+			return nil
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
+	}
+	for i, items := range results {
+		if err := syncFeed(state, items, urls[i], w); err != nil {
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(1)
+		}
+	}
+
+	if err := writeState(statePath, state); err != nil {
+		return fmt.Errorf("Couldn't save state file: %w", err)
+	}
+	if err := os.Rename(statePath+".tmp", statePath); err != nil {
+		return fmt.Errorf("Couldn't rename state file: %w", err)
 	}
 
 	return nil
@@ -107,77 +166,4 @@ func newItems(seen map[string]bool, items []*gofeed.Item) []*gofeed.Item {
 	}
 
 	return ret
-}
-
-// Store JSON containing seen GUIDs for the current feed.
-func syncRead(state string, items []*gofeed.Item) (map[string]bool, error) {
-	ret := make(map[string]bool, len(items))
-
-	guids, err := readState(state)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't read state: %w", err)
-	}
-
-	for _, g := range guids {
-		ret[g] = true
-	}
-
-	// Generate news state
-	newState := make(map[string]bool, len(items)+len(guids))
-
-	for _, g := range guids {
-		newState[g] = true
-	}
-	for _, i := range items {
-		newState[i.GUID] = true
-	}
-	toStore := make([]string, 0, len(newState))
-
-	for k := range newState {
-		toStore = append(toStore, k)
-	}
-	sort.Strings(toStore)
-
-	err = writeState(state, toStore)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't write state: %w", err)
-	}
-	return ret, nil
-}
-
-func readState(state string) ([]string, error) {
-	file, err := os.Open(state)
-	if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("couldn't open state file: %w", err)
-	}
-
-	var guids []string
-
-	if err == nil {
-		decoder := json.NewDecoder(file)
-		err = decoder.Decode(&guids)
-		if err != nil && !os.IsNotExist(err) {
-			return nil, fmt.Errorf("couldn't decode state file: %w", err)
-		}
-	}
-
-	return guids, nil
-}
-
-func writeState(state string, guids []string) error {
-	tmp, err := os.Create(state + ".tmp")
-	if err != nil {
-		return fmt.Errorf("couldn't create state file: %w", err)
-	}
-	encoder := json.NewEncoder(tmp)
-	encoder.SetIndent("", "\t")
-	err = encoder.Encode(guids)
-	if err != nil {
-		return fmt.Errorf("couldn't encode state file: %w", err)
-	}
-	err = tmp.Close()
-	if err != nil {
-		return fmt.Errorf("couldn't write state file: %w", err)
-	}
-	return nil
 }

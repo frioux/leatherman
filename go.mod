@@ -14,6 +14,7 @@ require (
 	github.com/pierrec/lz4/v3 v3.1.0
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
+	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
 	golang.org/x/sys v0.0.0-20190904005037-43c01164e931 // indirect
 	golang.org/x/text v0.3.2
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect

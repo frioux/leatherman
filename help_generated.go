@@ -311,11 +311,11 @@ a single root for all files in the zipfile.
 
 ### ` + "`" + `rss` + "`" + `
 
-` + "`" + `rss` + "`" + ` is a minimalist rss client.  Outputs links as markdown on STDOUT.  Takes url
-to feed and path to state file. Example usage:
+` + "`" + `rss` + "`" + ` is a minimalist rss client.  Outputs links as markdown on STDOUT.  Takes urls
+to feeds and path to state file. Example usage:
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-$ rss https://blog.afoolishmanifesto.com/index.xml afm.json
+$ rss -state feed.json https://blog.afoolishmanifesto.com/index.xml
 [Announcing shellquote](https://blog.afoolishmanifesto.com/posts/announcing-shellquote/)
 [Detecting who used the EC2 metadata server with BCC](https://blog.afoolishmanifesto.com/posts/detecting-who-used-ec2-metadata-server-bcc/)
 [Centralized known_hosts for ssh](https://blog.afoolishmanifesto.com/posts/centralized-known-hosts-for-ssh/)
@@ -466,22 +466,22 @@ func init() {
 
 		"replace-unzip": readme[8780:9010],
 
-		"rss": readme[9010:9758],
+		"rss": readme[9010:9768],
 
-		"slack-deaddrop": readme[9758:9978],
+		"slack-deaddrop": readme[9768:9988],
 
-		"slack-open": readme[9978:10112],
+		"slack-open": readme[9988:10122],
 
-		"sm-list": readme[10112:10388],
+		"sm-list": readme[10122:10398],
 
-		"srv": readme[10388:10571],
+		"srv": readme[10398:10581],
 
-		"toml2json": readme[10571:10746],
+		"toml2json": readme[10581:10756],
 
-		"undefer": readme[10746:11054],
+		"undefer": readme[10756:11064],
 
-		"uni": readme[11054:11216],
+		"uni": readme[11064:11226],
 
-		"yaml2json": readme[11216:11293],
+		"yaml2json": readme[11226:11303],
 	}
 }

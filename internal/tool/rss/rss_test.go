@@ -429,7 +429,7 @@ might realize.&lt;/p&gt;
 	}
 
 	buf := &bytes.Buffer{}
-	err = run(ts.URL, f.Name(), buf)
+	err = run(f.Name(), []string{ts.URL}, buf)
 	assert.NoError(t, err)
 	assert.Equal(t, `[Sorting Books](https://blog.afoolishmanifesto.com/posts/sorting-books/)
 [Automating Email](https://blog.afoolishmanifesto.com/posts/automating-email/)
