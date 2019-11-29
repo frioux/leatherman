@@ -431,7 +431,7 @@ might realize.&lt;/p&gt;
 	buf := &bytes.Buffer{}
 	err = run(ts.URL, f.Name(), buf)
 	assert.NoError(t, err)
-	assert.Equal(t, buf.String(), `[Sorting Books](https://blog.afoolishmanifesto.com/posts/sorting-books/)
+	assert.Equal(t, `[Sorting Books](https://blog.afoolishmanifesto.com/posts/sorting-books/)
 [Automating Email](https://blog.afoolishmanifesto.com/posts/automating-email/)
 [How to Add a Subscription Service to Your Blog](https://blog.afoolishmanifesto.com/posts/how-to-add-a-subscription-mode-to-your-blog/)
 [Fixing Buggy Haskell Programs with Go](https://blog.afoolishmanifesto.com/posts/fixing-buggy-haskell-programs-with-golang/)
@@ -451,5 +451,5 @@ might realize.&lt;/p&gt;
 [Validating Kubernetes Manifests](https://blog.afoolishmanifesto.com/posts/validating-kubernetes-manifests/)
 [go generate: barely a framework](https://blog.afoolishmanifesto.com/posts/go-generate/)
 [Go Doesn't Have Generics](https://blog.afoolishmanifesto.com/posts/golang-no-generics/)
-`)
+`, buf.String())
 }
