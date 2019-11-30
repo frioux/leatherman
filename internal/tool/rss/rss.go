@@ -2,6 +2,7 @@ package rss
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -14,16 +15,16 @@ import (
 )
 
 /*
-Run is a minimalist rss client.  Outputs links as markdown on STDOUT.  Takes urls
+Run is a minimalist rss client.  Outputs JSON on STDOUT.  Takes urls
 to feeds and path to state file. Example usage:
 
 ```bash
-$ rss -state feed.json https://blog.afoolishmanifesto.com/index.xml
-[Announcing shellquote](https://blog.afoolishmanifesto.com/posts/announcing-shellquote/)
-[Detecting who used the EC2 metadata server with BCC](https://blog.afoolishmanifesto.com/posts/detecting-who-used-ec2-metadata-server-bcc/)
-[Centralized known_hosts for ssh](https://blog.afoolishmanifesto.com/posts/centralized-known-hosts-for-ssh/)
-[Buffered Channels in Golang](https://blog.afoolishmanifesto.com/posts/buffered-channels-in-golang/)
-[C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
+$ rss -state feed.json https://blog.afoolishmanifesto.com/index.xml | jq -r '" * [" + .title + "](" +.link+")"'
+ * [Announcing shellquote](https://blog.afoolishmanifesto.com/posts/announcing-shellquote/)
+ * [Detecting who used the EC2 metadata server with BCC](https://blog.afoolishmanifesto.com/posts/detecting-who-used-ec2-metadata-server-bcc/)
+ * [Centralized known_hosts for ssh](https://blog.afoolishmanifesto.com/posts/centralized-known-hosts-for-ssh/)
+ * [Buffered Channels in Golang](https://blog.afoolishmanifesto.com/posts/buffered-channels-in-golang/)
+ * [C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
 ```
 
 Command: rss
@@ -82,9 +83,7 @@ func syncFeed(state indexedStates, items []*gofeed.Item, urlString string, w io.
 		state[urlString][i.GUID] = true
 	}
 
-	renderItems(w, items)
-
-	return nil
+	return renderItems(w, items)
 }
 
 func run(statePath string, urls []string, w io.Writer) error {
@@ -149,10 +148,16 @@ func fixItems(feedURL *url.URL, items []*gofeed.Item) {
 	}
 }
 
-func renderItems(out io.Writer, items []*gofeed.Item) {
+func renderItems(out io.Writer, items []*gofeed.Item) error {
+	e := json.NewEncoder(out)
+
 	for _, i := range items {
-		fmt.Fprintf(out, "[%s](%s)\n", i.Title, i.Link)
+		if err := e.Encode(i); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // Return items in feed that are not in sync

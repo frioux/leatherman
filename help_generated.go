@@ -311,16 +311,16 @@ a single root for all files in the zipfile.
 
 ### ` + "`" + `rss` + "`" + `
 
-` + "`" + `rss` + "`" + ` is a minimalist rss client.  Outputs links as markdown on STDOUT.  Takes urls
+` + "`" + `rss` + "`" + ` is a minimalist rss client.  Outputs JSON on STDOUT.  Takes urls
 to feeds and path to state file. Example usage:
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-$ rss -state feed.json https://blog.afoolishmanifesto.com/index.xml
-[Announcing shellquote](https://blog.afoolishmanifesto.com/posts/announcing-shellquote/)
-[Detecting who used the EC2 metadata server with BCC](https://blog.afoolishmanifesto.com/posts/detecting-who-used-ec2-metadata-server-bcc/)
-[Centralized known_hosts for ssh](https://blog.afoolishmanifesto.com/posts/centralized-known-hosts-for-ssh/)
-[Buffered Channels in Golang](https://blog.afoolishmanifesto.com/posts/buffered-channels-in-golang/)
-[C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
+$ rss -state feed.json https://blog.afoolishmanifesto.com/index.xml | jq -r '" * [" + .title + "](" +.link+")"'
+ * [Announcing shellquote](https://blog.afoolishmanifesto.com/posts/announcing-shellquote/)
+ * [Detecting who used the EC2 metadata server with BCC](https://blog.afoolishmanifesto.com/posts/detecting-who-used-ec2-metadata-server-bcc/)
+ * [Centralized known_hosts for ssh](https://blog.afoolishmanifesto.com/posts/centralized-known-hosts-for-ssh/)
+ * [Buffered Channels in Golang](https://blog.afoolishmanifesto.com/posts/buffered-channels-in-golang/)
+ * [C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
 ` + "`" + `` + "`" + `` + "`" + `
 
 ### ` + "`" + `slack-deaddrop` + "`" + `
@@ -466,22 +466,22 @@ func init() {
 
 		"replace-unzip": readme[8780:9010],
 
-		"rss": readme[9010:9768],
+		"rss": readme[9010:9814],
 
-		"slack-deaddrop": readme[9768:9988],
+		"slack-deaddrop": readme[9814:10034],
 
-		"slack-open": readme[9988:10122],
+		"slack-open": readme[10034:10168],
 
-		"sm-list": readme[10122:10398],
+		"sm-list": readme[10168:10444],
 
-		"srv": readme[10398:10581],
+		"srv": readme[10444:10627],
 
-		"toml2json": readme[10581:10756],
+		"toml2json": readme[10627:10802],
 
-		"undefer": readme[10756:11064],
+		"undefer": readme[10802:11110],
 
-		"uni": readme[11064:11226],
+		"uni": readme[11110:11272],
 
-		"yaml2json": readme[11226:11303],
+		"yaml2json": readme[11272:11349],
 	}
 }
