@@ -298,6 +298,47 @@ then prints out the lines from STDIN, filtering out what's already been printed.
 $ alluni | prefix-hist ~/.uni_history
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `proj` + "`" + `
+
+` + "`" + `proj` + "`" + ` integrates my various project management tools.
+
+Usage is:
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ cd my/cool-project
+$ proj init cool-project
+` + "`" + `` + "`" + `` + "`" + `
+
+The following flags are supported before the project name:
+
+ * ` + "`" + `-skip-vim` + "`" + `: does not create vim session
+ * ` + "`" + `-force-vim` + "`" + `: overwrites any existing vim session
+ * ` + "`" + `-skip-note` + "`" + `: does not create note
+ * ` + "`" + `-force-note` + "`" + `: overwrites any existing note
+ * ` + "`" + `-skip-smartcd` + "`" + `: does not create smartcd enter script
+ * ` + "`" + `-force-smartcd` + "`" + `: overwrites any existing smartcd enter script
+
+Once a project has been initialized, you can run:
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ proj vim
+` + "`" + `` + "`" + `` + "`" + `
+
+To open the vim session for that project.
+
+I use [vim sessions][vim], [a notes system][notes], and of course checkouts of
+code all over the place.  Proj is meant to make creation of a vim session and a
+note easy and eventually allow jumping back and forth between the three.  As of
+2019-12-02 it is almost painfully specific to my personal setup, but as I
+discover the actual patterns I'll probably generalize.
+
+Proj uses uses [smartcd][smartcd] both as a mechanism and as the means to
+add functionality to projects within shell sessions.
+
+[vim]: https://blog.afoolishmanifesto.com/posts/vim-session-workflow/
+[notes]: https://blog.afoolishmanifesto.com/posts/a-love-letter-to-plain-text/#notes
+[smartcd]: https://github.com/cxreg/smartcd
+
 ### ` + "`" + `render-mail` + "`" + `
 
 ` + "`" + `render-mail` + "`" + ` is a scrappy tool to render email with a Local-Date included, if Date is
@@ -462,26 +503,28 @@ func init() {
 
 		"prepend-hist": readme[8405:8646],
 
-		"render-mail": readme[8646:8780],
+		"proj": readme[8646:9965],
 
-		"replace-unzip": readme[8780:9010],
+		"render-mail": readme[9965:10099],
 
-		"rss": readme[9010:9814],
+		"replace-unzip": readme[10099:10329],
 
-		"slack-deaddrop": readme[9814:10034],
+		"rss": readme[10329:11133],
 
-		"slack-open": readme[10034:10168],
+		"slack-deaddrop": readme[11133:11353],
 
-		"sm-list": readme[10168:10444],
+		"slack-open": readme[11353:11487],
 
-		"srv": readme[10444:10627],
+		"sm-list": readme[11487:11763],
 
-		"toml2json": readme[10627:10802],
+		"srv": readme[11763:11946],
 
-		"undefer": readme[10802:11110],
+		"toml2json": readme[11946:12121],
 
-		"uni": readme[11110:11272],
+		"undefer": readme[12121:12429],
 
-		"yaml2json": readme[11272:11349],
+		"uni": readme[12429:12591],
+
+		"yaml2json": readme[12591:12668],
 	}
 }
