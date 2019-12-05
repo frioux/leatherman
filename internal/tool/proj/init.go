@@ -1,25 +1,64 @@
 package proj
 
 import (
+	"crypto/sha1"
 	"errors"
 	"flag"
 	"fmt"
-	"time"
-	"crypto/sha1"
+	"io"
 	"os"
+	"path"
+	"time"
 )
+
+var workdir string
+
+func init() {
+	var err error
+	workdir, err = os.Getwd() // XXX I bet more needs to be done here
+	if err != nil {
+		panic("error getting workdir: " + err.Error())
+	}
+}
+
+type multiError []error
+
+func (e *multiError) Error() string {
+	ret := ""
+	for _, err := range *e {
+		ret += err.Error() + "; "
+	}
+	return ret
+}
 
 func initialize(args []string) error {
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
-	var skipVim, skipNote, skipSmartCD, forceVim, forceNote, forceSmartCD bool
 
-	flags.BoolVar(&skipVim, "skip-vim", false, "skips creation of vim session")
-	flags.BoolVar(&skipNote, "skip-note", false, "skips creation of note")
-	flags.BoolVar(&skipSmartCD, "skip-smartcd", false, "skips creation of smartcd")
+	vimMP := managedPath{
+		name:    "vim",
+		path:    func(m managedPath) string { return vimSessions + "/" + m.proj },
+		content: initVim,
+	}
+	noteMP := managedPath{
+		name:    "note",
+		path:    func(m managedPath) string { return notes + "/" + m.proj + ".md" },
+		content: initNote,
+	}
+	smartcdMP := managedPath{
+		name:    "smartcd",
+		path:    func(m managedPath) string { return smartcd + "/" + workdir + "/bash_enter" },
+		content: initSmartCD,
+	}
 
-	flags.BoolVar(&forceVim, "force-vim", false, "forces creation of vim session")
-	flags.BoolVar(&forceNote, "force-note", false, "forces creation of note")
-	flags.BoolVar(&forceSmartCD, "force-smartcd", false, "forces creation of smartcd")
+	mps := []managedPath{vimMP, noteMP, smartcdMP}
+
+	flags.BoolVar(&vimMP.skip, "skip-vim", false, "skips creation of vim session")
+	flags.BoolVar(&noteMP.skip, "skip-note", false, "skips creation of note")
+	flags.BoolVar(&smartcdMP.skip, "skip-smartcd", false, "skips creation of smartcd")
+
+	flags.BoolVar(&vimMP.force, "force-vim", false, "forces creation of vim session")
+	flags.BoolVar(&noteMP.force, "force-note", false, "forces creation of note")
+	flags.BoolVar(&smartcdMP.force, "force-smartcd", false, "forces creation of smartcd")
 
 	if err := flags.Parse(args[1:]); err != nil {
 		return err
@@ -30,24 +69,45 @@ func initialize(args []string) error {
 	}
 
 	name := flags.Args()[0]
-
-	if err := initSmartCD(name, skipSmartCD, forceSmartCD); err != nil {
-		return err
+	for i := range mps {
+		mps[i].proj = name
 	}
 
-	if err := initVim(name, skipVim, forceVim); err != nil {
-		return err
+	var errs multiError
+	for _, m := range mps {
+		if m.skip {
+			continue // remove from list?
+		}
+		exists, err := m.fileExists()
+		if err != nil {
+			errs = append(errs, fmt.Errorf(m.name+" exist check: %w", err))
+			continue
+		}
+
+		if !m.force && exists {
+			errs = append(errs, errors.New("file already exists: "+m.path(m)))
+			continue
+		}
 	}
 
-	if err := initNote(name, skipNote, forceNote); err != nil {
-		return err
+	if len(errs) != 0 {
+		return &errs
+	}
+
+	for _, m := range mps {
+		if m.skip {
+			continue
+		}
+		if err := m.manage(); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func fileExists(name string) (bool, error) {
-	_, err := os.Stat(name)
+func (m managedPath) fileExists() (bool, error) {
+	_, err := os.Stat(m.path(m))
 	if err == nil {
 		return true, nil
 	}
@@ -59,67 +119,35 @@ func fileExists(name string) (bool, error) {
 	return false, err
 }
 
-func initSmartCD(name string, skip, force bool) error {
-	if skip {
-		return nil
-	}
+type managedPath struct {
+	path        func(managedPath) string
+	content     func(managedPath, io.Writer) error
+	force, skip bool
+	proj, name  string
+}
 
-	workdir, err := os.Getwd() // XXX I bet more needs to be done here
+func (m managedPath) manage() error {
+	if err := os.MkdirAll(path.Dir(m.path(m)), os.FileMode(0755)); err != nil {
+		return err
+	}
+	f, err := os.Create(m.path(m))
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
-	dir := smartcd + "/" + workdir
-	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
-		return err
-	}
+	return m.content(m, f)
+}
 
-	p := dir + "/bash_enter"
-	e, err := fileExists(p)
-	if err != nil {
-		return err
-	}
-
-	if !force && e {
-		return errors.New("file already exists: " + p)
-	}
-
-	f, err := os.Create(p)
-	if err != nil {
-		return err
-	}
-
-	if _, err := fmt.Fprintln(f, "autostash PROJ="+name); err != nil {
+func initSmartCD(m managedPath, w io.Writer) error {
+	if _, err := fmt.Fprintln(w, "autostash PROJ="+m.proj); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func initVim(name string, skip, force bool) error {
-	if skip {
-		return nil
-	}
-
-	workdir, err := os.Getwd() // XXX I bet more needs to be done here
-	if err != nil {
-		return err
-	}
-
-	p := vimSessions + "/" + name
-	e, err := fileExists(p)
-	if err != nil {
-		return err
-	}
-
-	if !force && e {
-		return errors.New("file already exists: " + p)
-	}
-
-	f, err := os.Create(p)
-	if err != nil {
-		return err
-	}
+func initVim(m managedPath, w io.Writer) error {
 	// blindly copy pasted from a fresh session
 	session := `let SessionLoad = 1
 if &cp | set nocp | endif
@@ -162,44 +190,25 @@ doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim : 
 `
-	if _, err := fmt.Fprint(f, session); err != nil {
+	if _, err := fmt.Fprint(w, session); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func initNote(name string, skip, force bool) error {
-	if skip {
-		return nil
-	}
-
-	p := notes + "/" + name + ".md"
-	e, err := fileExists(p)
-	if err != nil {
-		return err
-	}
-
-	if !force && e {
-		return errors.New("file already exists: " + p)
-	}
-
-	f, err := os.Create(p)
-	if err != nil {
-		return err
-	}
-
-	sum := sha1.Sum([]byte(name))
+func initNote(m managedPath, w io.Writer) error {
+	sum := sha1.Sum([]byte(m.proj))
 
 	// XXX could just use the post from .projections.json
 	session := `---
-title: ` + name + `
+title: ` + m.proj + `
 date: ` + time.Now().Format("2006-01-02T15:04:05") + `
 tags: [ project ]
 guid: ` + fmt.Sprintf("%x", sum[:]) + `
 ---
 `
-	if _, err := fmt.Fprint(f, session); err != nil {
+	if _, err := fmt.Fprint(w, session); err != nil {
 		return err
 	}
 
