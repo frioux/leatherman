@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -24,11 +25,15 @@ func init() {
 type multiError []error
 
 func (e *multiError) Error() string {
-	ret := ""
-	for _, err := range *e {
-		ret += err.Error() + "; "
+	if len(*e) == 1 {
+		return (*e)[0].Error()
 	}
-	return ret
+
+	toJoin := make([]string, len(*e))
+	for i, err := range *e {
+		toJoin[i] += " * " + err.Error()
+	}
+	return "Multiple errors:\n" + strings.Join(toJoin, "\n")
 }
 
 func initialize(args []string) error {
