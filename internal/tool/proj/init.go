@@ -50,8 +50,6 @@ func initialize(args []string) error {
 		content: initSmartCD,
 	}
 
-	mps := []managedPath{vimMP, noteMP, smartcdMP}
-
 	flags.BoolVar(&vimMP.skip, "skip-vim", false, "skips creation of vim session")
 	flags.BoolVar(&noteMP.skip, "skip-note", false, "skips creation of note")
 	flags.BoolVar(&smartcdMP.skip, "skip-smartcd", false, "skips creation of smartcd")
@@ -63,6 +61,8 @@ func initialize(args []string) error {
 	if err := flags.Parse(args[1:]); err != nil {
 		return err
 	}
+
+	mps := []managedPath{vimMP, noteMP, smartcdMP}
 
 	if len(flags.Args()) != 1 {
 		return errors.New(args[0] + " requires at least one argument")
