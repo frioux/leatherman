@@ -8,12 +8,12 @@ import (
 
 func TestToAllStates(t *testing.T) {
 	var i indexedStates = map[string]map[string]bool{
-		"aurl": map[string]bool{
+		"aurl": {
 			"a": true,
 			"b": true,
 			"c": true,
 		},
-		"curl": map[string]bool{
+		"curl": {
 			"1": true,
 			"2": true,
 			"3": true,
