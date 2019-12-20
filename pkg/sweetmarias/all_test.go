@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestAllCoffees(t *testing.T) {
@@ -19,7 +19,7 @@ func TestAllCoffees(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Couldn't load allCoffees: %s", err)
 	}
-	assert.Equal(t, []string{
+	testutil.Equal(t, c, []string{
 		"https://www.sweetmarias.com/sweet-maria-s-new-classic-espresso.html",
 		"https://www.sweetmarias.com/rwanda-nyamasheke-cyato-2018.html",
 		"https://www.sweetmarias.com/costa-rica-helsar-cascara-coffee-fruit-tea-2018.html",
@@ -87,5 +87,5 @@ func TestAllCoffees(t *testing.T) {
 		"https://www.sweetmarias.com/colombia-honey-process-buenos-aires-gesha-6037.html",
 		"https://www.sweetmarias.com/green-coffee-decaf-sample-set-4-pounds-1.html",
 		"https://www.sweetmarias.com/papua-new-guinea-honey-process-nebilyer-estate.html",
-	}, c)
+	}, "wrong links")
 }

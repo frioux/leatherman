@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestLeading(t *testing.T) {
@@ -21,5 +21,5 @@ func TestLeading(t *testing.T) {
 	l.Write(start.Add(time.Nanosecond), []byte("baz\n"))
 	l.Write(start.Add(time.Second+2*time.Nanosecond), []byte("biff\n"))
 
-	assert.Equal(t, "foo\nbiff\n", buf.String())
+	testutil.Equal(t, buf.String(), "foo\nbiff\n", "wrong output")
 }

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestTree(t *testing.T) {
@@ -22,7 +22,7 @@ func TestTree(t *testing.T) {
 		t.Fatalf("Couldn't load tree: " + err.Error())
 	}
 
-	assert.Equal(t, `{"tree":1}`, buf.String())
+	testutil.Equal(t, buf.String(), `{"tree":1}`, "wrong tree found")
 }
 
 func TestDir(t *testing.T) {
@@ -40,5 +40,5 @@ func TestDir(t *testing.T) {
 		t.Fatalf("Couldn't load directory: " + err.Error())
 	}
 
-	assert.Equal(t, `dir`, buf.String())
+	testutil.Equal(t, buf.String(), `dir`, "wrong directory found")
 }

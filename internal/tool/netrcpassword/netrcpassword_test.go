@@ -3,7 +3,7 @@ package netrcpassword
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestRun(t *testing.T) {
@@ -14,5 +14,5 @@ func TestRun(t *testing.T) {
 		t.Fatalf("Failed to call run: %s", err)
 	}
 
-	assert.Equal(t, "baz", pass)
+	testutil.Equal(t, pass, "baz", "passwords not equal")
 }

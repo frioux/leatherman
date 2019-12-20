@@ -3,15 +3,16 @@ package shellquote
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func test(t *testing.T, in []string, expected string) {
-
 	ret, err := Quote(in)
-	if assert.Nil(t, err, "No error") {
-		assert.Equal(t, expected, ret)
+	if err != nil {
+		t.Errorf("Quote errored: %s", err)
+		return
 	}
+	testutil.Equal(t, ret, expected, "wrong quote")
 }
 
 func TestShellQuote(t *testing.T) {
@@ -35,5 +36,7 @@ func TestShellQuote(t *testing.T) {
 	test(t, []string{"foo=bar", "baz=quux", "command"}, `'foo=bar' 'baz=quux' command`)
 
 	_, err := Quote([]string{"\x00"})
-	assert.Equal(t, err, ErrNull)
+	if err != ErrNull {
+		t.Errorf("err should be ErrNull; was %s", err)
+	}
 }

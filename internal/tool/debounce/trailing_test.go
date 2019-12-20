@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestTrailing(t *testing.T) {
@@ -33,5 +33,5 @@ func TestTrailing(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond) // print 5
 
-	assert.Equal(t, "3\n4\n5\n", buf.String())
+	testutil.Equal(t, buf.String(), "3\n4\n5\n", "wrong output")
 }

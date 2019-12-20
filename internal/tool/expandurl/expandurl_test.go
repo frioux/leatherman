@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestRun(t *testing.T) {
@@ -447,6 +447,9 @@ during my three year long obsession with supervisors.</p>
 
 	buf := &bytes.Buffer{}
 	err := run(strings.NewReader(ts.URL), buf)
-	assert.NoError(t, err)
-	assert.Equal(t, "[fREW Schmidt's Foolish Manifesto]("+ts.URL+")\n", buf.String())
+	if err != nil {
+		t.Errorf("run errored: %s", err)
+		return
+	}
+	testutil.Equal(t, buf.String(), "[fREW Schmidt's Foolish Manifesto]("+ts.URL+")\n", "wrong output")
 }

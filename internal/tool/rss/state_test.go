@@ -3,7 +3,7 @@ package rss
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestToAllStates(t *testing.T) {
@@ -20,8 +20,8 @@ func TestToAllStates(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, allStates([]feedState{
+	testutil.Equal(t, i.toAllStates(), allStates([]feedState{
 		{URL: "aurl", GUIDs: []string{"a", "b", "c"}},
 		{URL: "curl", GUIDs: []string{"1", "2", "3"}},
-	}), i.toAllStates())
+	}), "wrong states")
 }

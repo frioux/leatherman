@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestExtractMember(t *testing.T) {
@@ -23,8 +23,8 @@ func TestExtractMember(t *testing.T) {
 	}
 
 	ms := zt.File
-	assert.Equal(t, 1, len(ms))
-	assert.Equal(t, "a", ms[0].Name)
+	testutil.Equal(t, len(ms), 1, "length not equal")
+	testutil.Equal(t, ms[0].Name, "a", "name not equal")
 
 	d, err := ioutil.TempDir("", "")
 	if err != nil {
@@ -42,16 +42,23 @@ func TestExtractMember(t *testing.T) {
 	}
 	defer os.Chdir(orig)
 
-	err = extractMember(ms[0])
-	assert.NoError(t, err)
+	if err := extractMember(ms[0]); err != nil {
+		t.Errorf("couldn't extractMember: %s", err)
+		return
+	}
 
 	f, err := os.Open("a")
-	assert.NoError(t, err)
+	if err != nil {
+		t.Errorf("couldn't os.Open: %s", err)
+		return
+	}
 
 	buf := &bytes.Buffer{}
-	_, err = io.Copy(buf, f)
-	assert.NoError(t, err)
-	assert.Equal(t, "a", buf.String())
+	if _, err := io.Copy(buf, f); err != nil {
+		t.Errorf("couldn't io.Copy: %s", err)
+		return
+	}
+	testutil.Equal(t, buf.String(), "a", "file contents not equal")
 }
 
 func TestSanitizeFilter(t *testing.T) {
@@ -67,9 +74,13 @@ func TestSanitizeFilter(t *testing.T) {
 	}
 
 	ms, err := sanitize("", zt.File)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(ms))
-	assert.Equal(t, "a", ms[0].Name)
+	if err != nil {
+		t.Errorf("couldn't sanitize: %s", err)
+		return
+	}
+	if testutil.Equal(t, len(ms), 1, "length not equal") {
+		testutil.Equal(t, ms[0].Name, "a", "name not equal")
+	}
 }
 
 func TestSanitizeSecure(t *testing.T) {
@@ -79,10 +90,14 @@ func TestSanitizeSecure(t *testing.T) {
 		"a":      []byte("a"),
 		"b/../c": []byte("b"),
 	})
-	assert.NoError(t, err)
+	if err != nil {
+		t.Errorf("couldn't buildZip: %s", err)
+		return
+	}
 
-	_, err = sanitize("", zt.File)
-	assert.Error(t, err) // No .. segments
+	if _, err := sanitize("", zt.File); err == nil {
+		t.Errorf("sanitize should have errored")
+	}
 }
 
 func TestSanitizeSetRoot(t *testing.T) {
@@ -91,22 +106,36 @@ func TestSanitizeSetRoot(t *testing.T) {
 	zt, err := buildZip(map[string][]byte{
 		"a": []byte("a"),
 	})
-	assert.NoError(t, err)
+	if err != nil {
+		t.Errorf("buildZip failed: %s", err)
+		return
+	}
 
 	ms, err := sanitize("c", zt.File)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(ms))
-	assert.Equal(t, "c/a", ms[0].Name)
+	if err != nil {
+		t.Errorf("sanitize failed: %s", err)
+		return
+	}
+	if testutil.Equal(t, len(ms), 1, "length not equal") {
+		testutil.Equal(t, ms[0].Name, "c/a", "name not equal")
+	}
 
 	zt, err = buildZip(map[string][]byte{
 		"a": []byte("a"),
 	})
-	assert.NoError(t, err)
+	if err != nil {
+		t.Errorf("buildZip failed: %s", err)
+		return
+	}
 
 	ms, err = sanitize("", zt.File)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(ms))
-	assert.Equal(t, "a", ms[0].Name)
+	if err != nil {
+		t.Errorf("sanitize failed: %s", err)
+		return
+	}
+	if testutil.Equal(t, len(ms), 1, "length not equal") {
+		testutil.Equal(t, ms[0].Name, "a", "name not equal")
+	}
 }
 
 func TestHasRoot(t *testing.T) {
@@ -120,7 +149,9 @@ func TestHasRoot(t *testing.T) {
 		t.Fatalf("Couldn't make test zip: %s", err)
 	}
 
-	assert.Equal(t, false, hasRoot(zt.File))
+	if hasRoot(zt.File) {
+		t.Errorf("hasRoot() should be false")
+	}
 
 	zt, err = buildZip(map[string][]byte{
 		"a/":  []byte(""),
@@ -131,14 +162,16 @@ func TestHasRoot(t *testing.T) {
 		t.Fatalf("Couldn't make test zip: %s", err)
 	}
 
-	assert.Equal(t, true, hasRoot(zt.File))
+	if !hasRoot(zt.File) {
+		t.Errorf("hasRoot() should be true")
+	}
 }
 
 func TestGenRoot(t *testing.T) {
 	t.Parallel()
 
-	assert.Equal(t, "foo", genRoot("foo.zip"))
-	assert.Equal(t, "bar", genRoot("bar"))
+	testutil.Equal(t, genRoot("foo.zip"), "foo", "genRoot() should be foo")
+	testutil.Equal(t, genRoot("bar"), "bar", "genRoot() should be bar")
 }
 
 func buildZip(files map[string][]byte) (*zip.Reader, error) {
@@ -172,7 +205,7 @@ func TestBuildZip(t *testing.T) {
 		t.Fatalf("Couldn't build ZR: %s", err)
 	}
 
-	assert.Equal(t, 2, len(zr.File))
+	testutil.Equal(t, len(zr.File), 2, "length should be 2")
 	for _, f := range zr.File {
 		r, err := f.Open()
 		if err != nil {
@@ -187,6 +220,6 @@ func TestBuildZip(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Couldn't close member: %s", err)
 		}
-		assert.Equal(t, f.Name, b.String())
+		testutil.Equal(t, b.String(), f.Name, "wrong name")
 	}
 }

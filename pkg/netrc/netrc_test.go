@@ -3,109 +3,142 @@ package netrc
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestLogin(t *testing.T) {
 	t.Parallel()
 
 	f, err := Parse("./testdata/login.netrc")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("Parse failed: %s", err)
+		return
+	}
 	heroku, _ := f.Machine("api.heroku.com")
-	assert.Equal(t, "jeff@heroku.com", heroku.Login)
-	assert.Equal(t, "foo", heroku.Password)
+	testutil.Equal(t, heroku.Login, "jeff@heroku.com", "wrong login")
+	testutil.Equal(t, heroku.Password, "foo", "wrong password")
 
 	heroku2, _ := f.MachineAndLogin("api.heroku.com", "jeff2@heroku.com")
-	assert.Equal(t, heroku2.Login, "jeff2@heroku.com")
-	assert.Equal(t, heroku2.Password, "bar")
+	testutil.Equal(t, heroku2.Login, "jeff2@heroku.com", "wrong login")
+	testutil.Equal(t, heroku2.Password, "bar", "wrong password")
 }
 
 func TestSampleMulti(t *testing.T) {
 	t.Parallel()
 
 	f, err := Parse("./testdata/sample_multi.netrc")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("Parse failed: %s", err)
+		return
+	}
 	m, _ := f.Machine("m")
 	n, _ := f.Machine("n")
-	assert.Equal(t, m.Login, "lm")
-	assert.Equal(t, m.Password, "pm")
-	assert.Equal(t, n.Login, "ln")
-	assert.Equal(t, n.Password, "pn")
+	testutil.Equal(t, m.Login, "lm", "wrong login")
+	testutil.Equal(t, m.Password, "pm", "wrong password")
+	testutil.Equal(t, n.Login, "ln", "wrong login")
+	testutil.Equal(t, n.Password, "pn", "wrong password")
 }
 
 func TestSampleMultiWithDefault(t *testing.T) {
 	t.Parallel()
 
 	f, err := Parse("./testdata/sample_multi_with_default.netrc")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("Parse failed: %s", err)
+		return
+	}
 
 	m, _ := f.Machine("m")
 	n, _ := f.Machine("n")
-	assert.Equal(t, m.Login, "lm")
-	assert.Equal(t, m.Password, "pm")
-	assert.Equal(t, n.Login, "ln")
-	assert.Equal(t, n.Password, "pn")
+	testutil.Equal(t, m.Login, "lm", "wrong login")
+	testutil.Equal(t, m.Password, "pm", "wrong password")
+	testutil.Equal(t, n.Login, "ln", "wrong login")
+	testutil.Equal(t, n.Password, "pn", "wrong password")
 }
 
 func TestNewlineless(t *testing.T) {
 	t.Parallel()
 
 	f, err := Parse("./testdata/newlineless.netrc")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("Parse failed: %s", err)
+		return
+	}
+
 	m, _ := f.Machine("m")
-	assert.Equal(t, m.Login, "l")
-	assert.Equal(t, m.Password, "p")
+	testutil.Equal(t, m.Login, "l", "wrong login")
+	testutil.Equal(t, m.Password, "p", "wrong password")
 }
 
 func TestBadDefaultOrder(t *testing.T) {
 	t.Parallel()
 
 	f, err := Parse("./testdata/bad_default_order.netrc")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("Parse failed: %s", err)
+		return
+	}
+
 	g, _ := f.Machine("mail.google.com")
 	r, _ := f.Machine("ray")
-	assert.Equal(t, g.Login, "joe@gmail.com")
-	assert.Equal(t, g.Password, "somethingSecret")
-	assert.Equal(t, r.Login, "demo")
-	assert.Equal(t, r.Password, "mypassword")
+	testutil.Equal(t, g.Login, "joe@gmail.com", "wrong login")
+	testutil.Equal(t, g.Password, "somethingSecret", "wrong password")
+	testutil.Equal(t, r.Login, "demo", "wrong login")
+	testutil.Equal(t, r.Password, "mypassword", "wrong password")
 }
 
 func TestDefaultOnly(t *testing.T) {
 	t.Parallel()
 
 	f, err := Parse("./testdata/default_only.netrc")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("Parse failed: %s", err)
+		return
+	}
+
 	d, _ := f.Machine("default")
-	assert.Equal(t, d.Login, "ld")
-	assert.Equal(t, d.Password, "pd")
+	testutil.Equal(t, d.Login, "ld", "wrong login")
+	testutil.Equal(t, d.Password, "pd", "wrong password")
 }
 
 func TestGood(t *testing.T) {
 	t.Parallel()
 
 	f, err := Parse("./testdata/good.netrc")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("Parse failed: %s", err)
+		return
+	}
+
 	g, _ := f.Machine("mail.google.com")
-	assert.Equal(t, g.Login, "joe@gmail.com")
-	assert.Equal(t, g.Account, "justagmail")
-	assert.Equal(t, g.Password, "somethingSecret")
+	testutil.Equal(t, g.Login, "joe@gmail.com", "wrong login")
+	testutil.Equal(t, g.Account, "justagmail", "wrong account")
+	testutil.Equal(t, g.Password, "somethingSecret", "wrong password")
 }
 
 func TestPassword(t *testing.T) {
 	t.Parallel()
 
 	f, err := Parse("./testdata/password.netrc")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("Parse failed: %s", err)
+		return
+	}
+
 	m, _ := f.Machine("m")
-	assert.Equal(t, m.Password, "p")
+	testutil.Equal(t, m.Password, "p", "wrong password")
 }
 
 func TestPermissive(t *testing.T) {
 	t.Parallel()
 
 	f, err := Parse("./testdata/permissive.netrc")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("Parse failed: %s", err)
+		return
+	}
+
 	m, _ := f.Machine("m")
-	assert.Equal(t, m.Login, "l")
-	assert.Equal(t, m.Password, "p")
+	testutil.Equal(t, m.Login, "l", "wrong login")
+	testutil.Equal(t, m.Password, "p", "wrong password")
 }

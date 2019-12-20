@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestServe(t *testing.T) {
@@ -48,5 +48,5 @@ func TestServe(t *testing.T) {
 		t.Fatal("Somehow got empty test case")
 	}
 
-	assert.Equal(t, expected, got)
+	testutil.Equal(t, got, expected, "incorrect body")
 }

@@ -10,8 +10,6 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/frankban/quicktest v1.4.0 h1:rCSCih1FnSWJEel/eub9wclBSqpF2F/PuvxUWGWnbO8=
 github.com/frankban/quicktest v1.4.0/go.mod h1:36zfPVQyHxymz4cH7wlDmVwDrJuljRB60qkgn7rorfQ=
-github.com/frioux/yaml v0.0.0-20181016190607-99e7b284ccac h1:hqYqZlh27Yl+UZnXpERyx0kz8KHcq6jt/RYKNinpZeE=
-github.com/frioux/yaml v0.0.0-20181016190607-99e7b284ccac/go.mod h1:YG995++5o4pY+dtMfaYY/sWBn/Qhj5rYQ7QaCnyTc+8=
 github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f h1:vPrzBLZB9NBFMoydArwYLJMLJjv9YBwjORlyyVp+n2o=
 github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f/go.mod h1:YG995++5o4pY+dtMfaYY/sWBn/Qhj5rYQ7QaCnyTc+8=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=

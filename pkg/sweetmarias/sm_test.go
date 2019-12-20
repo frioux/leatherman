@@ -8,7 +8,7 @@ import (
 
 	"net/http/httptest"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestLoadCoffee(t *testing.T) {
@@ -32,7 +32,7 @@ func TestLoadCoffee(t *testing.T) {
 		t.Fatalf("Failed to LoadCoffee: %s", err)
 	}
 
-	assert.Equal(t, Coffee{
+	testutil.Equal(t, c, Coffee{
 		Title:    "Papua New Guinea Honey Nebilyer Estate",
 		Overview: "Honey process seems to bring out fruited notes like cranberry, raisin, red grape, and underscored by molasses-like sweetness. This PNG boasts body, and with mild acidity, is great espresso too. City+ to Full City+. Good for espresso.",
 		Score:    86.6,
@@ -55,5 +55,5 @@ func TestLoadCoffee(t *testing.T) {
 			"Region":                   "Waghi Valley",
 			"Roast Recommendations":    "City+ to Full City+",
 		},
-	}, c)
+	}, "wrong coffee")
 }

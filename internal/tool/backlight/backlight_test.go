@@ -8,34 +8,36 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func runAndCheck(t *testing.T, change, newBrightness int) {
-	err := run(change)
-	assert.NoError(t, err)
+	if err := run(change); err != nil {
+		t.Errorf("run failed: %s", err)
+		return
+	}
 
 	f, err := os.Open("./brightness")
-	assert.NoError(t, err)
 	if err != nil {
+		t.Errorf("os.Open failed: %s", err)
 		return
 	}
 
 	buf := &bytes.Buffer{}
 	_, err = io.Copy(buf, f)
-	assert.NoError(t, err)
 	if err != nil {
+		t.Errorf("io.Copy failed: %s", err)
 		return
 	}
 
 	raw := buf.String()
 	i, err := strconv.Atoi(raw[:len(raw)-1])
-	assert.NoError(t, err)
 	if err != nil {
+		t.Errorf("strconv.Atoi failed: %s", err)
 		return
 	}
 
-	assert.Equal(t, newBrightness, i)
+	testutil.Equal(t, i, newBrightness, "wrong brightness")
 }
 
 func TestRun(t *testing.T) {

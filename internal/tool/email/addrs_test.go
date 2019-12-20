@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestAllAddrs(t *testing.T) {
@@ -18,14 +18,14 @@ Subject: Station
 
 Foo bar`))
 	if err != nil {
-		assert.NoError(t, err, "Couldn't set up test")
+		t.Errorf("Couldn't set up test: %s", err)
 		return
 	}
 
 	a := allAddrs(message)
-	if assert.Equal(t, 1, len(a)) {
-		assert.Equal(t, "A B", a[0].Name)
-		assert.Equal(t, "a.b@c.com", a[0].Address)
+	if testutil.Equal(t, len(a), 1, "wrong address count") {
+		testutil.Equal(t, a[0].Name, "A B", "wrong name")
+		testutil.Equal(t, a[0].Address, "a.b@c.com", "wrong address")
 	}
 }
 func TestScoreEmail(t *testing.T) {
@@ -37,7 +37,7 @@ Subject: Station
 
 Foo bar`))
 	if err != nil {
-		assert.NoError(t, err, "Coudln't set up test")
+		t.Errorf("Couldn't set up test: %s", err)
 		return
 	}
 
@@ -49,7 +49,9 @@ Foo bar`))
 	}
 
 	m.scoreEmail(message, time.Date(2012, 12, 12, 12, 12, 12, 12, time.UTC))
-	assert.InDelta(t, 1.217, m["a.b@c.com"].score, 0.001, "Scored address")
+	if s := m["a.b@c.com"].score; s > 1.217+0.001 || s < 1.217-0.001 {
+		t.Errorf("Score should have been about 1.217, was %f", s)
+	}
 }
 
 func TestBuildAddrMap(t *testing.T) {
@@ -60,14 +62,15 @@ func TestBuildAddrMap(t *testing.T) {
 		"frew@me.com\tFrew2\n",
 	))
 
-	if assert.Equal(t, 1, len(m)) {
-		a := m["frew@me.com"]
-		if !assert.NotNil(t, a) {
+	if testutil.Equal(t, len(m), 1, "incorrectly sized map") {
+		a, ok := m["frew@me.com"]
+		if !ok {
+			t.Errorf("didn't find address frew@me.com")
 			return
 		}
-		assert.Equal(t, "Frew", a.name)
-		assert.Equal(t, "frew@me.com", a.addr)
-		assert.Equal(t, float64(0), a.score)
+		testutil.Equal(t, a.name, "Frew", "incorrect name")
+		testutil.Equal(t, a.addr, "frew@me.com", "incorrect address")
+		testutil.Equal(t, a.score, float64(0), "incorrect score")
 	}
 }
 
@@ -81,11 +84,11 @@ func TestSortAddrMap(t *testing.T) {
 	m["d@b.com"] = &addr{name: "d", addr: "d@b.com", score: 3}
 
 	a := sortAddrMap(m)
-	if assert.Equal(t, 4, len(a)) {
-		assert.Equal(t, "d", a[0].name)
-		assert.Equal(t, "a", a[1].name)
-		assert.Equal(t, "c", a[2].name)
-		assert.Equal(t, "b", a[3].name)
+	if testutil.Equal(t, len(a), 4, "incorrectly sized slice") {
+		testutil.Equal(t, a[0].name, "d", "wrong name")
+		testutil.Equal(t, a[1].name, "a", "wrong name")
+		testutil.Equal(t, a[2].name, "c", "wrong name")
+		testutil.Equal(t, a[3].name, "b", "wrong name")
 	}
 }
 
@@ -93,5 +96,5 @@ func TestAddrString(t *testing.T) {
 	t.Parallel()
 
 	a := &addr{name: "frew", addr: "a@b.com"}
-	assert.Equal(t, "a@b.com\tfrew", a.String())
+	testutil.Equal(t, a.String(), "a@b.com\tfrew", "wrong mutt address format")
 }

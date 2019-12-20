@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 func TestRun(t *testing.T) {
@@ -35,5 +35,5 @@ SKULL AND CROSSBONES
 		t.Fatalf("Couldn't run `run`: %s", err)
 	}
 
-	assert.Equal(t, "SKULL AND CROSSBONES\nBEER MUG\nWHITE STAR\nRABBIT\n", out.String())
+	testutil.Equal(t, out.String(), "SKULL AND CROSSBONES\nBEER MUG\nWHITE STAR\nRABBIT\n", "output not equal")
 }

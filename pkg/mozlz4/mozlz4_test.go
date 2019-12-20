@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/frioux/leatherman/internal/testutil"
 	"github.com/pierrec/lz4/v3"
-	"github.com/stretchr/testify/assert"
 )
 
 func errHasPrefix(t *testing.T, err error, prefix string) bool {
@@ -51,7 +51,7 @@ func TestHappyPath(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, str, string(out), "data roundtripped")
+	testutil.Equal(t, string(out), str, "data didn't roundtrip")
 }
 
 func TestWrongLength(t *testing.T) {
@@ -69,7 +69,9 @@ func TestWrongLength(t *testing.T) {
 	}
 
 	_, err = NewReader(w)
-	assert.True(t, errors.Is(err, ErrWrongSize))
+	if !errors.Is(err, ErrWrongSize) {
+		t.Errorf("wanted ErrWrongSize but got: %s", err)
+	}
 }
 
 func TestCantReadHeader(t *testing.T) {
@@ -85,7 +87,9 @@ func TestWrongHeader(t *testing.T) {
 
 	r := bytes.NewReader([]byte("lol"))
 	_, err := NewReader(r)
-	assert.True(t, errors.Is(err, ErrWrongHeader))
+	if !errors.Is(err, ErrWrongHeader) {
+		t.Errorf("wanted ErrWrongHeader but got: %s", err)
+	}
 }
 
 func TestCantReadSize(t *testing.T) {

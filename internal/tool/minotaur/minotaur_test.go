@@ -6,7 +6,8 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestParseArgs(t *testing.T) {
@@ -46,9 +47,32 @@ func TestParseArgs(t *testing.T) {
 		expectedErr: errNoScript,
 	}}
 
+	opt := cmp.Comparer(func(x, y config) bool {
+		var sameInclude bool
+		if x.include == nil && y.include == nil {
+			sameInclude = true
+		} else if x.include.String() == y.include.String() {
+			sameInclude = true
+		}
+
+		var sameIgnore bool
+		if x.ignore == nil && y.ignore == nil {
+			sameIgnore = true
+		} else if x.ignore.String() == y.ignore.String() {
+			sameIgnore = true
+		}
+
+		return sameInclude && sameIgnore &&
+			x.verbose == y.verbose &&
+			cmp.Equal(x.dirs, y.dirs) &&
+			cmp.Equal(x.script, y.script)
+	})
+
 	for i, test := range table {
 		c, err := parseFlags(test.in)
-		assert.Equal(t, test.expectedConfig, c, fmt.Sprintf("%s (%d): c", test.name, i))
-		assert.True(t, errors.Is(err, test.expectedErr), fmt.Sprintf("%s (%d): err", test.name, i))
+		testutil.Equal(t, c, test.expectedConfig, fmt.Sprintf("%s (%d): c", test.name, i), opt)
+		if !errors.Is(err, test.expectedErr) {
+			t.Errorf("expected err to be %s, instead it's: %s", test.expectedErr, err)
+		}
 	}
 }

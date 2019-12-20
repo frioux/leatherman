@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -28,7 +28,10 @@ func TestToJSON(t *testing.T) {
 
 			buf := &bytes.Buffer{}
 			err = toJSON(sourceMIME, buf)
-			assert.NoError(t, err, name+" doesn't error")
+			if err != nil {
+				t.Errorf("%s errored: %s", name, err)
+				return
+			}
 
 			golden := filepath.Join("testdata", name+".json")
 			if *update {
@@ -41,7 +44,7 @@ func TestToJSON(t *testing.T) {
 				t.Fatalf("Couldn't load JSON: %s", err)
 			}
 
-			assert.JSONEq(t, string(expected), buf.String(), name+" matches")
+			testutil.Equal(t, buf.String(), string(expected), name+" matches")
 		})
 	}
 }

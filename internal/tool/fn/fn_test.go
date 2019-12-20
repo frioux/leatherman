@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/leatherman/internal/testutil"
 )
 
 type runTest struct {
@@ -59,7 +59,7 @@ func TestRun(t *testing.T) {
 				t.Fatalf("Couldn't run command: %s", err)
 			}
 
-			assert.Equal(t, test.out, string(out))
+			testutil.Equal(t, string(out), test.out, "wrong output")
 		})
 	}
 }
