@@ -1,6 +1,8 @@
 package testutil
 
 import (
+	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -15,4 +17,20 @@ func Equal(t *testing.T, got, expected interface{}, prefix string, opts ...cmp.O
 	}
 
 	return true
+}
+
+// JSONEqual takes a got and expected string of json and compares the parsed values with Equal.
+func JSONEqual(t *testing.T, got, expected string, prefix string, opts ...cmp.Option) bool {
+	var gotValue, expectedValue interface{}
+	if err := json.NewDecoder(strings.NewReader(got)).Decode(&gotValue); err != nil {
+		t.Errorf("Couldn't decode got: %s", err)
+		return false
+	}
+
+	if err := json.NewDecoder(strings.NewReader(expected)).Decode(&expectedValue); err != nil {
+		t.Errorf("Couldn't decode expected: %s", err)
+		return false
+	}
+
+	return Equal(t, gotValue, expectedValue, prefix, opts...)
 }

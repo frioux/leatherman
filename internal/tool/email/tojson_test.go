@@ -44,7 +44,7 @@ func TestToJSON(t *testing.T) {
 				t.Fatalf("Couldn't load JSON: %s", err)
 			}
 
-			testutil.Equal(t, buf.String(), string(expected), name+" matches")
+			testutil.JSONEqual(t, buf.String(), string(expected), name+" matches")
 		})
 	}
 }

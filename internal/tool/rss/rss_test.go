@@ -47,5 +47,5 @@ func TestRun(t *testing.T) {
 		t.Errorf("couldn't open test data file: %s", err)
 		return
 	}
-	testutil.Equal(t, string(expected), buf.String(), "wrong json")
+	testutil.JSONEqual(t, string(expected), buf.String(), "wrong json")
 }
