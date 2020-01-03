@@ -2,6 +2,7 @@ package rss
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -37,7 +38,7 @@ func TestRun(t *testing.T) {
 	}
 
 	buf := &bytes.Buffer{}
-	err = run(f.Name(), []string{ts.URL}, buf)
+	err = run(context.TODO(), f.Name(), []string{ts.URL}, buf)
 	if err != nil {
 		t.Errorf("Failed to run: %s", err)
 		return

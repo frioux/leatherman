@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/mmcdole/gofeed"
@@ -27,14 +28,21 @@ $ rss -state feed.json https://blog.afoolishmanifesto.com/index.xml | jq -r '" *
  * [C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
 ```
 
+Optionally takes -timeout to limit how long to wait for feeds to sync.  Passing
+0 will disable timeout.  Default is 15s.
+
 Command: rss
 */
 func Run(args []string, _ io.Reader) error {
 	flags := flag.NewFlagSet("rss", flag.ExitOnError)
 
-	var statePath string
+	var (
+		statePath string
+		timeout   time.Duration
+	)
 
 	flags.StringVar(&statePath, "state", "", "location to store state")
+	flags.DurationVar(&timeout, "timeout", 15*time.Second, "timeout before giving up; default is 15s")
 	if err := flags.Parse(args[1:]); err != nil {
 		return fmt.Errorf("flags.Parse: %w", err)
 	}
@@ -49,16 +57,22 @@ func Run(args []string, _ io.Reader) error {
 		os.Exit(1)
 	}
 
-	return run(statePath, flags.Args(), os.Stdout)
+	ctx := context.Background()
+	if timeout != time.Duration(0) {
+		var cancel func()
+		ctx, cancel = context.WithTimeout(context.Background(), timeout)
+		defer cancel()
+	}
+	return run(ctx, statePath, flags.Args(), os.Stdout)
 }
 
-func loadFeed(fp *gofeed.Parser, urlString string) ([]*gofeed.Item, error) {
+func loadFeed(ctx context.Context, fp *gofeed.Parser, urlString string) ([]*gofeed.Item, error) {
 	feedURL, err := url.Parse(urlString)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't parse feed url (%s): %w", urlString, err)
 	}
 
-	resp, err := lmhttp.Get(urlString)
+	resp, err := lmhttp.Get(ctx, urlString)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't get feed: %w", err)
 	}
@@ -86,7 +100,7 @@ func syncFeed(state indexedStates, items []*gofeed.Item, urlString string, w io.
 	return renderItems(w, items)
 }
 
-func run(statePath string, urls []string, w io.Writer) error {
+func run(ctx context.Context, statePath string, urls []string, w io.Writer) error {
 	state, err := readState(statePath)
 	if err != nil {
 		return fmt.Errorf("couldn't read state: %w", err)
@@ -94,12 +108,15 @@ func run(statePath string, urls []string, w io.Writer) error {
 	fp := gofeed.NewParser()
 
 	results := make([][]*gofeed.Item, len(urls))
-	g, _ := errgroup.WithContext(context.Background())
+	// not passing in the context here because we would rather some
+	// feeds timeout and the fast ones work, than all of them fail because
+	// the errgroup errored
+	g := &errgroup.Group{}
 
 	for i, urlString := range urls {
 		i, urlString := i, urlString
 		g.Go(func() error { // O(n) goroutines
-			items, err := loadFeed(fp, urlString)
+			items, err := loadFeed(ctx, fp, urlString)
 			if err != nil { // log errors and move on, allow the rest to succeed
 				fmt.Fprintf(os.Stderr, "Trouble syncing %s: %s\n", urlString, err)
 				return nil
@@ -110,7 +127,7 @@ func run(statePath string, urls []string, w io.Writer) error {
 	}
 
 	if err := g.Wait(); err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
+		fmt.Fprintf(os.Stderr, "errgroup should not be able to error but did: %s\n", err)
 		os.Exit(1)
 	}
 	for i, items := range results {

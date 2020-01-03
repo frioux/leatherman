@@ -2,6 +2,7 @@ package expandurl
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -71,7 +72,7 @@ func run(r io.Reader, w io.Writer) error {
 }
 
 func urlToLink(ua *http.Client, url string) (string, error) {
-	resp, err := lmhttp.Get(url)
+	resp, err := lmhttp.Get(context.TODO(), url)
 	if err != nil {
 		return "", fmt.Errorf("lmhttp.Get: %s", err)
 	}

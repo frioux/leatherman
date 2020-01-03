@@ -1,6 +1,7 @@
 package sweetmarias // import "github.com/frioux/leatherman/pkg/sweetmarias"
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -24,7 +25,7 @@ type Coffee struct {
 
 // LoadCoffee loads a Coffee from the passed url.
 func LoadCoffee(url string) (Coffee, error) {
-	res, err := lmhttp.Get(url)
+	res, err := lmhttp.Get(context.TODO(), url)
 	if err != nil {
 		return Coffee{}, fmt.Errorf("http.Get: %w", err)
 	}

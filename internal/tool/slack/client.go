@@ -1,6 +1,7 @@
 package slack
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -68,7 +69,7 @@ func (c client) usersList(i usersListInput) (usersListOutput, error) {
 	}
 	v.Set("limit", strconv.Itoa(i.limit))
 
-	req, err := lmhttp.NewRequest("GET", "https://slack.com/api/users.list?"+v.Encode(), nil)
+	req, err := lmhttp.NewRequest(context.TODO(), "GET", "https://slack.com/api/users.list?"+v.Encode(), nil)
 	if err != nil {
 		return usersListOutput{}, err
 	}
@@ -146,7 +147,7 @@ func (c client) conversationsList(i conversationsListInput) (conversationsListOu
 	}
 	v.Set("limit", strconv.Itoa(i.limit))
 
-	req, err := lmhttp.NewRequest("GET", "https://slack.com/api/conversations.list?"+v.Encode(), nil)
+	req, err := lmhttp.NewRequest(context.TODO(), "GET", "https://slack.com/api/conversations.list?"+v.Encode(), nil)
 	if err != nil {
 		return conversationsListOutput{}, err
 	}
@@ -181,7 +182,7 @@ func (c client) teamInfo(team string) (string, error) {
 		v.Set("team", team)
 	}
 
-	req, err := lmhttp.NewRequest("GET", "https://slack.com/api/team.info?"+v.Encode(), nil)
+	req, err := lmhttp.NewRequest(context.TODO(), "GET", "https://slack.com/api/team.info?"+v.Encode(), nil)
 	if err != nil {
 		return "", err
 	}
@@ -250,7 +251,7 @@ func (c client) chatPostMessage(i chatPostMessageInput) (*http.Response, error) 
 		v.Set("as_user", "true")
 	}
 
-	req, err := lmhttp.NewRequest("POST", "https://slack.com/api/chat.postMessage", strings.NewReader(v.Encode()))
+	req, err := lmhttp.NewRequest(context.TODO(), "POST", "https://slack.com/api/chat.postMessage", strings.NewReader(v.Encode()))
 	if err != nil {
 		return nil, err
 	}

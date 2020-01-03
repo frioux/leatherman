@@ -364,6 +364,9 @@ $ rss -state feed.json https://blog.afoolishmanifesto.com/index.xml | jq -r '" *
  * [C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
 ` + "`" + `` + "`" + `` + "`" + `
 
+Optionally takes -timeout to limit how long to wait for feeds to sync.  Passing
+0 will disable timeout.  Default is 15s.
+
 ### ` + "`" + `slack-deaddrop` + "`" + `
 
 ` + "`" + `slack-deaddrop` + "`" + ` allows sending messages to a slack channel without looking at slack.
@@ -509,22 +512,22 @@ func init() {
 
 		"replace-unzip": readme[10099:10329],
 
-		"rss": readme[10329:11133],
+		"rss": readme[10329:11255],
 
-		"slack-deaddrop": readme[11133:11353],
+		"slack-deaddrop": readme[11255:11475],
 
-		"slack-open": readme[11353:11487],
+		"slack-open": readme[11475:11609],
 
-		"sm-list": readme[11487:11763],
+		"sm-list": readme[11609:11885],
 
-		"srv": readme[11763:11946],
+		"srv": readme[11885:12068],
 
-		"toml2json": readme[11946:12121],
+		"toml2json": readme[12068:12243],
 
-		"undefer": readme[12121:12429],
+		"undefer": readme[12243:12551],
 
-		"uni": readme[12429:12591],
+		"uni": readme[12551:12713],
 
-		"yaml2json": readme[12591:12668],
+		"yaml2json": readme[12713:12790],
 	}
 }

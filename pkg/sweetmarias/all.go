@@ -1,6 +1,7 @@
 package sweetmarias // import "github.com/frioux/leatherman/pkg/sweetmarias"
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -16,7 +17,7 @@ var errStatusCode = errors.New("status code error")
 
 // AllCoffees returns a list of URLs for each coffee in Sweet Maria's inventory.
 func AllCoffees() ([]string, error) {
-	res, err := lmhttp.Get(allURL)
+	res, err := lmhttp.Get(context.TODO(), allURL)
 	if err != nil {
 		return nil, fmt.Errorf("http.Get: %w", err)
 	}
