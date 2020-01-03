@@ -100,8 +100,9 @@ func run(statePath string, urls []string, w io.Writer) error {
 		i, urlString := i, urlString
 		g.Go(func() error { // O(n) goroutines
 			items, err := loadFeed(fp, urlString)
-			if err != nil {
-				return err
+			if err != nil { // log errors and move on, allow the rest to succeed
+				fmt.Fprintf(os.Stderr, "Trouble syncing %s: %s\n", urlString, err)
+				return nil
 			}
 			results[i] = items
 			return nil
