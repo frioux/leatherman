@@ -71,6 +71,7 @@ func run(r io.Reader, w io.Writer) error {
 	return nil
 }
 
+// urlToLink downloads the contents of url, extracts the title, and produces a markdown link.
 func urlToLink(ua *http.Client, url string) (string, error) {
 	resp, err := lmhttp.Get(context.TODO(), url)
 	if err != nil {
@@ -90,6 +91,8 @@ func urlToLink(ua *http.Client, url string) (string, error) {
 
 var urlFinder = regexp.MustCompile(`^(|.*\s)(https?://\S+)(\s.*|)$`)
 
+// replaceLink replaces one or more raw http or https links on the passed
+// line with markdown links.
 func replaceLink(ua *http.Client, line string) string {
 	for {
 		if match := urlFinder.FindStringSubmatch(line); len(match) > 0 {
