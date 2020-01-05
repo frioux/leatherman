@@ -1,6 +1,7 @@
 package sweetmarias
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"os"
@@ -27,7 +28,7 @@ func TestLoadCoffee(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	c, err := LoadCoffee(ts.URL)
+	c, err := LoadCoffee(context.Background(), ts.URL)
 	if err != nil {
 		t.Fatalf("Failed to LoadCoffee: %s", err)
 	}

@@ -24,8 +24,8 @@ type Coffee struct {
 }
 
 // LoadCoffee loads a Coffee from the passed url.
-func LoadCoffee(url string) (Coffee, error) {
-	res, err := lmhttp.Get(context.TODO(), url)
+func LoadCoffee(ctx context.Context, url string) (Coffee, error) {
+	res, err := lmhttp.Get(ctx, url)
 	if err != nil {
 		return Coffee{}, fmt.Errorf("http.Get: %w", err)
 	}

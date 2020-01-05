@@ -1,11 +1,13 @@
 package smlist
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/frioux/leatherman/pkg/sweetmarias"
 )
@@ -24,20 +26,24 @@ func Run(_ []string, _ io.Reader) error {
 
 	tokens := make(chan struct{}, 10)
 
-	coffees, err := sweetmarias.AllCoffees()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	coffees, err := sweetmarias.AllCoffees(ctx)
 	if err != nil {
 		return fmt.Errorf("sweetmarias.AllCoffees: %w", err)
 	}
 
 	e := json.NewEncoder(os.Stdout)
 
+	ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 	for _, url := range coffees {
 		wg.Add(1)
 		tokens <- struct{}{}
 		url := url
 		go func() {
 			defer func() { wg.Done(); <-tokens }()
-			c, err := sweetmarias.LoadCoffee(url)
+			c, err := sweetmarias.LoadCoffee(ctx, url)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "sweetmarias.LoadCoffee: %s\n", err)
 				return

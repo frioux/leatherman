@@ -14,10 +14,10 @@ import (
 var errStatusCode = errors.New("status code error")
 
 // AllCoffees returns a list of URLs for each coffee in Sweet Maria's inventory.
-func AllCoffees() ([]string, error) {
+func AllCoffees(ctx context.Context) ([]string, error) {
 	const allURL = "https://www.sweetmarias.com/green-coffee.html?product_list_limit=all&sm_status=1"
 
-	res, err := lmhttp.Get(context.TODO(), allURL)
+	res, err := lmhttp.Get(ctx, allURL)
 	if err != nil {
 		return nil, fmt.Errorf("http.Get: %w", err)
 	}
