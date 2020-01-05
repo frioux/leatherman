@@ -38,7 +38,7 @@ func TestRun(t *testing.T) {
 	}
 
 	buf := &bytes.Buffer{}
-	err = run(context.TODO(), f.Name(), []string{ts.URL}, buf)
+	err = run(context.Background(), f.Name(), []string{ts.URL}, buf)
 	if err != nil {
 		t.Errorf("Failed to run: %s", err)
 		return
