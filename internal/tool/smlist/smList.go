@@ -26,7 +26,8 @@ func Run(_ []string, _ io.Reader) error {
 
 	tokens := make(chan struct{}, 10)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// 15s for the index
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	coffees, err := sweetmarias.AllCoffees(ctx)
 	if err != nil {
@@ -35,7 +36,8 @@ func Run(_ []string, _ io.Reader) error {
 
 	e := json.NewEncoder(os.Stdout)
 
-	ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
+	// 5m for all the details
+	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 	for _, url := range coffees {
 		wg.Add(1)
