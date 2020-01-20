@@ -2,6 +2,7 @@ package sweetmarias // import "github.com/frioux/leatherman/pkg/sweetmarias"
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -20,6 +21,7 @@ type Coffee struct {
 
 	FarmNotes, CuppingNotes string
 
+	Images               []string
 	AdditionalAttributes map[string]string
 }
 
@@ -73,6 +75,38 @@ func LoadCoffee(ctx context.Context, url string) (Coffee, error) {
 			header, _ := s.Attr("data-th")
 			c.AdditionalAttributes[header] = strings.Trim(s.Text(), " \n\t")
 		})
+
+	var imageErr error
+	doc.Find(`script[type="text/x-magento-init"]`).
+		Each(func(_ int, s *goquery.Selection) {
+			t := s.Text()
+			if !strings.Contains(s.Text(), "mage/gallery/gallery-ext") {
+				return
+			}
+			type imageContainer struct {
+				A struct {
+					B struct {
+						Data []struct {
+							Full string `json:"full"`
+						}
+					} `json:"mage/gallery/gallery-ext"`
+				} `json:"[data-gallery-role=gallery-placeholder]"`
+			}
+			var container imageContainer
+			imageErr = json.Unmarshal([]byte(t), &container)
+
+			if imageErr != nil {
+				return
+			}
+
+			c.Images = make([]string, len(container.A.B.Data))
+			for i, d := range container.A.B.Data {
+				c.Images[i] = d.Full
+			}
+		})
+	if imageErr != nil {
+		return Coffee{}, fmt.Errorf("parsing images json: %w", imageErr)
+	}
 
 	return c, nil
 }
