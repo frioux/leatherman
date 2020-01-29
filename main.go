@@ -15,8 +15,10 @@ import (
 // Dispatch is the dispatch table that maps command names to functions.
 var Dispatch map[string]func([]string, io.Reader) error
 
-func main() {
+// run returns false when an error occurred
+func run() bool {
 	startDebug()
+	defer stopDebug()
 
 	which := filepath.Base(os.Args[0])
 	args := os.Args
@@ -30,8 +32,7 @@ func main() {
 	fn, ok := Dispatch[which]
 	if !ok {
 		_ = Help(os.Args, os.Stdin)
-		stopDebug()
-		os.Exit(1)
+		return false
 	}
 	var err error
 
@@ -41,8 +42,13 @@ func main() {
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %s\n", which, err)
-		stopDebug()
+		return false
+	}
+	return true
+}
+
+func main() {
+	if !run() {
 		os.Exit(1)
 	}
-	stopDebug()
 }
