@@ -40,6 +40,9 @@ func Help(args []string, _ io.Reader) error {
 
 	tools := make([]string, 0, len(Dispatch))
 	for k := range Dispatch {
+		if k == "xyzzy" { // nothing to see here
+			continue
+		}
 		tools = append(tools, k)
 	}
 
