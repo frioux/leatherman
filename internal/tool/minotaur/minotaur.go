@@ -61,6 +61,8 @@ empty, so matches everything, and `-ignore` matches `.git`.  You can also pass
 `-verbose` to include output about minotaur itself, like which directories it's
 watching.
 
+The flag `-run-at-start` will run the script before there are any events.
+
 Command: minotaur
 */
 func Run(args []string, _ io.Reader) error {
@@ -80,6 +82,10 @@ func Run(args []string, _ io.Reader) error {
 	done := make(chan bool)
 	var timeout <-chan time.Time
 	events := make(map[string]bool)
+
+	if c.runAtStart {
+		timeout = time.After(0)
+	}
 
 	go func() {
 		for {

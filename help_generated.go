@@ -255,6 +255,8 @@ empty, so matches everything, and ` + "`" + `-ignore` + "`" + ` matches ` + "`" 
 ` + "`" + `-verbose` + "`" + ` to include output about minotaur itself, like which directories it's
 watching.
 
+The flag ` + "`" + `-run-at-start` + "`" + ` will run the script before there are any events.
+
 ### ` + "`" + `name2rune` + "`" + `
 
 ` + "`" + `name2rune` + "`" + ` takes the name of a unicode character and prints out any found
@@ -498,38 +500,38 @@ func init() {
 
 		"group-by-date": readme[5825:6043],
 
-		"minotaur": readme[6043:7711],
+		"minotaur": readme[6043:7786],
 
-		"name2rune": readme[7711:7816],
+		"name2rune": readme[7786:7891],
 
-		"netrc-password": readme[7816:7981],
+		"netrc-password": readme[7891:8056],
 
-		"pomotimer": readme[7981:8473],
+		"pomotimer": readme[8056:8548],
 
-		"prepend-hist": readme[8473:8714],
+		"prepend-hist": readme[8548:8789],
 
-		"proj": readme[8714:10033],
+		"proj": readme[8789:10108],
 
-		"render-mail": readme[10033:10167],
+		"render-mail": readme[10108:10242],
 
-		"replace-unzip": readme[10167:10397],
+		"replace-unzip": readme[10242:10472],
 
-		"rss": readme[10397:11323],
+		"rss": readme[10472:11398],
 
-		"slack-deaddrop": readme[11323:11543],
+		"slack-deaddrop": readme[11398:11618],
 
-		"slack-open": readme[11543:11677],
+		"slack-open": readme[11618:11752],
 
-		"sm-list": readme[11677:11953],
+		"sm-list": readme[11752:12028],
 
-		"srv": readme[11953:12136],
+		"srv": readme[12028:12211],
 
-		"toml2json": readme[12136:12311],
+		"toml2json": readme[12211:12386],
 
-		"undefer": readme[12311:12619],
+		"undefer": readme[12386:12694],
 
-		"uni": readme[12619:12781],
+		"uni": readme[12694:12856],
 
-		"yaml2json": readme[12781:12858],
+		"yaml2json": readme[12856:12933],
 	}
 }
