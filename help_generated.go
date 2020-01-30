@@ -257,6 +257,9 @@ watching.
 
 The flag ` + "`" + `-run-at-start` + "`" + ` will run the script before there are any events.
 
+The flag ` + "`" + `-report` + "`" + ` will decorate output with a text wrapper to clarify when the
+script is run.
+
 ### ` + "`" + `name2rune` + "`" + `
 
 ` + "`" + `name2rune` + "`" + ` takes the name of a unicode character and prints out any found
@@ -500,38 +503,38 @@ func init() {
 
 		"group-by-date": readme[5825:6043],
 
-		"minotaur": readme[6043:7786],
+		"minotaur": readme[6043:7882],
 
-		"name2rune": readme[7786:7891],
+		"name2rune": readme[7882:7987],
 
-		"netrc-password": readme[7891:8056],
+		"netrc-password": readme[7987:8152],
 
-		"pomotimer": readme[8056:8548],
+		"pomotimer": readme[8152:8644],
 
-		"prepend-hist": readme[8548:8789],
+		"prepend-hist": readme[8644:8885],
 
-		"proj": readme[8789:10108],
+		"proj": readme[8885:10204],
 
-		"render-mail": readme[10108:10242],
+		"render-mail": readme[10204:10338],
 
-		"replace-unzip": readme[10242:10472],
+		"replace-unzip": readme[10338:10568],
 
-		"rss": readme[10472:11398],
+		"rss": readme[10568:11494],
 
-		"slack-deaddrop": readme[11398:11618],
+		"slack-deaddrop": readme[11494:11714],
 
-		"slack-open": readme[11618:11752],
+		"slack-open": readme[11714:11848],
 
-		"sm-list": readme[11752:12028],
+		"sm-list": readme[11848:12124],
 
-		"srv": readme[12028:12211],
+		"srv": readme[12124:12307],
 
-		"toml2json": readme[12211:12386],
+		"toml2json": readme[12307:12482],
 
-		"undefer": readme[12386:12694],
+		"undefer": readme[12482:12790],
 
-		"uni": readme[12694:12856],
+		"uni": readme[12790:12952],
 
-		"yaml2json": readme[12856:12933],
+		"yaml2json": readme[12952:13029],
 	}
 }

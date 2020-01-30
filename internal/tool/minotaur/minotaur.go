@@ -63,6 +63,9 @@ watching.
 
 The flag `-run-at-start` will run the script before there are any events.
 
+The flag `-report` will decorate output with a text wrapper to clarify when the
+script is run.
+
 Command: minotaur
 */
 func Run(args []string, _ io.Reader) error {
@@ -124,12 +127,19 @@ func Run(args []string, _ io.Reader) error {
 					}
 				}
 				events = make(map[string]bool)
+				if c.report {
+					fmt.Println("==============", time.Now().Format("2006-01-02 03:04:05"), "==============")
+				}
+
 				cmd := exec.Command(s[0], s[1:]...)
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 				err := cmd.Run()
 				if err != nil && c.verbose {
 					fmt.Fprintf(os.Stderr, "script (%q) failed: %s\n", s, err)
+				}
+				if c.report {
+					fmt.Println("=================================================")
 				}
 			}
 
