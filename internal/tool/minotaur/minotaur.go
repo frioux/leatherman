@@ -17,9 +17,9 @@ events in those directories occur.  The script receives the events as arguments,
 so you can exit early if only irrelevant files changed.
 
 ```bash
-minotaur -include internal -ignore yaml \
+minotaur -suppress-args -include internal -ignore yaml \
    ~/code/leatherman -- \
-   sh -c 'go test ~/code/leatherman/...'
+   go test ~/code/leatherman/...
 ```
 
 The arguments are of the form `$event\t$filename`; for example `CREATE	x.pl`.
@@ -30,6 +30,8 @@ As far as I know the valid events are;
  * `REMOVE`
  * `RENAME`
  * `WRITE`
+
+Include the `-suppress-args` flag to disable the arguments.
 
 The events are deduplicated and also debounced, so your script will never fire
 more often than once a second.  If events are happening every half second the
@@ -110,8 +112,10 @@ func Run(args []string, _ io.Reader) error {
 			case <-timeout:
 				s := make([]string, 0, len(c.script)+len(events))
 				s = append(s, c.script...)
-				for e := range events {
-					s = append(s, e)
+				if !c.suppressArgs {
+					for e := range events {
+						s = append(s, e)
+					}
 				}
 				events = make(map[string]bool)
 				cmd := exec.Command(s[0], s[1:]...)

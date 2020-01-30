@@ -211,9 +211,9 @@ events in those directories occur.  The script receives the events as arguments,
 so you can exit early if only irrelevant files changed.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-minotaur -include internal -ignore yaml \
+minotaur -suppress-args -include internal -ignore yaml \
    ~/code/leatherman -- \
-   sh -c 'go test ~/code/leatherman/...'
+   go test ~/code/leatherman/...
 ` + "`" + `` + "`" + `` + "`" + `
 
 The arguments are of the form ` + "`" + `$event\t$filename` + "`" + `; for example ` + "`" + `CREATE	x.pl` + "`" + `.
@@ -224,6 +224,8 @@ As far as I know the valid events are;
  * ` + "`" + `REMOVE` + "`" + `
  * ` + "`" + `RENAME` + "`" + `
  * ` + "`" + `WRITE` + "`" + `
+
+Include the ` + "`" + `-suppress-args` + "`" + ` flag to disable the arguments.
 
 The events are deduplicated and also debounced, so your script will never fire
 more often than once a second.  If events are happening every half second the
@@ -496,38 +498,38 @@ func init() {
 
 		"group-by-date": readme[5825:6043],
 
-		"minotaur": readme[6043:7643],
+		"minotaur": readme[6043:7711],
 
-		"name2rune": readme[7643:7748],
+		"name2rune": readme[7711:7816],
 
-		"netrc-password": readme[7748:7913],
+		"netrc-password": readme[7816:7981],
 
-		"pomotimer": readme[7913:8405],
+		"pomotimer": readme[7981:8473],
 
-		"prepend-hist": readme[8405:8646],
+		"prepend-hist": readme[8473:8714],
 
-		"proj": readme[8646:9965],
+		"proj": readme[8714:10033],
 
-		"render-mail": readme[9965:10099],
+		"render-mail": readme[10033:10167],
 
-		"replace-unzip": readme[10099:10329],
+		"replace-unzip": readme[10167:10397],
 
-		"rss": readme[10329:11255],
+		"rss": readme[10397:11323],
 
-		"slack-deaddrop": readme[11255:11475],
+		"slack-deaddrop": readme[11323:11543],
 
-		"slack-open": readme[11475:11609],
+		"slack-open": readme[11543:11677],
 
-		"sm-list": readme[11609:11885],
+		"sm-list": readme[11677:11953],
 
-		"srv": readme[11885:12068],
+		"srv": readme[11953:12136],
 
-		"toml2json": readme[12068:12243],
+		"toml2json": readme[12136:12311],
 
-		"undefer": readme[12243:12551],
+		"undefer": readme[12311:12619],
 
-		"uni": readme[12551:12713],
+		"uni": readme[12619:12781],
 
-		"yaml2json": readme[12713:12790],
+		"yaml2json": readme[12781:12858],
 	}
 }
