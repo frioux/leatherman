@@ -207,14 +207,16 @@ write them in format -o.
 ### ` + "`" + `minotaur` + "`" + `
 
 ` + "`" + `minotaur` + "`" + ` watches one or more directories (before the ` + "`" + `--` + "`" + `) and runs a script when
-events in those directories occur.  The script receives the events as arguments,
-so you can exit early if only irrelevant files changed.
+events in those directories occur.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-minotaur -suppress-args -include internal -ignore yaml \
+minotaur -include-args -include internal -ignore yaml \
    ~/code/leatherman -- \
    go test ~/code/leatherman/...
 ` + "`" + `` + "`" + `` + "`" + `
+
+If the ` + "`" + `-include-args` + "`" + ` flag is set, the script receives the events as
+arguments, so you can exit early if only irrelevant files changed.
 
 The arguments are of the form ` + "`" + `$event\t$filename` + "`" + `; for example ` + "`" + `CREATE	x.pl` + "`" + `.
 As far as I know the valid events are;
@@ -224,8 +226,6 @@ As far as I know the valid events are;
  * ` + "`" + `REMOVE` + "`" + `
  * ` + "`" + `RENAME` + "`" + `
  * ` + "`" + `WRITE` + "`" + `
-
-Include the ` + "`" + `-suppress-args` + "`" + ` flag to disable the arguments.
 
 The events are deduplicated and also debounced, so your script will never fire
 more often than once a second.  If events are happening every half second the
@@ -255,7 +255,7 @@ empty, so matches everything, and ` + "`" + `-ignore` + "`" + ` matches ` + "`" 
 ` + "`" + `-verbose` + "`" + ` to include output about minotaur itself, like which directories it's
 watching.
 
-The flag ` + "`" + `-run-at-start` + "`" + ` will run the script before there are any events.
+The flag ` + "`" + `-no-run-at-start` + "`" + ` will not the the script until there are any events.
 
 The flag ` + "`" + `-report` + "`" + ` will decorate output with a text wrapper to clarify when the
 script is run.
@@ -503,38 +503,38 @@ func init() {
 
 		"group-by-date": readme[5825:6043],
 
-		"minotaur": readme[6043:7882],
+		"minotaur": readme[6043:7862],
 
-		"name2rune": readme[7882:7987],
+		"name2rune": readme[7862:7967],
 
-		"netrc-password": readme[7987:8152],
+		"netrc-password": readme[7967:8132],
 
-		"pomotimer": readme[8152:8644],
+		"pomotimer": readme[8132:8624],
 
-		"prepend-hist": readme[8644:8885],
+		"prepend-hist": readme[8624:8865],
 
-		"proj": readme[8885:10204],
+		"proj": readme[8865:10184],
 
-		"render-mail": readme[10204:10338],
+		"render-mail": readme[10184:10318],
 
-		"replace-unzip": readme[10338:10568],
+		"replace-unzip": readme[10318:10548],
 
-		"rss": readme[10568:11494],
+		"rss": readme[10548:11474],
 
-		"slack-deaddrop": readme[11494:11714],
+		"slack-deaddrop": readme[11474:11694],
 
-		"slack-open": readme[11714:11848],
+		"slack-open": readme[11694:11828],
 
-		"sm-list": readme[11848:12124],
+		"sm-list": readme[11828:12104],
 
-		"srv": readme[12124:12307],
+		"srv": readme[12104:12287],
 
-		"toml2json": readme[12307:12482],
+		"toml2json": readme[12287:12462],
 
-		"undefer": readme[12482:12790],
+		"undefer": readme[12462:12770],
 
-		"uni": readme[12790:12952],
+		"uni": readme[12770:12932],
 
-		"yaml2json": readme[12952:13029],
+		"yaml2json": readme[12932:13009],
 	}
 }

@@ -13,14 +13,16 @@ import (
 
 /*
 Run watches one or more directories (before the `--`) and runs a script when
-events in those directories occur.  The script receives the events as arguments,
-so you can exit early if only irrelevant files changed.
+events in those directories occur.
 
 ```bash
-minotaur -suppress-args -include internal -ignore yaml \
+minotaur -include-args -include internal -ignore yaml \
    ~/code/leatherman -- \
    go test ~/code/leatherman/...
 ```
+
+If the `-include-args` flag is set, the script receives the events as
+arguments, so you can exit early if only irrelevant files changed.
 
 The arguments are of the form `$event\t$filename`; for example `CREATE	x.pl`.
 As far as I know the valid events are;
@@ -30,8 +32,6 @@ As far as I know the valid events are;
  * `REMOVE`
  * `RENAME`
  * `WRITE`
-
-Include the `-suppress-args` flag to disable the arguments.
 
 The events are deduplicated and also debounced, so your script will never fire
 more often than once a second.  If events are happening every half second the
@@ -61,7 +61,7 @@ empty, so matches everything, and `-ignore` matches `.git`.  You can also pass
 `-verbose` to include output about minotaur itself, like which directories it's
 watching.
 
-The flag `-run-at-start` will run the script before there are any events.
+The flag `-no-run-at-start` will not the the script until there are any events.
 
 The flag `-report` will decorate output with a text wrapper to clarify when the
 script is run.
@@ -86,7 +86,7 @@ func Run(args []string, _ io.Reader) error {
 	var timeout <-chan time.Time
 	events := make(map[string]bool)
 
-	if c.runAtStart {
+	if !c.noRunAtStart {
 		timeout = time.After(0)
 	}
 
@@ -121,7 +121,7 @@ func Run(args []string, _ io.Reader) error {
 			case <-timeout:
 				s := make([]string, 0, len(c.script)+len(events))
 				s = append(s, c.script...)
-				if !c.suppressArgs {
+				if c.includeArgs {
 					for e := range events {
 						s = append(s, e)
 					}

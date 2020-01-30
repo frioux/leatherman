@@ -19,7 +19,7 @@ type config struct {
 
 	include, ignore *regexp.Regexp
 
-	verbose, report, suppressArgs, runAtStart bool
+	verbose, report, includeArgs, noRunAtStart bool
 }
 
 func parseFlags(args []string) (config, error) {
@@ -32,8 +32,8 @@ func parseFlags(args []string) (config, error) {
 	flags.StringVar(&includeStr, "include", "", "regexp matching directories to include")
 	flags.StringVar(&ignoreStr, "ignore", "(^.git|/.git$|/.git/)", "regexp matching directories to include")
 	flags.BoolVar(&c.verbose, "verbose", false, "enable verbose output")
-	flags.BoolVar(&c.suppressArgs, "suppress-args", false, "suppress event args args to script")
-	flags.BoolVar(&c.runAtStart, "run-at-start", false, "run the script when you start")
+	flags.BoolVar(&c.includeArgs, "include-args", false, "include event args args to script")
+	flags.BoolVar(&c.noRunAtStart, "no-run-at-start", false, "do not run the script when you start")
 	flags.BoolVar(&c.report, "report", false, "wrap script runs with an ascii report")
 
 	err := flags.Parse(args)
