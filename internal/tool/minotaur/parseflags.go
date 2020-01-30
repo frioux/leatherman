@@ -25,12 +25,13 @@ type config struct {
 func parseFlags(args []string) (config, error) {
 	flags := flag.NewFlagSet("minotaur", flag.ExitOnError)
 
+	var c config
+
 	var ignoreStr, includeStr string
-	var verbose bool
 
 	flags.StringVar(&includeStr, "include", "", "regexp matching directories to include")
 	flags.StringVar(&ignoreStr, "ignore", "(^.git|/.git$|/.git/)", "regexp matching directories to include")
-	flags.BoolVar(&verbose, "verbose", false, "enable verbose output")
+	flags.BoolVar(&c.verbose, "verbose", false, "enable verbose output")
 
 	err := flags.Parse(args)
 	if err != nil {
@@ -46,32 +47,26 @@ func parseFlags(args []string) (config, error) {
 		return config{}, errUsage
 	}
 
-	var dirs, script []string
-
 	var token string
 
 	token, args = args[0], args[1:]
 	for len(args) > 0 && token != "--" {
-		dirs = append(dirs, token)
+		c.dirs = append(c.dirs, token)
 
 		token, args = args[0], args[1:]
 	}
 
-	script = args
+	c.script = args
 
-	if len(script) == 0 {
+	if len(c.script) == 0 {
 		return config{}, errNoScript
 	}
 
-	if len(dirs) == 0 {
+	if len(c.dirs) == 0 {
 		return config{}, errNoDirs
 	}
 
-	return config{
-		dirs:    dirs,
-		script:  script,
-		include: include,
-		ignore:  ignore,
-		verbose: verbose,
-	}, nil
+	c.include = include
+	c.ignore = ignore
+	return c, nil
 }
