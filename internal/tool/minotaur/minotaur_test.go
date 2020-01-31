@@ -22,8 +22,8 @@ func TestParseArgs(t *testing.T) {
 		expectedErr    error
 	}
 
-	include := regexp.MustCompile("")
-	ignore := regexp.MustCompile("(^.git|/.git$|/.git/)")
+	include := regexpFlag{*regexp.MustCompile("")}
+	ignore := regexpFlag{*regexp.MustCompile("(^.git|/.git$|/.git/)")}
 
 	var table = []row{{
 		name: "simple and correct",
@@ -49,16 +49,12 @@ func TestParseArgs(t *testing.T) {
 
 	opt := cmp.Comparer(func(x, y config) bool {
 		var sameInclude bool
-		if x.include == nil && y.include == nil {
-			sameInclude = true
-		} else if x.include.String() == y.include.String() {
+		if x.include.String() == y.include.String() {
 			sameInclude = true
 		}
 
 		var sameIgnore bool
-		if x.ignore == nil && y.ignore == nil {
-			sameIgnore = true
-		} else if x.ignore.String() == y.ignore.String() {
+		if x.ignore.String() == y.ignore.String() {
 			sameIgnore = true
 		}
 

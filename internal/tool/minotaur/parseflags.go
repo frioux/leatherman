@@ -13,11 +13,26 @@ var (
 	errUsage    = errors.New("usage: minotaur <dir1> [dir2 dir3] -- <cmd> [args to cmd]")
 )
 
+type regexpFlag struct {
+	regexp.Regexp
+}
+
+func (f *regexpFlag) Set(s string) error {
+	re, err := regexp.Compile(s)
+	if err != nil {
+		return err
+	}
+
+	f.Regexp = *re
+
+	return nil
+}
+
 type config struct {
 	dirs   []string
 	script []string
 
-	include, ignore *regexp.Regexp
+	include, ignore regexpFlag
 
 	verbose, report, includeArgs, noRunAtStart bool
 }
@@ -27,10 +42,16 @@ func parseFlags(args []string) (config, error) {
 
 	var c config
 
-	var ignoreStr, includeStr string
+	if err := c.ignore.Set("(^.git|/.git$|/.git/)"); err != nil {
+		return config{}, fmt.Errorf("couldn't create default ignore value: %w", err)
+	}
 
-	flags.StringVar(&includeStr, "include", "", "regexp matching directories to include")
-	flags.StringVar(&ignoreStr, "ignore", "(^.git|/.git$|/.git/)", "regexp matching directories to include")
+	if err := c.include.Set(""); err != nil {
+		return config{}, fmt.Errorf("couldn't create default include value: %w", err)
+	}
+
+	flags.Var(&c.include, "include", "regexp matching directories to include")
+	flags.Var(&c.ignore, "ignore", "regexp matching directories to include")
 	flags.BoolVar(&c.verbose, "verbose", false, "enable verbose output")
 	flags.BoolVar(&c.includeArgs, "include-args", false, "include event args args to script")
 	flags.BoolVar(&c.noRunAtStart, "no-run-at-start", false, "do not run the script when you start")
@@ -40,9 +61,6 @@ func parseFlags(args []string) (config, error) {
 	if err != nil {
 		return config{}, fmt.Errorf("flags.Parse: %w", err)
 	}
-
-	include := regexp.MustCompile(includeStr)
-	ignore := regexp.MustCompile(ignoreStr)
 
 	args = flags.Args()
 
@@ -69,7 +87,5 @@ func parseFlags(args []string) (config, error) {
 		return config{}, errNoDirs
 	}
 
-	c.include = include
-	c.ignore = ignore
 	return c, nil
 }
