@@ -6,9 +6,10 @@ use warnings;
 $|++;
 my $off_count = 0;
 
-while (1) {
-   sleep 1;
 
+open my $pipe, '-|', 'pactl subscribe | debounce'
+   or die "Couldn't run subscribe to events: $!";
+while (my $line = <$pipe>) {
    if (playing_sounds()) {
       print "r255\n";
       $off_count = 0;
