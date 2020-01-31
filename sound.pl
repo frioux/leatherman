@@ -1,11 +1,19 @@
 #!/usr/bin/perl
 
 use 5.22.0;
+use JSON::PP;
 use warnings;
+
+# test this program by passing it a single true flag.
 
 $|++;
 my $off_count = 0;
 
+if (shift) {
+   print encode_json([_parse_plsi()]) . "\n";
+   print STDERR "Playing sounds? " . (playing_sounds() ? 'yes!' : 'no :(') . "\n";
+   exit
+}
 
 open my $pipe, '-|', 'pactl subscribe | debounce'
    or die "Couldn't run subscribe to events: $!";
