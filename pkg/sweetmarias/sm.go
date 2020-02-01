@@ -18,6 +18,7 @@ type Coffee struct {
 	Overview string
 	Score    float32
 	URL      string
+	SKU      string
 
 	FarmNotes, CuppingNotes string
 
@@ -106,6 +107,37 @@ func LoadCoffee(ctx context.Context, url string) (Coffee, error) {
 		})
 	if imageErr != nil {
 		return Coffee{}, fmt.Errorf("parsing images json: %w", imageErr)
+	}
+
+	var skuErr error
+	doc.Find(`script[type="text/x-magento-init"]`).Each(func(_ int, s *goquery.Selection) {
+		t := s.Text()
+		if !strings.Contains(s.Text(), "view_sku") {
+			return
+		}
+		type skuContainer struct {
+			A struct {
+				B struct {
+					Handles []string `json:"handles"`
+				} `json:"pageCache"`
+			} `json:"body"`
+		}
+		var container skuContainer
+		skuErr = json.Unmarshal([]byte(t), &container)
+		if skuErr != nil {
+			return
+		}
+
+		for _, h := range container.A.B.Handles {
+			const prefix = "catalog_product_view_sku_"
+			if strings.HasPrefix(h, prefix) {
+				c.SKU = strings.TrimPrefix(h, prefix)
+				break
+			}
+		}
+	})
+	if skuErr != nil {
+		return Coffee{}, fmt.Errorf("parsing sku json: %w", imageErr)
 	}
 
 	return c, nil
