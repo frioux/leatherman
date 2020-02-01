@@ -26,6 +26,80 @@ type Coffee struct {
 	AdditionalAttributes map[string]string
 }
 
+func extractImages(doc *goquery.Document) ([]string, error) {
+	var (
+		err    error
+		images []string
+	)
+	doc.Find(`script[type="text/x-magento-init"]`).Each(func(_ int, s *goquery.Selection) {
+		t := s.Text()
+		if !strings.Contains(s.Text(), "mage/gallery/gallery-ext") {
+			return
+		}
+		type imageContainer struct {
+			A struct {
+				B struct {
+					Data []struct {
+						Full string `json:"full"`
+					}
+				} `json:"mage/gallery/gallery-ext"`
+			} `json:"[data-gallery-role=gallery-placeholder]"`
+		}
+		var container imageContainer
+		if err = json.Unmarshal([]byte(t), &container); err != nil {
+			return
+		}
+
+		images = make([]string, len(container.A.B.Data))
+		for i, d := range container.A.B.Data {
+			images[i] = d.Full
+		}
+	})
+	if err != nil {
+		return nil, fmt.Errorf("parsing images json: %w", err)
+	}
+
+	return images, nil
+}
+
+func extractSKU(doc *goquery.Document) (string, error) {
+	var (
+		err error
+		sku string
+	)
+	doc.Find(`script[type="text/x-magento-init"]`).Each(func(_ int, s *goquery.Selection) {
+		t := s.Text()
+		if !strings.Contains(s.Text(), "view_sku") {
+			return
+		}
+		type skuContainer struct {
+			A struct {
+				B struct {
+					Handles []string `json:"handles"`
+				} `json:"pageCache"`
+			} `json:"body"`
+		}
+		var container skuContainer
+		if err = json.Unmarshal([]byte(t), &container); err != nil {
+			return
+		}
+
+		for _, h := range container.A.B.Handles {
+			const prefix = "catalog_product_view_sku_"
+			if strings.HasPrefix(h, prefix) {
+				sku = strings.TrimPrefix(h, prefix)
+				break
+			}
+		}
+	})
+	if err != nil {
+		return "", fmt.Errorf("parsing sku json: %w", err)
+	}
+
+	return sku, nil
+
+}
+
 // LoadCoffee loads a Coffee from the passed url.
 func LoadCoffee(ctx context.Context, url string) (Coffee, error) {
 	res, err := lmhttp.Get(ctx, url)
@@ -77,67 +151,14 @@ func LoadCoffee(ctx context.Context, url string) (Coffee, error) {
 			c.AdditionalAttributes[header] = strings.Trim(s.Text(), " \n\t")
 		})
 
-	var imageErr error
-	doc.Find(`script[type="text/x-magento-init"]`).
-		Each(func(_ int, s *goquery.Selection) {
-			t := s.Text()
-			if !strings.Contains(s.Text(), "mage/gallery/gallery-ext") {
-				return
-			}
-			type imageContainer struct {
-				A struct {
-					B struct {
-						Data []struct {
-							Full string `json:"full"`
-						}
-					} `json:"mage/gallery/gallery-ext"`
-				} `json:"[data-gallery-role=gallery-placeholder]"`
-			}
-			var container imageContainer
-			imageErr = json.Unmarshal([]byte(t), &container)
-
-			if imageErr != nil {
-				return
-			}
-
-			c.Images = make([]string, len(container.A.B.Data))
-			for i, d := range container.A.B.Data {
-				c.Images[i] = d.Full
-			}
-		})
-	if imageErr != nil {
-		return Coffee{}, fmt.Errorf("parsing images json: %w", imageErr)
+	c.Images, err = extractImages(doc)
+	if err != nil {
+		return Coffee{}, err
 	}
 
-	var skuErr error
-	doc.Find(`script[type="text/x-magento-init"]`).Each(func(_ int, s *goquery.Selection) {
-		t := s.Text()
-		if !strings.Contains(s.Text(), "view_sku") {
-			return
-		}
-		type skuContainer struct {
-			A struct {
-				B struct {
-					Handles []string `json:"handles"`
-				} `json:"pageCache"`
-			} `json:"body"`
-		}
-		var container skuContainer
-		skuErr = json.Unmarshal([]byte(t), &container)
-		if skuErr != nil {
-			return
-		}
-
-		for _, h := range container.A.B.Handles {
-			const prefix = "catalog_product_view_sku_"
-			if strings.HasPrefix(h, prefix) {
-				c.SKU = strings.TrimPrefix(h, prefix)
-				break
-			}
-		}
-	})
-	if skuErr != nil {
-		return Coffee{}, fmt.Errorf("parsing sku json: %w", imageErr)
+	c.SKU, err = extractSKU(doc)
+	if err != nil {
+		return Coffee{}, err
 	}
 
 	return c, nil
