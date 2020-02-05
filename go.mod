@@ -2,7 +2,7 @@ module github.com/frioux/leatherman
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/PuerkitoBio/goquery v1.5.0
+	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/google/go-cmp v0.4.0
