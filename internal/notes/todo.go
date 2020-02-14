@@ -18,30 +18,27 @@ import (
 var bodyTemplate *template.Template
 
 type bodyArgs struct {
-	Message, ID, At string
+	Message, At string
 }
 
 func init() {
 	var err error
-	bodyTemplate, err = template.New("xxx").Parse(`---
-title: {{.Message | printf "%q"}}
-date: "{{.At}}"
-tags: [ private, inbox ]
-guid: {{.ID}}
----
-
+	bodyTemplate, err = template.New("xxx").Parse(`{
+"title": {{.Message | printf "%q"}}
+"date": "{{.At}}"
+"tags": [ "private", "inbox" ]
+}
  * {{.Message}}
-
 `)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func body(message, id string, at time.Time) io.Reader {
+func body(message string, at time.Time) io.Reader {
 	buf := &bytes.Buffer{}
 
-	bodyTemplate.Execute(buf, bodyArgs{message, id, at.Format("2006-01-02T15:04:05")})
+	bodyTemplate.Execute(buf, bodyArgs{message, at.Format("2006-01-02T15:04:05")})
 
 	return buf
 }
@@ -61,7 +58,7 @@ func todo(cl dropbox.Client) func(message string, media []twilio.Media) (string,
 		id := hex.EncodeToString(sha[:])
 		path := "/notes/content/posts/todo-" + id + ".md"
 
-		buf := body(message, id, time.Now())
+		buf := body(message, time.Now())
 
 		up := dropbox.UploadParams{Path: path, Autorename: true}
 		if err := cl.Create(up, buf); err != nil {
