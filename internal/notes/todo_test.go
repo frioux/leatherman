@@ -17,8 +17,8 @@ func TestBody(t *testing.T) {
 	}
 
 	assert.Equal(t, `{
-"title": "testing"
-"date": "2012-12-12T12:12:12"
+"title": "testing",
+"date": "2012-12-12T12:12:12",
 "tags": [ "private", "inbox" ]
 }
  * testing

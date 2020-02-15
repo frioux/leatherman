@@ -24,8 +24,8 @@ type bodyArgs struct {
 func init() {
 	var err error
 	bodyTemplate, err = template.New("xxx").Parse(`{
-"title": {{.Message | printf "%q"}}
-"date": "{{.At}}"
+"title": {{.Message | printf "%q"}},
+"date": "{{.At}}",
 "tags": [ "private", "inbox" ]
 }
  * {{.Message}}
