@@ -12,7 +12,7 @@ import (
 // expected are expected.
 func Equal(t *testing.T, got, expected interface{}, prefix string, opts ...cmp.Option) bool {
 	t.Helper()
-	if diff := cmp.Diff(got, expected, opts...); diff != "" {
+	if diff := cmp.Diff(expected, got, opts...); diff != "" {
 		t.Errorf("%s (-want +got):\n%s", prefix, diff)
 		return false
 	}
