@@ -11,6 +11,7 @@ import (
 // Equal takes t, got, expected, and a prefix, returning true if got and
 // expected are expected.
 func Equal(t *testing.T, got, expected interface{}, prefix string, opts ...cmp.Option) bool {
+	t.Helper()
 	if diff := cmp.Diff(got, expected, opts...); diff != "" {
 		t.Errorf("%s (-want +got):\n%s", prefix, diff)
 		return false
@@ -21,6 +22,7 @@ func Equal(t *testing.T, got, expected interface{}, prefix string, opts ...cmp.O
 
 // JSONEqual takes a got and expected string of json and compares the parsed values with Equal.
 func JSONEqual(t *testing.T, got, expected string, prefix string, opts ...cmp.Option) bool {
+	t.Helper()
 	var gotValue, expectedValue interface{}
 	if err := json.NewDecoder(strings.NewReader(got)).Decode(&gotValue); err != nil {
 		t.Errorf("Couldn't decode got: %s", err)
