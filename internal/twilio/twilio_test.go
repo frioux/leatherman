@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"net/url"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCheckMAC(t *testing.T) {
@@ -24,6 +22,11 @@ func TestCheckMAC(t *testing.T) {
 		}),
 	})
 
-	assert.True(t, ok)
-	assert.NoError(t, err)
+	if !ok {
+		t.Error("ok should be true")
+	}
+
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
 }

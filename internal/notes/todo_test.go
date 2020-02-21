@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/amygdala/internal/testutil"
 )
 
 func TestBody(t *testing.T) {
@@ -16,11 +16,11 @@ func TestBody(t *testing.T) {
 		t.Fatalf("Couldn't couldn't copy body: %s", err)
 	}
 
-	assert.Equal(t, `{
+	testutil.Equal(t, `{
 "title": "testing",
 "date": "2012-12-12T12:12:12",
 "tags": [ "private", "inbox" ]
 }
  * testing
-`, buf.String())
+`, buf.String(), "expected content")
 }

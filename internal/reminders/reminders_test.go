@@ -4,14 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/amygdala/internal/testutil"
 )
 
 func TestAssertRegexLocations(t *testing.T) {
 	sn := remindFormat.SubexpNames()
-	assert.Equal(t, sn[MESSAGE], "message")
-	assert.Equal(t, sn[WHEN], "when")
-	assert.Equal(t, sn[DURATION], "duration")
+	testutil.Equal(t, sn[MESSAGE], "message", "")
+	testutil.Equal(t, sn[WHEN], "when", "")
+	testutil.Equal(t, sn[DURATION], "duration", "")
 }
 
 var LA *time.Location
@@ -34,7 +34,7 @@ func TestNextTime(t *testing.T) {
 		{now, time.Date(0, 0, 0, 5, 0, 0, 0, LA), time.Date(2012, 12, 13, 5, 0, 0, 0, LA)},
 	}
 	for _, a := range assertions {
-		assert.Equal(t, a.result, nextTime(a.start, a.clock))
+		testutil.Equal(t, a.result, nextTime(a.start, a.clock), "")
 	}
 }
 
@@ -62,13 +62,13 @@ func TestParse(t *testing.T) {
 	for _, a := range assertions {
 		t.Run(a.in, func(t *testing.T) {
 			when, mess, err := Parse(now, a.in)
-			if a.err {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
+			if a.err && err == nil {
+				t.Error("should have errored but didn't")
+			} else if !a.err && err != nil {
+				t.Errorf("unexpected error: %s", err)
 			}
-			assert.Equal(t, a.t, when)
-			assert.Equal(t, a.message, mess)
+			testutil.Equal(t, a.t, when, "")
+			testutil.Equal(t, a.message, mess, "")
 		})
 	}
 

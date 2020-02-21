@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/frioux/amygdala/internal/testutil"
 )
 
 func TestLog(t *testing.T) {
@@ -35,6 +35,6 @@ func TestLog(t *testing.T) {
 	if err = d.Decode(&x); err != nil {
 		panic(err)
 	}
-	assert.Equal(t, x.StatusCode, http.StatusNotFound, "status code recorded")
 
+	testutil.Equal(t, x.StatusCode, http.StatusNotFound, "status code recorded")
 }
