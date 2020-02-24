@@ -402,8 +402,9 @@ $ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
 ` + "`" + `` + "`" + `` + "`" + `
 ### ` + "`" + `srv` + "`" + `
 
-` + "`" + `srv` + "`" + ` will serve a directory over http; takes a single optional parameter which
-is the dir to serve, default is ` + "`" + `.` + "`" + `:
+` + "`" + `srv` + "`" + ` will serve a directory over http; takes an optional parameter which is
+the dir to serve, and -port if you care to choose the serving port,
+default is ` + "`" + `.` + "`" + `:
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ srv ~
@@ -527,14 +528,14 @@ func init() {
 
 		"sm-list": readme[11828:12104],
 
-		"srv": readme[12104:12287],
+		"srv": readme[12104:12331],
 
-		"toml2json": readme[12287:12462],
+		"toml2json": readme[12331:12506],
 
-		"undefer": readme[12462:12770],
+		"undefer": readme[12506:12814],
 
-		"uni": readme[12770:12932],
+		"uni": readme[12814:12976],
 
-		"yaml2json": readme[12932:13009],
+		"yaml2json": readme[12976:13053],
 	}
 }

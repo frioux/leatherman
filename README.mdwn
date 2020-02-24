@@ -401,8 +401,9 @@ $ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
 ```
 ### `srv`
 
-`srv` will serve a directory over http; takes a single optional parameter which
-is the dir to serve, default is `.`:
+`srv` will serve a directory over http; takes an optional parameter which is
+the dir to serve, and -port if you care to choose the serving port,
+default is `.`:
 
 ```bash
 $ srv ~
