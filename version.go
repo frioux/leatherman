@@ -3,20 +3,21 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
+	"runtime"
 	"runtime/debug"
+
+	"github.com/frioux/leatherman/internal/version"
 )
 
 // Version prints current version
 func Version(args []string, _ io.Reader) error {
+	fmt.Printf("Leatherman built from %s on %s by with %s\n",
+		version.Version, version.When, runtime.Version())
+
 	bi, ok := debug.ReadBuildInfo()
 	if !ok {
-		fmt.Fprintln(os.Stderr, "Couldn't read version info")
 		return nil
 	}
-
-	m := bi.Main
-	fmt.Printf("Leatherman (%s) Version %s (%s)\n", m.Path, m.Version, m.Sum)
 
 	for _, dep := range bi.Deps {
 		fmt.Printf("%s@%s (%s)\n", dep.Path, dep.Version, dep.Sum)

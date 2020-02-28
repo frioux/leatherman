@@ -4,20 +4,12 @@ import (
 	"context"
 	"io"
 	"net/http"
-	"runtime/debug"
+
+	"github.com/frioux/leatherman/internal/version"
 )
 
 // UserAgent is the canonical UserAgent string for the leatherman.
-var UserAgent = "leatherman/"
-
-func init() {
-	bi, ok := debug.ReadBuildInfo()
-	if ok {
-		UserAgent += bi.Main.Version
-	} else {
-		UserAgent += "devel"
-	}
-}
+var UserAgent = "leatherman/" + version.Version
 
 // NewRequest returns an *http.Request with the UserAgent header properly set.
 func NewRequest(ctx context.Context, method, url string, body io.Reader) (*http.Request, error) {

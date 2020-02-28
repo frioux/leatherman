@@ -7,40 +7,34 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Tests
-          environment:
-             TZ: America/Los_Angeles
-             GO111MODULE: "on"
-          command: go test -coverprofile=cover.cover -race ./...
-      - run:
-          name: Cleanup
-          command: rm -rf *
-      - run:
           name: Create Artifacts Target
           command: 'mkdir ./artifacts/'
       - run:
-          name: Linux Build
-          environment:
-             GO111MODULE: "on"
-          command: >
-             go get -v -mod=readonly github.com/frioux/leatherman@${CIRCLE_SHA1};
-             xz --stdout "$(go env GOPATH)/bin/leatherman" > ./artifacts/leatherman.xz
+          name: Install Deps
+          command: 'go get ./...'
       - run:
           name: Windows Build
           environment:
              GOOS: windows
-             GO111MODULE: "on"
           command: >
-             go get -v -mod=readonly github.com/frioux/leatherman@${CIRCLE_SHA1};
-             zip ./artifacts/leatherman.zip "$(go env GOPATH)/bin/windows_amd64/leatherman.exe"
+            go mod verify;
+            go build -ldflags "-s -X 'github.com/frioux/leatherman/internal/version.Version=$(git describe --abbrev=7 --dirty --always)' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $(git describe --abbrev=7 --dirty --always) 2>/dev/null)'";
+            zip leatherman.zip leatherman.exe;
+            mv leatherman.zip ./artifacts/leatherman-windows.zip
       - run:
           name: OSX Build
           environment:
              GOOS: darwin
-             GO111MODULE: "on"
           command: >
-             go get -v -mod=readonly -x github.com/frioux/leatherman@${CIRCLE_SHA1};
-             xz --stdout "$(go env GOPATH)/bin/leatherman" > ./artifacts/leatherman-osx.xz
+            go mod verify;
+            go build -ldflags "-s -X 'github.com/frioux/leatherman/internal/version.Version=$(git describe --abbrev=7 --dirty --always)' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $(git describe --abbrev=7 --dirty --always) 2>/dev/null)'";
+            xz leatherman;
+            mv leatherman.xz ./artifacts/leatherman-osx.xz
+      - run:
+          name: Linux Build
+          command: >
+            make;
+            mv leatherman.xz artifacts/leatherman.xz
       - run:
           name: Install GHR
           working_directory: ~/
