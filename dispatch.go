@@ -59,6 +59,7 @@ func init() {
 		"rss":                  rss.Run,
 		"slack-deaddrop":       slack.Deaddrop,
 		"slack-open":           slack.Open,
+		"slack-status":         slack.Status,
 		"sm-list":              smlist.Run,
 		"srv":                  srv.Serve,
 		"toml2json":            toml.ToJSON,

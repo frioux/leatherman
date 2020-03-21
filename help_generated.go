@@ -391,6 +391,14 @@ $ slack-deaddrop -channel general -text 'good morning!'
 $ slack-open -channel general
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `slack-status` + "`" + `
+
+` + "`" + `slack-status` + "`" + ` sets the current users's status.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ slack-status -text "working for the weekend" -emoji :guitar:
+` + "`" + `` + "`" + `` + "`" + `
+
 ### ` + "`" + `sm-list` + "`" + `
 
 ` + "`" + `sm-list` + "`" + ` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
@@ -526,16 +534,18 @@ func init() {
 
 		"slack-open": readme[11694:11828],
 
-		"sm-list": readme[11828:12104],
+		"slack-status": readme[11828:11973],
 
-		"srv": readme[12104:12331],
+		"sm-list": readme[11973:12249],
 
-		"toml2json": readme[12331:12506],
+		"srv": readme[12249:12476],
 
-		"undefer": readme[12506:12814],
+		"toml2json": readme[12476:12651],
 
-		"uni": readme[12814:12976],
+		"undefer": readme[12651:12959],
 
-		"yaml2json": readme[12976:13053],
+		"uni": readme[12959:13121],
+
+		"yaml2json": readme[13121:13198],
 	}
 }

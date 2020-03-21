@@ -1,6 +1,7 @@
 package slack
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -52,8 +53,7 @@ type usersListInput struct {
 }
 
 type usersListOutput struct {
-	OK               bool
-	Error            string // only set if OK is false
+	status
 	Members          []slackConversation
 	ResponseMetadata struct {
 		NextCursor string `json:"next_cursor"`
@@ -126,8 +126,7 @@ type conversationsListInput struct {
 }
 
 type conversationsListOutput struct {
-	OK               bool
-	Error            string // only set if OK is false
+	status
 	Channels         []slackConversation
 	ResponseMetadata struct {
 		NextCursor string `json:"next_cursor"`
@@ -263,4 +262,66 @@ func (c client) chatPostMessage(i chatPostMessageInput) (*http.Response, error) 
 	}
 
 	return resp, nil
+}
+
+type usersProfileSetInput struct {
+	StatusText       string `json:"status_text"`
+	StatusEmoji      string `json:"status_emoji"`
+	StatusExpiration int    `json:"status_expiration,omitempty"`
+}
+
+func (i usersProfileSetInput) MarshalJSON() ([]byte, error) {
+	type p struct {
+		StatusText       string `json:"status_text"`
+		StatusEmoji      string `json:"status_emoji"`
+		StatusExpiration int    `json:"status_expiration,omitempty"`
+	}
+	type a struct {
+		Profile p `json:"profile"`
+	}
+
+	A := a{Profile: p(i)}
+
+	return json.Marshal(A)
+}
+
+type status struct {
+	OK    bool
+	Error string // only set if OK is false
+}
+
+// https://api.slack.com/methods/users.profile.set
+func (c client) usersProfileSet(i usersProfileSetInput) error {
+	buf := &bytes.Buffer{}
+	e := json.NewEncoder(buf)
+	if err := e.Encode(i); err != nil {
+		return err
+	}
+	req, err := lmhttp.NewRequest(context.TODO(), "POST", "https://slack.com/api/users.profile.set", buf)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	req.Header.Set("Authorization", "Bearer "+c.Token)
+
+	resp, err := c.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return errors.New("users.profile.set failed: " + resp.Status)
+	}
+
+	d := json.NewDecoder(resp.Body)
+	var s status
+	if err := d.Decode(&s); err != nil {
+		return err
+	}
+
+	if !s.OK {
+		return errors.New("users.profile.set failed: " + s.Error)
+	}
+
+	return nil
 }

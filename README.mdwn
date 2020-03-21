@@ -390,6 +390,14 @@ $ slack-deaddrop -channel general -text 'good morning!'
 $ slack-open -channel general
 ```
 
+### `slack-status`
+
+`slack-status` sets the current users's status.
+
+```bash
+$ slack-status -text "working for the weekend" -emoji :guitar:
+```
+
 ### `sm-list`
 
 `sm-list` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
