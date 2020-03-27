@@ -1,27 +1,31 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"time"
 )
 
-func meeting() bool {
-	c := exec.Command("xdotool", "search", "--name", "Meet")
+func cam() bool {
+	c := exec.Command("lsof", "/dev/video0")
 	o, err := c.Output()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "xdotool seach --name Meet: %s\n", err)
+		fmt.Fprintf(os.Stderr, "lsof /dev/video*: %s\n", err)
+		if eErr, ok := err.(*exec.ExitError); ok {
+			fmt.Fprintf(os.Stderr, "stderr: %s\n", eErr.Stderr)
+		}
 		return false
 	}
 
-	return len(o) > 0
+	return bytes.Contains(o, []byte("mem"))
 }
 
 func main() {
 	for {
 		var red, green, blue int
-		if meeting() {
+		if cam() {
 			green = 255
 		}
 		if sound() {
