@@ -410,13 +410,24 @@ $ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
 ` + "`" + `` + "`" + `` + "`" + `
 ### ` + "`" + `srv` + "`" + `
 
-` + "`" + `srv` + "`" + ` will serve a directory over http; takes an optional parameter which is
-the dir to serve, and -port if you care to choose the serving port,
-default is ` + "`" + `.` + "`" + `:
+` + "`" + `srv` + "`" + ` will serve a directory over http, injecting javascript to have pages
+reload when files change.
+
+It takes an optional dir to serve, the default is ` + "`" + `.` + "`" + `.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ srv ~
 Serving /home/frew on [::]:21873
+` + "`" + `` + "`" + `` + "`" + `
+
+You can pass -port if you care to choose the listen port.
+
+It will set up file watchers and trigger page reloads (via SSE,) this
+functionality can be disabled with -no-autoreload.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ srv -port 8080 -no-autoreload ~
+Serving /home/frew on [::]:8080
 ` + "`" + `` + "`" + `` + "`" + `
 
 ### ` + "`" + `toml2json` + "`" + `
@@ -538,14 +549,14 @@ func init() {
 
 		"sm-list": readme[11973:12249],
 
-		"srv": readme[12249:12476],
+		"srv": readme[12249:12732],
 
-		"toml2json": readme[12476:12651],
+		"toml2json": readme[12732:12907],
 
-		"undefer": readme[12651:12959],
+		"undefer": readme[12907:13215],
 
-		"uni": readme[12959:13121],
+		"uni": readme[13215:13377],
 
-		"yaml2json": readme[13121:13198],
+		"yaml2json": readme[13377:13454],
 	}
 }
