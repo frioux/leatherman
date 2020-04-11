@@ -54,6 +54,9 @@ func autoReload(h http.Handler, dir string) (http.Handler, error) {
 				if event.Op&fsnotify.Create == fsnotify.Create {
 					stat, err := os.Stat(event.Name)
 					if err != nil {
+						if os.IsNotExist(err) {
+							continue
+						}
 						fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
 					} else if stat.IsDir() {
 						err := watcher.Add(event.Name)

@@ -100,6 +100,9 @@ func Run(args []string, _ io.Reader) error {
 				if event.Op&fsnotify.Create == fsnotify.Create {
 					stat, err := os.Stat(event.Name)
 					if err != nil {
+						if os.IsNotExist(err) {
+							continue
+						}
 						fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
 					} else if stat.IsDir() && c.include.MatchString(event.Name) && !c.ignore.MatchString(event.Name) {
 						err := watcher.Add(event.Name)
