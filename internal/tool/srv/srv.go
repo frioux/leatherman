@@ -61,5 +61,5 @@ func serve(dir string, port int, log chan net.Addr) error {
 
 	log <- listener.Addr()
 
-	return http.Serve(listener, logReqs(http.FileServer(http.Dir(dir))))
+	return http.Serve(listener, logReqs(autoReload(http.FileServer(http.Dir(dir)), dir)))
 }
