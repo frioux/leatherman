@@ -1,6 +1,7 @@
 package minotaur
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -82,7 +83,12 @@ func Run(args []string, _ io.Reader) error {
 	}
 	defer watcher.Close()
 
-	done := make(chan bool)
+	for _, path := range c.dirs {
+		if err := addDir(watcher, c, path); err != nil {
+			return err
+		}
+	}
+
 	var timeout <-chan time.Time
 	events := make(map[string]bool)
 
@@ -90,71 +96,62 @@ func Run(args []string, _ io.Reader) error {
 		timeout = time.After(0)
 	}
 
-	go func() {
-		for {
-			select {
-			case event, ok := <-watcher.Events:
-				if !ok {
-					return
-				}
-				if event.Op&fsnotify.Create == fsnotify.Create {
-					stat, err := os.Stat(event.Name)
+	for {
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return errors.New("watcher went away")
+			}
+			if event.Op&fsnotify.Create == fsnotify.Create {
+				stat, err := os.Stat(event.Name)
+				if err != nil {
+					if os.IsNotExist(err) {
+						continue
+					}
+					fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
+				} else if stat.IsDir() {
+					err := addDir(watcher, c, event.Name)
 					if err != nil {
-						if os.IsNotExist(err) {
-							continue
-						}
-						fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
-					} else if stat.IsDir() {
-						err := addDir(watcher, c, event.Name)
-						if err != nil {
-							fmt.Fprintf(os.Stderr, "failed to watch %s: %s\n", event.Name, err)
-						} else if c.verbose {
-							fmt.Fprintf(os.Stderr, "watching %s\n", event.Name)
-						}
+						fmt.Fprintf(os.Stderr, "failed to watch %s: %s\n", event.Name, err)
+					} else if c.verbose {
+						fmt.Fprintf(os.Stderr, "watching %s\n", event.Name)
 					}
-				}
-
-				events[event.Op.String()+"\t"+event.Name] = true
-				timeout = time.After(time.Second)
-			case err, ok := <-watcher.Errors:
-				if !ok {
-					return
-				}
-				fmt.Println("error:", err)
-			case <-timeout:
-				s := make([]string, 0, len(c.script)+len(events))
-				s = append(s, c.script...)
-				if c.includeArgs {
-					for e := range events {
-						s = append(s, e)
-					}
-				}
-				events = make(map[string]bool)
-				if c.report {
-					fmt.Println("==============", time.Now().Format("2006-01-02 03:04:05"), "==============")
-				}
-
-				cmd := exec.Command(s[0], s[1:]...)
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = os.Stderr
-				err := cmd.Run()
-				if err != nil && c.verbose {
-					fmt.Fprintf(os.Stderr, "script (%q) failed: %s\n", s, err)
-				}
-				if c.report {
-					fmt.Println("=================================================")
 				}
 			}
 
-		}
-	}()
+			events[event.Op.String()+"\t"+event.Name] = true
+			timeout = time.After(time.Second)
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return err
+			}
+			fmt.Println("error:", err)
+		case <-timeout:
+			s := make([]string, 0, len(c.script)+len(events))
+			s = append(s, c.script...)
+			if c.includeArgs {
+				for e := range events {
+					s = append(s, e)
+				}
+			}
+			events = make(map[string]bool)
+			if c.report {
+				fmt.Println("==============", time.Now().Format("2006-01-02 03:04:05"), "==============")
+			}
 
-	for _, path := range c.dirs {
-		if err := addDir(watcher, c, path); err != nil {
-			return err
+			cmd := exec.Command(s[0], s[1:]...)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			err := cmd.Run()
+			if err != nil && c.verbose {
+				fmt.Fprintf(os.Stderr, "script (%q) failed: %s\n", s, err)
+			}
+			if c.report {
+				fmt.Println("=================================================")
+			}
 		}
+
 	}
-	<-done
 
 	return nil
 }
