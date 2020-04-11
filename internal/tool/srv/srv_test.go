@@ -15,7 +15,7 @@ func TestServe(t *testing.T) {
 	t.Parallel()
 
 	ch := make(chan net.Addr)
-	go serve(".", 0, ch)
+	go serve(false, ".", 0, ch)
 
 	var addr net.Addr
 	timer := time.NewTimer(time.Second)
