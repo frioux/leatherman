@@ -152,8 +152,6 @@ func Run(args []string, _ io.Reader) error {
 		}
 
 	}
-
-	return nil
 }
 
 func addDir(watcher *fsnotify.Watcher, c config, path string) error {
