@@ -23,22 +23,9 @@ func autoReload(h http.Handler, dir string) (http.Handler, error) {
 	if err != nil {
 		return nil, fmt.Errorf("fsnotify.NewWatcher: %w", err)
 	}
-	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !info.IsDir() {
-			return nil
-		}
-
-		if err := watcher.Add(path); err != nil {
-			return fmt.Errorf("fsnotify.Watcher.Add: %w", err)
-		}
-		return nil
-	})
+	err = addDir(watcher, dir)
 	if err != nil {
-		return nil, fmt.Errorf("filepath.Walk: %w", err)
+		return nil, fmt.Errorf("addDir: %w", err)
 	}
 
 	var timeout <-chan time.Time
@@ -59,7 +46,7 @@ func autoReload(h http.Handler, dir string) (http.Handler, error) {
 						}
 						fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
 					} else if stat.IsDir() {
-						err := watcher.Add(event.Name)
+						err := addDir(watcher, event.Name)
 						if err != nil {
 							fmt.Fprintf(os.Stderr, "failed to watch %s: %s\n", event.Name, err)
 						}
@@ -137,4 +124,21 @@ func autoReload(h http.Handler, dir string) (http.Handler, error) {
 			}
 		}
 	}), nil
+}
+
+func addDir(watcher *fsnotify.Watcher, dir string) error {
+	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			return nil
+		}
+
+		if err := watcher.Add(path); err != nil {
+			return fmt.Errorf("fsnotify.Watcher.Add: %w", err)
+		}
+		return nil
+	})
 }

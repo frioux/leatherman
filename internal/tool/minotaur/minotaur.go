@@ -104,8 +104,8 @@ func Run(args []string, _ io.Reader) error {
 							continue
 						}
 						fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
-					} else if stat.IsDir() && c.include.MatchString(event.Name) && !c.ignore.MatchString(event.Name) {
-						err := watcher.Add(event.Name)
+					} else if stat.IsDir() {
+						err := addDir(watcher, c, event.Name)
 						if err != nil {
 							fmt.Fprintf(os.Stderr, "failed to watch %s: %s\n", event.Name, err)
 						} else if c.verbose {
@@ -150,35 +150,38 @@ func Run(args []string, _ io.Reader) error {
 	}()
 
 	for _, path := range c.dirs {
-		err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-
-			if !info.IsDir() {
-				return nil
-			}
-
-			if c.ignore.MatchString(path) {
-				return filepath.SkipDir
-			}
-			if !c.include.MatchString(path) {
-				return nil
-			}
-
-			if c.verbose {
-				fmt.Fprintln(os.Stderr, "watching "+path)
-			}
-			if err := watcher.Add(path); err != nil {
-				return fmt.Errorf("fsnotify.Watcher.Add: %w", err)
-			}
-			return nil
-		})
-		if err != nil {
-			return fmt.Errorf("filepath.Walk: %w", err)
+		if err := addDir(watcher, c, path); err != nil {
+			return err
 		}
 	}
 	<-done
 
 	return nil
+}
+
+func addDir(watcher *fsnotify.Watcher, c config, path string) error {
+	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			return nil
+		}
+
+		if c.ignore.MatchString(path) {
+			return filepath.SkipDir
+		}
+		if !c.include.MatchString(path) {
+			return nil
+		}
+
+		if c.verbose {
+			fmt.Fprintln(os.Stderr, "watching "+path)
+		}
+		if err := watcher.Add(path); err != nil {
+			return fmt.Errorf("fsnotify.Watcher.Add: %w", err)
+		}
+		return nil
+	})
 }
