@@ -124,7 +124,7 @@ LOOP:
 			timeout = time.After(time.Second)
 		case err, ok := <-watcher.Errors:
 			if !ok {
-				return err
+				return errors.New("watcher went away")
 			}
 			fmt.Println("error:", err)
 		case <-timeout:
