@@ -96,6 +96,7 @@ func Run(args []string, _ io.Reader) error {
 		timeout = time.After(0)
 	}
 
+LOOP:
 	for {
 		select {
 		case event, ok := <-watcher.Events:
@@ -106,7 +107,7 @@ func Run(args []string, _ io.Reader) error {
 				stat, err := os.Stat(event.Name)
 				if err != nil {
 					if os.IsNotExist(err) {
-						continue
+						continue LOOP
 					}
 					fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
 				} else if stat.IsDir() {
