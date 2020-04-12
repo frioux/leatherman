@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"path/filepath"
 	"regexp"
 )
 
@@ -72,7 +73,7 @@ func parseFlags(args []string) (config, error) {
 
 	token, args = args[0], args[1:]
 	for len(args) > 0 && token != "--" {
-		c.dirs = append(c.dirs, token)
+		c.dirs = append(c.dirs, filepath.Clean(token))
 
 		token, args = args[0], args[1:]
 	}

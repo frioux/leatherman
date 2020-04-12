@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
@@ -50,6 +51,8 @@ func Serve(args []string, _ io.Reader) error {
 	if len(fs.Args()) > 0 {
 		dir = fs.Arg(0)
 	}
+
+	dir = filepath.Clean(dir)
 
 	ch := make(chan net.Addr)
 

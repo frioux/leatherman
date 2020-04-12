@@ -33,7 +33,7 @@ func TestParseArgs(t *testing.T) {
 			"foo", "bar",
 		},
 		expectedConfig: config{
-			dirs:    []string{"./foo", "./bar"},
+			dirs:    []string{"foo", "bar"},
 			script:  []string{"foo", "bar"},
 			include: include,
 			ignore:  ignore,
