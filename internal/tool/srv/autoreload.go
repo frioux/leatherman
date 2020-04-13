@@ -1,6 +1,7 @@
 package srv
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"mime"
@@ -18,61 +19,66 @@ const evtSource = new EventSource("/_reload");
 evtSource.onmessage = function(event) { location.reload() }
 </script>`
 
-func autoReload(h http.Handler, dir string) (http.Handler, error) {
+var errARGone = errors.New("auto-reload watcher disappeared")
+
+func doReload(watcher *fsnotify.Watcher, dir string, generation *chan bool) error {
+	var timeout <-chan time.Time
+
+	for {
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return errARGone
+			}
+			// sink the ship if a root disappears
+			if event.Op&fsnotify.Remove == fsnotify.Remove {
+				if event.Name == dir {
+					return errors.New("deleted root, capsizing")
+				}
+			}
+
+			if event.Op&fsnotify.Create == fsnotify.Create {
+				stat, err := os.Stat(event.Name)
+				if err != nil {
+					if os.IsNotExist(err) {
+						continue
+					}
+					fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
+				} else if stat.IsDir() {
+					err := addDir(watcher, event.Name)
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "failed to watch %s: %s\n", event.Name, err)
+					}
+				}
+			}
+
+			timeout = time.After(time.Second)
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return errARGone
+			}
+			fmt.Println("error:", err)
+		case <-timeout:
+			close(*generation)
+			*generation = make(chan bool)
+		}
+
+	}
+}
+
+func autoReload(h http.Handler, dir string) (handler http.Handler, sinking chan error, err error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		return nil, fmt.Errorf("fsnotify.NewWatcher: %w", err)
+		return nil, nil, fmt.Errorf("fsnotify.NewWatcher: %w", err)
 	}
 	err = addDir(watcher, dir)
 	if err != nil {
-		return nil, fmt.Errorf("addDir: %w", err)
+		return nil, nil, fmt.Errorf("addDir: %w", err)
 	}
 
-	var timeout <-chan time.Time
 	generation := make(chan bool)
-
-	go func() {
-		for {
-			select {
-			case event, ok := <-watcher.Events:
-				if !ok {
-					return
-				}
-				// sink the ship if a root disappears
-				if event.Op&fsnotify.Remove == fsnotify.Remove {
-					if event.Name == dir {
-						panic("deleted root, capsizing")
-					}
-				}
-
-				if event.Op&fsnotify.Create == fsnotify.Create {
-					stat, err := os.Stat(event.Name)
-					if err != nil {
-						if os.IsNotExist(err) {
-							continue
-						}
-						fmt.Fprintf(os.Stderr, "Couldn't stat created thing: %s\n", err)
-					} else if stat.IsDir() {
-						err := addDir(watcher, event.Name)
-						if err != nil {
-							fmt.Fprintf(os.Stderr, "failed to watch %s: %s\n", event.Name, err)
-						}
-					}
-				}
-
-				timeout = time.After(time.Second)
-			case err, ok := <-watcher.Errors:
-				if !ok {
-					return
-				}
-				fmt.Println("error:", err)
-			case <-timeout:
-				close(generation)
-				generation = make(chan bool)
-			}
-
-		}
-	}()
+	reloadErr := make(chan error)
+	go func() { reloadErr <- doReload(watcher, dir, &generation) }()
 
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		f, ok := rw.(http.Flusher)
@@ -130,7 +136,7 @@ func autoReload(h http.Handler, dir string) (http.Handler, error) {
 				fmt.Fprint(rw, js)
 			}
 		}
-	}), nil
+	}), reloadErr, nil
 }
 
 func addDir(watcher *fsnotify.Watcher, dir string) error {

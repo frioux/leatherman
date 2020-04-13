@@ -79,13 +79,29 @@ func serve(reload bool, dir string, port int, log chan net.Addr) error {
 
 	log <- listener.Addr()
 
+	var sinking chan error
+
 	h := http.FileServer(http.Dir(dir))
 	if reload {
-		h, err = autoReload(h, dir)
+		h, sinking, err = autoReload(h, dir)
 		if err != nil {
 			return err
 		}
 	}
 
-	return http.Serve(listener, logReqs(h))
+	s := http.Server{Handler: logReqs(h)}
+
+	if reload {
+		go func() {
+			err = <-sinking
+			fmt.Fprintln(os.Stderr, "auto-reload:", err)
+			s.Close()
+		}()
+	}
+
+	if err := s.Serve(listener); err != nil {
+		return err
+	}
+
+	return err
 }
