@@ -38,6 +38,13 @@ func autoReload(h http.Handler, dir string) (http.Handler, error) {
 				if !ok {
 					return
 				}
+				// sink the ship if a root disappears
+				if event.Op&fsnotify.Remove == fsnotify.Remove {
+					if event.Name == dir {
+						panic("deleted root, capsizing")
+					}
+				}
+
 				if event.Op&fsnotify.Create == fsnotify.Create {
 					stat, err := os.Stat(event.Name)
 					if err != nil {

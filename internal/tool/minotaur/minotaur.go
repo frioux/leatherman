@@ -103,6 +103,16 @@ LOOP:
 			if !ok {
 				return errors.New("watcher went away")
 			}
+
+			// sink the ship if a root disappears
+			if event.Op&fsnotify.Remove == fsnotify.Remove {
+				for _, path := range c.dirs {
+					if path == event.Name {
+						return errors.New("deleted root, capsizing")
+					}
+				}
+			}
+
 			if event.Op&fsnotify.Create == fsnotify.Create {
 				stat, err := os.Stat(event.Name)
 				if err != nil {
