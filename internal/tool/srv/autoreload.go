@@ -98,9 +98,13 @@ func autoReload(h http.Handler, dir string) (handler http.Handler, sinking chan 
 			rw.Header().Set("Cache-Control", "no-cache")
 			rw.Header().Set("Content-Type", "text/event-stream")
 
-			<-generation
-			fmt.Fprintf(rw, "data: Message: reload!!!\n\n")
-			f.Flush()
+			select {
+			case <-generation:
+				fmt.Fprintf(rw, "data: Message: reload!!!\n\n")
+				f.Flush()
+			case <-r.Context().Done():
+				// client went away
+			}
 			return
 		} else if r.URL.Path == "/_force_reload" {
 			rw.Header().Set("Cache-Control", "no-cache")
