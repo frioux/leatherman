@@ -16,6 +16,14 @@ import (
 
 const js = `<script>
 const evtSource = new EventSource("/_reload");
+evtSource.onerror = function(event) {
+  if (event.target.readyState == EventSource.CLOSED) {
+    // refresh page after 2-5s
+    setTimeout(function() { location.reload() }, 2000 + Math.random() * 3000);
+    return;
+  }
+  console.log(event);
+};
 evtSource.onmessage = function(event) { location.reload() }
 </script>`
 
