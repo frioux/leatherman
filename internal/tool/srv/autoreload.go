@@ -14,19 +14,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-const js = `<script>
-const evtSource = new EventSource("/_reload");
-evtSource.onerror = function(event) {
-  if (event.target.readyState == EventSource.CLOSED) {
-    // refresh page after 2-5s
-    setTimeout(function() { location.reload() }, 2000 + Math.random() * 3000);
-    return;
-  }
-  console.log(event);
-};
-evtSource.onmessage = function(event) { location.reload() }
-</script>`
-
 var errARGone = errors.New("auto-reload watcher disappeared")
 
 func doReload(watcher *fsnotify.Watcher, dir string, generation *chan bool) error {
@@ -143,6 +130,19 @@ func autoReload(h http.Handler, dir string) (handler http.Handler, sinking chan 
 			if _, err := io.Copy(rw, res.Body); err != nil {
 				fmt.Fprintf(os.Stderr, "error writing body: %s\n", err)
 			}
+
+			const js = `<script>
+			const evtSource = new EventSource("/_reload");
+			evtSource.onerror = function(event) {
+			  if (event.target.readyState == EventSource.CLOSED) {
+			    // refresh page after 2-5s
+			    setTimeout(function() { location.reload() }, 2000 + Math.random() * 3000);
+			    return;
+			  }
+			  console.log(event);
+			};
+			evtSource.onmessage = function(event) { location.reload() }
+			</script>`
 
 			if mt, _, _ := mime.ParseMediaType(res.Header.Get("Content-Type")); mt == "text/html" {
 				fmt.Fprint(rw, js)
