@@ -21,7 +21,6 @@ import (
 	"github.com/frioux/leatherman/internal/tool/prependhist"
 	"github.com/frioux/leatherman/internal/tool/proj"
 	"github.com/frioux/leatherman/internal/tool/replaceunzip"
-	"github.com/frioux/leatherman/internal/tool/rss"
 	"github.com/frioux/leatherman/internal/tool/slack"
 	"github.com/frioux/leatherman/internal/tool/smlist"
 	"github.com/frioux/leatherman/internal/tool/srv"
@@ -56,7 +55,6 @@ func init() {
 		"proj":                 proj.Proj,
 		"render-mail":          email.Render,
 		"replace-unzip":        replaceunzip.Run,
-		"rss":                  rss.Run,
 		"slack-deaddrop":       slack.Deaddrop,
 		"slack-open":           slack.Open,
 		"slack-status":         slack.Status,

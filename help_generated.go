@@ -357,23 +357,6 @@ not already in local time.
 Automatically extracts into a directory named after the zipfile if there is not
 a single root for all files in the zipfile.
 
-### ` + "`" + `rss` + "`" + `
-
-` + "`" + `rss` + "`" + ` is a minimalist rss client.  Outputs JSON on STDOUT.  Takes urls
-to feeds and path to state file. Example usage:
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ rss -state feed.json https://blog.afoolishmanifesto.com/index.xml | jq -r '" * [" + .title + "](" +.link+")"'
- * [Announcing shellquote](https://blog.afoolishmanifesto.com/posts/announcing-shellquote/)
- * [Detecting who used the EC2 metadata server with BCC](https://blog.afoolishmanifesto.com/posts/detecting-who-used-ec2-metadata-server-bcc/)
- * [Centralized known_hosts for ssh](https://blog.afoolishmanifesto.com/posts/centralized-known-hosts-for-ssh/)
- * [Buffered Channels in Golang](https://blog.afoolishmanifesto.com/posts/buffered-channels-in-golang/)
- * [C, Golang, Perl, and Unix](https://blog.afoolishmanifesto.com/posts/c-golang-perl-and-unix/)
-` + "`" + `` + "`" + `` + "`" + `
-
-Optionally takes -timeout to limit how long to wait for feeds to sync.  Passing
-0 will disable timeout.  Default is 15s.
-
 ### ` + "`" + `slack-deaddrop` + "`" + `
 
 ` + "`" + `slack-deaddrop` + "`" + ` allows sending messages to a slack channel without looking at slack.
@@ -539,24 +522,22 @@ func init() {
 
 		"replace-unzip": readme[10318:10548],
 
-		"rss": readme[10548:11474],
+		"slack-deaddrop": readme[10548:10768],
 
-		"slack-deaddrop": readme[11474:11694],
+		"slack-open": readme[10768:10902],
 
-		"slack-open": readme[11694:11828],
+		"slack-status": readme[10902:11047],
 
-		"slack-status": readme[11828:11973],
+		"sm-list": readme[11047:11323],
 
-		"sm-list": readme[11973:12249],
+		"srv": readme[11323:11806],
 
-		"srv": readme[12249:12732],
+		"toml2json": readme[11806:11981],
 
-		"toml2json": readme[12732:12907],
+		"undefer": readme[11981:12289],
 
-		"undefer": readme[12907:13215],
+		"uni": readme[12289:12451],
 
-		"uni": readme[13215:13377],
-
-		"yaml2json": readme[13377:13454],
+		"yaml2json": readme[12451:12528],
 	}
 }
