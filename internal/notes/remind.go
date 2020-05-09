@@ -28,16 +28,24 @@ func remind(cl dropbox.Client) func(string, []twilio.Media) (string, error) {
 
 		sha := sha1.Sum([]byte(what))
 		id := hex.EncodeToString(sha[:])
-		ts := when.Format(time.RFC3339)
-		path := "/notes/.alerts/" + ts + "_" + id + ".txt"
+		path := "/notes/content/posts/deferred_" + id + ".md"
 
-		buf := strings.NewReader(what)
+		const tpl = `
+{
+"title": "deferred %s",
+"tags":["deferred"],
+"review_by": "%s",
+}
+
+%s
+`
+		buf := strings.NewReader(fmt.Sprintf(tpl, id, when.Format("2006-01-02"), what))
 
 		up := dropbox.UploadParams{Path: path, Autorename: true}
 		if err := cl.Create(up, buf); err != nil {
 			return personality.Err(), fmt.Errorf("dropbox.Create: %w", err)
 		}
 
-		return personality.Ack() + "; will remind you @ " + ts, nil
+		return personality.Ack() + "; will remind you @ " + when.Format(time.RFC3339), nil
 	}
 }
