@@ -1,7 +1,6 @@
 package proj
 
 import (
-	"crypto/sha1"
 	"errors"
 	"flag"
 	"fmt"
@@ -203,15 +202,12 @@ unlet SessionLoad
 }
 
 func initNote(m managedPath, w io.Writer) error {
-	sum := sha1.Sum([]byte(m.proj))
-
 	// XXX could just use the post from .projections.json
-	session := `---
-title: ` + m.proj + `
-date: ` + time.Now().Format("2006-01-02T15:04:05") + `
-tags: [ project ]
-guid: ` + fmt.Sprintf("%x", sum[:]) + `
----
+	session := `{
+"title": "` + m.proj + `",
+"reviewed-on": "` + time.Now().Format("2006-01-02T15:04:05") + `",
+"tags": [ "project" ],
+}
 `
 	if _, err := fmt.Fprint(w, session); err != nil {
 		return err
