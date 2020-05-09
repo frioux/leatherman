@@ -25,7 +25,6 @@ import (
 	"github.com/frioux/leatherman/internal/tool/smlist"
 	"github.com/frioux/leatherman/internal/tool/srv"
 	"github.com/frioux/leatherman/internal/tool/toml"
-	"github.com/frioux/leatherman/internal/tool/undefer"
 	"github.com/frioux/leatherman/internal/tool/uni"
 	"github.com/frioux/leatherman/internal/tool/yaml"
 )
@@ -61,7 +60,6 @@ func init() {
 		"sm-list":              smlist.Run,
 		"srv":                  srv.Serve,
 		"toml2json":            toml.ToJSON,
-		"undefer":              undefer.Run,
 		"uni":                  uni.Describe,
 		"yaml2json":            yaml.ToJSON,
 

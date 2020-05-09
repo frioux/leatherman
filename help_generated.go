@@ -424,20 +424,6 @@ $ echo 'foo = "bar"` + "`" + ` | toml2json
 {"foo":"bar"}
 ` + "`" + `` + "`" + `` + "`" + `
 
-### ` + "`" + `undefer` + "`" + `
-
-` + "`" + `undefer` + "`" + ` takes a directory argument, prints contents of each file named before the
-current date, and then deletes the file.
-
-If the current date were ` + "`" + `2018-06-07` + "`" + ` the starred files would be printed and
-then deleted:
-
-` + "`" + `` + "`" + `` + "`" + `
- * 2018-01-01.txt
- * 2018-06-06-awesome-file.md
-   2018-07-06.txt
-` + "`" + `` + "`" + `` + "`" + `
-
 ### ` + "`" + `uni` + "`" + `
 
 ` + "`" + `uni` + "`" + ` will describe the characters in the args.
@@ -534,10 +520,8 @@ func init() {
 
 		"toml2json": readme[11806:11981],
 
-		"undefer": readme[11981:12289],
+		"uni": readme[11981:12143],
 
-		"uni": readme[12289:12451],
-
-		"yaml2json": readme[12451:12528],
+		"yaml2json": readme[12143:12220],
 	}
 }
