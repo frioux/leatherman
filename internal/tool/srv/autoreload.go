@@ -114,15 +114,23 @@ func autoReload(h http.Handler, dir string) (handler http.Handler, sinking chan 
 			// Run handler against buffer
 			h.ServeHTTP(brw, r)
 
+			res := brw.Result()
+			defer res.Body.Close()
+
 			// Copy headers back out
-			for h := range brw.Header() {
-				rw.Header().Set(h, brw.Header().Get(h))
+			for h := range res.Header {
+				rw.Header().Set(h, res.Header.Get(h))
 			}
 
 			rw.Header().Del("Content-Length")
 
-			res := brw.Result()
-			defer res.Body.Close()
+			// When the file is not found it's usually that we
+			// caught a file event before the file was recreated,
+			// so we turn the 404 page into text/html so the
+			// reloader JS gets injected.
+			if res.StatusCode == 404 {
+				rw.Header().Set("Content-Type", "text/html")
+			}
 
 			rw.WriteHeader(res.StatusCode)
 
@@ -144,7 +152,7 @@ func autoReload(h http.Handler, dir string) (handler http.Handler, sinking chan 
 			evtSource.onmessage = function(event) { location.reload() }
 			</script>`
 
-			if mt, _, _ := mime.ParseMediaType(res.Header.Get("Content-Type")); mt == "text/html" {
+			if mt, _, _ := mime.ParseMediaType(rw.Header().Get("Content-Type")); mt == "text/html" {
 				fmt.Fprint(rw, js)
 			}
 		}
