@@ -18,7 +18,7 @@ jobs:
              GOOS: windows
           command: >
             go mod verify;
-            go build -ldflags "-s -X 'github.com/frioux/leatherman/internal/version.Version=$(git describe --abbrev=7 --dirty --always)' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $(git describe --abbrev=7 --dirty --always) 2>/dev/null)'";
+            go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$(git describe --abbrev=7 --dirty --always)' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $(git describe --abbrev=7 --dirty --always) 2>/dev/null)'";
             zip leatherman.zip leatherman.exe;
             mv leatherman.zip ./artifacts/leatherman-windows.zip
       - run:
@@ -27,7 +27,7 @@ jobs:
              GOOS: darwin
           command: >
             go mod verify;
-            go build -ldflags "-s -X 'github.com/frioux/leatherman/internal/version.Version=$(git describe --abbrev=7 --dirty --always)' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $(git describe --abbrev=7 --dirty --always) 2>/dev/null)'";
+            go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$(git describe --abbrev=7 --dirty --always)' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $(git describe --abbrev=7 --dirty --always) 2>/dev/null)'";
             xz leatherman;
             mv leatherman.xz ./artifacts/leatherman-osx.xz
       - run:

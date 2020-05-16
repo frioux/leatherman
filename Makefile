@@ -12,7 +12,7 @@ leatherman:
 	go vet ./...
 	TZ=America/Los_Angeles go test -coverprofile=cover.cover -race ./...
 	go mod verify
-	go build -ldflags "-s -X 'github.com/frioux/leatherman/internal/version.Version=$(VERSION)' -X 'github.com/frioux/leatherman/internal/version.When=$(WHEN)'"
+	go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$(VERSION)' -X 'github.com/frioux/leatherman/internal/version.When=$(WHEN)'"
 	./leatherman version
 
 watch:
