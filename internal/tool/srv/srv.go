@@ -99,9 +99,5 @@ func serve(reload bool, dir string, port int, log chan net.Addr) error {
 		}()
 	}
 
-	if err := s.Serve(listener); err != nil {
-		return err
-	}
-
-	return err
+	return s.Serve(listener)
 }
