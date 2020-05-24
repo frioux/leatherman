@@ -420,6 +420,9 @@ I'm using the machine.  For example, it can say which window is active, what
 firefox tabs are loaded, if the screen is locked, etc.  The main benefit of the
 tool is that it caches the values returned.
 
+In the background, it interact swith the [blink(1)](http://blink1.thingm.com/).
+It turns the light green when I'm in a meeting and red when audio is playing.
+
 ### ` + "`" + `toml2json` + "`" + `
 
 ` + "`" + `toml2json` + "`" + ` reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON
@@ -533,12 +536,12 @@ func init() {
 
 		"srv": readme[11323:11806],
 
-		"status": readme[11806:12104],
+		"status": readme[11806:12263],
 
-		"toml2json": readme[12104:12279],
+		"toml2json": readme[12263:12438],
 
-		"uni": readme[12279:12441],
+		"uni": readme[12438:12600],
 
-		"yaml2json": readme[12441:12518],
+		"yaml2json": readme[12600:12677],
 	}
 }
