@@ -2,17 +2,27 @@ package status
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
-	"os/exec"
+
+	"github.com/frioux/leatherman/pkg/mozlz4"
 )
 
 type tabs struct{ value string }
 
 func (l *tabs) load() error {
-	// XXX use a function since we can?
-	cmd := exec.Command("dump-mozlz4", os.Getenv("MOZ_RECOVERY"))
-	b, err := cmd.Output()
+	f, err := os.Open(os.Getenv("MOZ_RECOVERY"))
+	if err != nil {
+		return err
+	}
+
+	r, err := mozlz4.NewReader(f)
+	if err != nil {
+		return err
+	}
+
+	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
 	}
