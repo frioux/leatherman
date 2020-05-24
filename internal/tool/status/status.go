@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -30,16 +31,16 @@ func Status(args []string, _ io.Reader) error {
 		}
 	}))
 
-	mux.Handle("/locked", &cacher{reloadEvery: time.Second, value: &locked{}})
-	mux.Handle("/curwindow", &cacher{reloadEvery: time.Second, value: &curWindow{}})
-	mux.Handle("/tabs", &cacher{reloadEvery: time.Second * 2, value: &tabs{}})
+	mux.Handle("/locked", &cacher{reloadEvery: time.Second, value: &locked{}, mu: &sync.Mutex{}})
+	mux.Handle("/curwindow", &cacher{reloadEvery: time.Second, value: &curWindow{}, mu: &sync.Mutex{}})
+	mux.Handle("/tabs", &cacher{reloadEvery: time.Second * 2, value: &tabs{}, mu: &sync.Mutex{}})
 
 	s := &sound{}
-	soundCacher := &cacher{reloadEvery: time.Second, value: s}
+	soundCacher := &cacher{reloadEvery: time.Second, value: s, mu: &sync.Mutex{}}
 	mux.Handle("/sound", soundCacher)
 
 	c := &cam{}
-	camCacher := &cacher{reloadEvery: time.Minute, value: c}
+	camCacher := &cacher{reloadEvery: time.Minute, value: c, mu: &sync.Mutex{}}
 	mux.Handle("/cam", camCacher)
 
 	go func() {
