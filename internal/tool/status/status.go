@@ -58,7 +58,14 @@ func Status(args []string, _ io.Reader) error {
 		return fmt.Errorf("net.Listen: %w", err)
 	}
 
-	srv := http.Server{Handler: mux}
+	srv := http.Server{Handler: logReqs(mux)}
 
 	return srv.Serve(listener)
+}
+
+func logReqs(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(os.Stderr, time.Now(), r.URL)
+		h.ServeHTTP(rw, r)
+	})
 }
