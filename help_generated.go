@@ -413,6 +413,13 @@ $ srv -port 8080 -no-autoreload ~
 Serving /home/frew on [::]:8080
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `status` + "`" + `
+
+` + "`" + `status` + "`" + ` runs a little web server that surfaces status information related to how
+I'm using the machine.  For example, it can say which window is active, what
+firefox tabs are loaded, if the screen is locked, etc.  The main benefit of the
+tool is that it caches the values returned.
+
 ### ` + "`" + `toml2json` + "`" + `
 
 ` + "`" + `toml2json` + "`" + ` reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON
@@ -456,6 +463,14 @@ trace will be the most useful.
 If you have a long running tool, the pprof http endpoint is exposed on
 ` + "`" + `localhost:6060/debug/pprof` + "`" + ` but picks a random port if that port is in use; the
 port can be overridden by setting ` + "`" + `LMHTTPPROF=$someport` + "`" + `.
+
+## Auxiliary Tools
+
+Some tools are annoying to have in the main leatherman tool.  Maybe they pull
+in deps that are huge or need cgo, but in any case I try to keep them separate.
+For now, these tools are under ` + "`" + `leatherman/cmd` + "`" + ` and must be built and run
+separately.  At some point I may come up with a policy around building or naming these,
+but for now they are simply extra tools.
 `)
 
 var commandReadme map[string][]byte
@@ -518,10 +533,12 @@ func init() {
 
 		"srv": readme[11323:11806],
 
-		"toml2json": readme[11806:11981],
+		"status": readme[11806:12104],
 
-		"uni": readme[11981:12143],
+		"toml2json": readme[12104:12279],
 
-		"yaml2json": readme[12143:12220],
+		"uni": readme[12279:12441],
+
+		"yaml2json": readme[12441:12518],
 	}
 }

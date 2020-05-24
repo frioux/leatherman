@@ -24,6 +24,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/slack"
 	"github.com/frioux/leatherman/internal/tool/smlist"
 	"github.com/frioux/leatherman/internal/tool/srv"
+	"github.com/frioux/leatherman/internal/tool/status"
 	"github.com/frioux/leatherman/internal/tool/toml"
 	"github.com/frioux/leatherman/internal/tool/uni"
 	"github.com/frioux/leatherman/internal/tool/yaml"
@@ -59,6 +60,7 @@ func init() {
 		"slack-status":         slack.Status,
 		"sm-list":              smlist.Run,
 		"srv":                  srv.Serve,
+		"status":               status.Status,
 		"toml2json":            toml.ToJSON,
 		"uni":                  uni.Describe,
 		"yaml2json":            yaml.ToJSON,
