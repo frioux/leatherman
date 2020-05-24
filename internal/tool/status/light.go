@@ -13,6 +13,14 @@ func manageLight(camMu, soundMu *sync.Mutex, c *cam, s *sound) error {
 	soundMu.Lock()
 	defer soundMu.Unlock()
 
+	if err := c.load(); err != nil {
+		return err
+	}
+
+	if err := s.load(); err != nil {
+		return err
+	}
+
 	var red, green, blue int
 	if c.value {
 		green = 255
