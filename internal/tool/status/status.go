@@ -1,11 +1,13 @@
 package status
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"strconv"
 	"sync"
 	"time"
@@ -26,7 +28,7 @@ func Status(args []string, _ io.Reader) error {
 	mux := http.NewServeMux()
 
 	mux.Handle("/", http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		for _, s := range []string{"cam", "curwindow", "sound", "tabs", "locked"} {
+		for _, s := range []string{"cam", "curwindow", "sound", "tabs", "vpn", "locked"} {
 			fmt.Fprintf(rw, " * /%s\n", s)
 		}
 	}))
@@ -34,6 +36,7 @@ func Status(args []string, _ io.Reader) error {
 	mux.Handle("/locked", &cacher{reloadEvery: time.Second, value: &locked{}, mu: &sync.Mutex{}})
 	mux.Handle("/curwindow", &cacher{reloadEvery: time.Second, value: &curWindow{}, mu: &sync.Mutex{}})
 	mux.Handle("/tabs", &cacher{reloadEvery: time.Second * 2, value: &tabs{}, mu: &sync.Mutex{}})
+	mux.Handle("/vpn", &cacher{reloadEvery: time.Second, value: &vpn{}, mu: &sync.Mutex{}})
 
 	s := &sound{}
 	soundCacher := &cacher{reloadEvery: time.Second, value: s, mu: &sync.Mutex{}}
@@ -68,4 +71,19 @@ func logReqs(h http.Handler) http.Handler {
 		fmt.Fprintln(os.Stderr, time.Now(), r.URL)
 		h.ServeHTTP(rw, r)
 	})
+}
+
+func exec1Fail(cmd string, rest ...string) (bool, error) {
+	c := exec.Command(cmd, rest...)
+	_, err := c.Output()
+	if err != nil {
+		eErr := &exec.ExitError{}
+		if errors.As(err, &eErr) {
+			if eErr.ExitCode() == 1 {
+				return false, nil
+			}
+		}
+		return false, err
+	}
+	return true, nil
 }

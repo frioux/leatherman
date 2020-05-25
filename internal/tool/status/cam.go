@@ -1,29 +1,19 @@
 package status
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
-	"os/exec"
 )
 
 type cam struct{ value bool }
 
 func (v *cam) load() error {
-	c := exec.Command("lsof", "/dev/video0")
-	_, err := c.Output()
+	val, err := exec1Fail("lsof", "/dev/video0")
 	if err != nil {
-		eErr := &exec.ExitError{}
-		if errors.As(err, &eErr) {
-			if eErr.ExitCode() == 1 {
-				v.value = false
-				return nil
-			}
-			return err
-		}
 		return err
 	}
-	v.value = true
+
+	v.value = val
 	return nil
 }
 
