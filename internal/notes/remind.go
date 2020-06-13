@@ -30,8 +30,7 @@ func remind(cl dropbox.Client) func(string, []twilio.Media) (string, error) {
 		id := hex.EncodeToString(sha[:])
 		path := "/notes/content/posts/deferred_" + id + ".md"
 
-		const tpl = `
-{
+		const tpl = `{
 "title": "deferred %s",
 "tags":["deferred"],
 "review_by": "%s",
