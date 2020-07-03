@@ -140,9 +140,20 @@ func autoReload(h http.Handler, dir string) (handler http.Handler, sinking chan 
 			}
 
 			const js = `<script>
+			let sinking = false;
+
+			// Disable the reload when we navigate away from the page.
+			//
+			// This event happens when we try to download files in Firefox, but
+			// the reload triggered on the navigated-away-from page which is still
+			// in the tab behind the download prompt actually causes the download
+			// window to close.
+			window.addEventListener('beforeunload', function(event) {
+			  sinking = true;
+			});
 			const evtSource = new EventSource("/_reload");
 			evtSource.onerror = function(event) {
-			  if (event.target.readyState == EventSource.CLOSED) {
+			  if (!sinking && event.target.readyState == EventSource.CLOSED) {
 			    // refresh page after 2-5s
 			    setTimeout(function() { location.reload() }, 2000 + Math.random() * 3000);
 			    return;
