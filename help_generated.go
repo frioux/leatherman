@@ -274,6 +274,11 @@ $ netrc-password google.com me@gmail.com
 supersecretpassword
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `notes` + "`" + `
+
+` + "`" + `notes` + "`" + ` provides a web interface to parts of my notes stored in
+Dropbox.  This should eventually be merged into Amygdala.
+
 ### ` + "`" + `pomotimer` + "`" + `
 
 ` + "`" + `pomotimer` + "`" + ` starts a timer for 25m or the duration expressed in the first
@@ -516,32 +521,34 @@ func init() {
 
 		"netrc-password": readme[7967:8132],
 
-		"pomotimer": readme[8132:8624],
+		"notes": readme[8132:8268],
 
-		"prepend-hist": readme[8624:8865],
+		"pomotimer": readme[8268:8760],
 
-		"proj": readme[8865:10184],
+		"prepend-hist": readme[8760:9001],
 
-		"render-mail": readme[10184:10318],
+		"proj": readme[9001:10320],
 
-		"replace-unzip": readme[10318:10548],
+		"render-mail": readme[10320:10454],
 
-		"slack-deaddrop": readme[10548:10768],
+		"replace-unzip": readme[10454:10684],
 
-		"slack-open": readme[10768:10902],
+		"slack-deaddrop": readme[10684:10904],
 
-		"slack-status": readme[10902:11047],
+		"slack-open": readme[10904:11038],
 
-		"sm-list": readme[11047:11323],
+		"slack-status": readme[11038:11183],
 
-		"srv": readme[11323:11806],
+		"sm-list": readme[11183:11459],
 
-		"status": readme[11806:12263],
+		"srv": readme[11459:11942],
 
-		"toml2json": readme[12263:12438],
+		"status": readme[11942:12399],
 
-		"uni": readme[12438:12600],
+		"toml2json": readme[12399:12574],
 
-		"yaml2json": readme[12600:12677],
+		"uni": readme[12574:12736],
+
+		"yaml2json": readme[12736:12813],
 	}
 }

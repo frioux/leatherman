@@ -17,6 +17,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/groupbydate"
 	"github.com/frioux/leatherman/internal/tool/minotaur"
 	"github.com/frioux/leatherman/internal/tool/netrcpassword"
+	"github.com/frioux/leatherman/internal/tool/notes"
 	"github.com/frioux/leatherman/internal/tool/pomotimer"
 	"github.com/frioux/leatherman/internal/tool/prependhist"
 	"github.com/frioux/leatherman/internal/tool/proj"
@@ -50,6 +51,7 @@ func init() {
 		"minotaur":             minotaur.Run,
 		"name2rune":            uni.ToRune,
 		"netrc-password":       netrcpassword.Run,
+		"notes":                notes.Serve,
 		"pomotimer":            pomotimer.Run,
 		"prepend-hist":         prependemojihist.Run,
 		"proj":                 proj.Proj,

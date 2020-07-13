@@ -273,6 +273,11 @@ $ netrc-password google.com me@gmail.com
 supersecretpassword
 ```
 
+### `notes`
+
+`notes` provides a web interface to parts of my notes stored in
+Dropbox.  This should eventually be merged into Amygdala.
+
 ### `pomotimer`
 
 `pomotimer` starts a timer for 25m or the duration expressed in the first
