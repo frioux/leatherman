@@ -8,7 +8,7 @@ import (
 type cam struct{ value bool }
 
 func (v *cam) load() error {
-	val, err := exec1Fail("lsof", "/dev/video0")
+	val, err := exec1Fail("lsof", []string{"/dev/video0"})
 	if err != nil {
 		return err
 	}

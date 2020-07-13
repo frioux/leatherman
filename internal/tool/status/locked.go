@@ -8,7 +8,7 @@ import (
 type locked struct{ value bool }
 
 func (l *locked) load() error {
-	v, err := exec1Fail("pgrep", "i3lock")
+	v, err := exec1Fail("pgrep", []string{"i3lock"})
 	if err != nil {
 		return err
 	}
