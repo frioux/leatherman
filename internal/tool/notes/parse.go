@@ -84,7 +84,7 @@ func server() (http.Handler, error) {
 
 	const nowPath = "/notes/content/posts/now.md"
 
-	mux.Handle("/now", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+	mux.Handle("/", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		r, err := db.Download(nowPath)
 		if err != nil {
 			return err
