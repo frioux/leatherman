@@ -11,7 +11,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -30,15 +29,15 @@ Command: notes
 */
 func Serve(args []string, _ io.Reader) error {
 	var (
-		port int
+		listen string
 	)
 	fs := flag.NewFlagSet("notes", flag.ContinueOnError)
-	fs.IntVar(&port, "port", 0, "port to listen on; default is random")
+	fs.StringVar(&listen, "listen", ":0", "location to listen on; default is random")
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
 
-	listener, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+	listener, err := net.Listen("tcp", listen)
 	if err != nil {
 		return fmt.Errorf("net.Listen: %w", err)
 	}
