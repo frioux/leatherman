@@ -141,8 +141,8 @@ func server() (http.Handler, error) {
 	mux.Handle("/render", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		f := req.URL.Query().Get("file")
 		if f == "" {
-			rw.WriteHeader(302)
 			rw.Header().Add("Location", "/list")
+			rw.WriteHeader(303)
 			fmt.Fprint(rw, "No file param, going to /list")
 			return nil
 		}
@@ -195,8 +195,8 @@ func server() (http.Handler, error) {
 			return err
 		}
 
-		rw.WriteHeader(302)
-		rw.Header().Add("Location", "/now")
+		rw.Header().Add("Location", "/")
+		rw.WriteHeader(303)
 
 		fmt.Fprintln(rw, prelude)
 		return mdwn.Convert(b, rw)
@@ -236,8 +236,8 @@ func server() (http.Handler, error) {
 			return err
 		}
 
-		rw.WriteHeader(302)
-		rw.Header().Add("Location", "/now")
+		rw.Header().Add("Location", "/")
+		rw.WriteHeader(303)
 
 		fmt.Fprintln(rw, prelude)
 		return mdwn.Convert(b, rw)
