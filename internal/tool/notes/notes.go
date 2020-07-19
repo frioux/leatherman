@@ -27,6 +27,7 @@ const prelude = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1" /> 
 </head>
+<a href="/list">list</a> | <a href="/">now</a><br><br>
 `
 
 /*
