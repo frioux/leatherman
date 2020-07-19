@@ -34,6 +34,8 @@ func parseNow(r io.Reader, when time.Time) ([]byte, error) {
 		case !inToday && line == desiredHeader:
 			inToday = true
 		case inToday && strings.HasPrefix(line, "## "):
+			ret.WriteString(`<form action="/add-item" method="POST"><input type="input" name="item"><button>Add Item</button></form>`)
+			ret.WriteString("\n\n")
 			inToday = false
 		case inToday && strings.HasPrefix(line, " * "):
 			md := md5.Sum([]byte(line))

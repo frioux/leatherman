@@ -201,5 +201,46 @@ func server() (http.Handler, error) {
 		return mdwn.Convert(b, rw)
 	}))
 
+	mux.Handle("/add-item", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		if err := req.ParseForm(); err != nil {
+			return err
+		}
+
+		v := req.Form.Get("item")
+		if v == "" {
+			rw.WriteHeader(400)
+			fmt.Fprint(rw, "missing item parameter")
+			return nil
+		}
+
+		r, err := db.Download(nowPath)
+		if err != nil {
+			return err
+		}
+
+		b, err := addItem(r, time.Now(), v)
+		if err != nil {
+			return err
+		}
+
+		if err := db.Create(dropbox.UploadParams{
+			Path: nowPath,
+			Mode: "overwrite",
+		}, bytes.NewReader(b)); err != nil {
+			return err
+		}
+
+		b, err = parseNow(bytes.NewReader(b), time.Now())
+		if err != nil {
+			return err
+		}
+
+		rw.WriteHeader(302)
+		rw.Header().Add("Location", "/now")
+
+		fmt.Fprintln(rw, prelude)
+		return mdwn.Convert(b, rw)
+	}))
+
 	return mux, nil
 }
