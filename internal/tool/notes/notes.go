@@ -95,6 +95,9 @@ func server() (http.Handler, error) {
 		nowPath = dir + "now.md"
 	)
 
+	changed := make(chan struct{})
+	go longpoll(db, dir, changed)
+
 	mux.Handle("/", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		r, err := db.Download(nowPath)
 		if err != nil {
@@ -243,5 +246,10 @@ func server() (http.Handler, error) {
 		return mdwn.Convert(b, rw)
 	}))
 
-	return mux, nil
+	arMux, err := autoReload(db, mux, dir)
+	if err != nil {
+		return nil, err
+	}
+
+	return arMux, nil
 }

@@ -132,7 +132,7 @@ func (cl Client) ListFolderContinue(cursor string) (ListFolderResult, error) {
 	return ret, nil
 }
 
-func (cl Client) ListFolderLongPoll(ctx context.Context, cursor string, timeout int) (ListFolderResult, error) {
+func (cl Client) ListFolderLongPoll(ctx context.Context, cursor string, timeout int) (bool, int, error) {
 	body := &bytes.Buffer{}
 
 	// match default of a missing value, for our own timeout calculation
@@ -147,7 +147,7 @@ func (cl Client) ListFolderLongPoll(ctx context.Context, cursor string, timeout 
 		Cursor  string `json:"cursor"`
 		Timeout int    `json:"timeout"`
 	}{cursor, timeout}); err != nil {
-		return ListFolderResult{}, err
+		return false, 0, err
 	}
 
 	// up to 90s added by dropbox to avoid thundering herd.  We add an
@@ -155,26 +155,28 @@ func (cl Client) ListFolderLongPoll(ctx context.Context, cursor string, timeout 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(timeout+90+1))
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", "https://api.dropboxapi.com/2/files/list_folder/longpoll", body)
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://notify.dropboxapi.com/2/files/list_folder/longpoll", body)
 	if err != nil {
-		return ListFolderResult{}, fmt.Errorf("http.NewRequest: %w", err)
+		return false, 0, fmt.Errorf("http.NewRequest: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+cl.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := cl.Do(req)
 	if err != nil {
-		return ListFolderResult{}, fmt.Errorf("http.Client.Do: %w", err)
+		return false, 0, fmt.Errorf("http.Client.Do: %w", err)
 	}
 	defer resp.Body.Close()
 
-	var ret ListFolderResult
+	var ret struct {
+		Changes bool `json:"changes"`
+		Backoff int  `json:"backoff"`
+	}
 	d := json.NewDecoder(resp.Body)
 
 	if err := d.Decode(&ret); err != nil {
-		return ListFolderResult{}, err
+		return false, 0, err
 	}
 
-	return ret, nil
+	return ret.Changes, ret.Backoff, nil
 }
