@@ -73,7 +73,7 @@ func logReqs(h http.Handler) http.Handler {
 	})
 }
 
-func exec1Fail(cmd string, rest []string) (bool, error) {
+func exec1Fail(cmd string, rest ...string) (bool, error) {
 	c := exec.Command(cmd, rest...)
 	_, err := c.Output()
 	if err != nil {

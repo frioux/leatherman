@@ -8,7 +8,7 @@ import (
 type vpn struct{ value bool }
 
 func (l *vpn) load() error {
-	v, err := exec1Fail("pgrep", []string{"openvpn"})
+	v, err := exec1Fail("pgrep", "openvpn")
 	if err != nil {
 		return err
 	}
