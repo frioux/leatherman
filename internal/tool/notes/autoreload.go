@@ -150,6 +150,15 @@ func autoReload(db dropbox.Client, h http.Handler, dir string) (handler http.Han
 			}
 
 			const js = `<script>
+			function sleep(n) {
+			  n = 1000*n;
+			  return new Promise(done => {
+			    setTimeout(() => {
+			      done();
+			    }, n);
+			  });
+			}
+
 			let sinking = false;
 
 			// Disable the reload when we navigate away from the page.
@@ -162,14 +171,27 @@ func autoReload(db dropbox.Client, h http.Handler, dir string) (handler http.Han
 			  sinking = true;
 			});
 			const evtSource = new EventSource("/_reload");
-			evtSource.onerror = function(event) {
+			evtSource.onerror = async function(event) {
 			  if (!sinking && event.target.readyState == EventSource.CLOSED) {
-			    // refresh page after 2-5s
-			    setTimeout(function() { location.reload() }, 2000 + Math.random() * 3000);
+			    // the server went away, poll till it's back, then reload.
+                            let i = 0;
+                            while(true) {
+                              try {
+                                await fetch('/');
+                                location.reload();
+                                break;
+                              } catch(e) {
+                                await sleep(Math.random() * i**2);
+	                        if (i < 7) { // ~a minute
+	                          i++;
+	                        }
+                              }
+                            }
 			    return;
 			  }
 			  console.log(event);
 			};
+
 			evtSource.onmessage = function(event) { location.reload() }
 			</script>`
 
