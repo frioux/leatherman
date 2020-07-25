@@ -25,7 +25,7 @@ func parseNow(r io.Reader, when time.Time) ([]byte, error) {
 		return nil, fmt.Errorf("readArticle: %w", err)
 	}
 
-	var inToday bool
+	var inToday, wroteAddItem bool
 	s := bufio.NewScanner(bytes.NewReader(a.Body))
 	for s.Scan() {
 		line := s.Text()
@@ -36,6 +36,7 @@ func parseNow(r io.Reader, when time.Time) ([]byte, error) {
 		case inToday && strings.HasPrefix(line, "## "):
 			ret.WriteString(`<form action="/add-item" method="POST"><input type="input" name="item"><button>Add Item</button></form>`)
 			ret.WriteString("\n\n")
+			wroteAddItem = true
 			inToday = false
 		case inToday && strings.HasPrefix(line, " * "):
 			md := md5.Sum([]byte(line))
@@ -45,6 +46,11 @@ func parseNow(r io.Reader, when time.Time) ([]byte, error) {
 
 		ret.WriteString(line)
 		ret.WriteRune('\n')
+	}
+
+	if !wroteAddItem {
+		ret.WriteString(`<form action="/add-item" method="POST"><input type="input" name="item"><button>Add Item</button></form>`)
+		ret.WriteString("\n\n")
 	}
 
 	return []byte(ret.String()), nil

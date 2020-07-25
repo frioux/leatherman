@@ -35,12 +35,13 @@ var eg = `{
 `
 
 func TestParseNow(t *testing.T) {
-	b, err := parseNow(strings.NewReader(eg), time.Date(2020, 7, 19, 2, 0, 0, 0, time.UTC))
-	if err != nil {
-		t.Fatalf("unexpected error: %s", err)
-	}
+	t.Run("1", func(t *testing.T) {
+		b, err := parseNow(strings.NewReader(eg), time.Date(2020, 7, 19, 2, 0, 0, 0, time.UTC))
+		if err != nil {
+			t.Fatalf("unexpected error: %s", err)
+		}
 
-	expect := `
+		expect := `
 
 ## Stash
 
@@ -63,5 +64,38 @@ func TestParseNow(t *testing.T) {
 
 
 `
-	testutil.Equal(t, string(b), expect, "parseNow renders properly")
+		testutil.Equal(t, string(b), expect, "parseNow renders properly")
+	})
+
+	t.Run("2", func(t *testing.T) {
+		b, err := parseNow(strings.NewReader(eg), time.Date(2020, 7, 18, 2, 0, 0, 0, time.UTC))
+		if err != nil {
+			t.Fatalf("unexpected error: %s", err)
+		}
+
+		expect := `
+
+## Stash
+
+ * foo
+ * bar
+ * baz
+
+## 2020-07-19 ##
+
+ * bong
+ * biff
+ * barp
+
+## 2020-07-18 ##
+
+ * ~~herp~~ <form action="/toggle" method="POST"><input type="hidden" name="chunk" value="3ac3845115fb4ee703f3c170eb9ba368"><button>Toggle</button></form>
+ * ~~dong~~ <form action="/toggle" method="POST"><input type="hidden" name="chunk" value="e23b23e871f27237c8d5a28960121cb7"><button>Toggle</button></form>
+
+
+<form action="/add-item" method="POST"><input type="input" name="item"><button>Add Item</button></form>
+
+`
+		testutil.Equal(t, string(b), expect, "parseNow renders properly")
+	})
 }
