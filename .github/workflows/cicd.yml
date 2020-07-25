@@ -1,0 +1,61 @@
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: go test ./...
+        env:
+          TZ: America/Los_Angeles
+
+      - run: go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
+        env:
+          GOOS: windows
+      - run: zip leatherman.zip leatherman.exe
+
+      - run: go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
+        env:
+          GOOS: darwin
+      - run: xz --stdout leatherman > leatherman-osx.xz
+
+      - run: go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
+      - run: xz --stdout leatherman > leatherman.xz
+
+      - uses: anothrNick/github-tag-action@1.17.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_TAG: untagged-${{ github.sha }}
+
+      - id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: untagged-${{ github.sha }}
+          release_name: Release ${{ github.sha }}
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./leatherman.zip
+          asset_name: leatherman.zip
+          asset_content_type: application/zip
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./leatherman.xz
+          asset_name: leatherman.xz
+          asset_content_type: application/x-xz
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./leatherman-osx.xz
+          asset_name: leatherman-osx.xz
+          asset_content_type: application/x-xz
