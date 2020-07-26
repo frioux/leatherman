@@ -26,6 +26,7 @@ const prelude = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+<title>%s</title>
 </head>
 <a href="/list">list</a> | <a href="/">now</a><br><br>
 `
@@ -109,7 +110,7 @@ func server() (http.Handler, error) {
 			return err
 		}
 
-		fmt.Fprintln(rw, prelude)
+		fmt.Fprintf(rw, prelude, "now")
 		return mdwn.Convert(b, rw)
 	}))
 
@@ -137,7 +138,7 @@ func server() (http.Handler, error) {
 			fmt.Fprintln(buf, " * ["+e.Name+"](/render?file="+e.Name+")")
 		}
 
-		fmt.Fprintln(rw, prelude)
+		fmt.Fprintf(rw, prelude, "now: list")
 		return mdwn.Convert(buf.Bytes(), rw)
 	}))
 
@@ -160,7 +161,7 @@ func server() (http.Handler, error) {
 			return fmt.Errorf("readArticle: %w", err)
 		}
 
-		fmt.Fprintln(rw, prelude)
+		fmt.Fprintf(rw, prelude, "now: "+a.Title)
 		return mdwn.Convert(a.Body, rw)
 	}))
 
