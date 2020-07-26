@@ -27,6 +27,7 @@ const prelude = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1" /> 
 <title>%s</title>
+<link rel="icon" href="/favicon">
 </head>
 <a href="/list">list</a> | <a href="/">now</a><br><br>
 `
@@ -98,6 +99,11 @@ func server() (http.Handler, error) {
 
 	changed := make(chan struct{})
 	go longpoll(db, dir, changed)
+
+	mux.Handle("/favicon", http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
+		rw.Header().Add("Content-Type", "image/svg+xml")
+		fmt.Fprintln(rw, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">☕</text></svg>`)
+	}))
 
 	mux.Handle("/", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		r, err := db.Download(nowPath)
