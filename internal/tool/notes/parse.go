@@ -7,9 +7,12 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 	"time"
 )
+
+var dateHeader = regexp.MustCompile(`## \d{4}-\d\d-\d\d ##`)
 
 // parseNow reads markdown and returns html.  The main difference from normal
 // markdown is that a section titled ## 2020-02-02 ## will get special
@@ -33,6 +36,14 @@ func parseNow(r io.Reader, when time.Time) ([]byte, error) {
 		switch {
 		case !inToday && line == desiredHeader:
 			inToday = true
+		case !wroteAddItem && !inToday && dateHeader.MatchString(line) && line < desiredHeader:
+			wroteAddItem = true
+			ret.WriteString(desiredHeader)
+			ret.WriteString("\n\n")
+			ret.WriteString(`<form action="/add-item" method="POST"><input type="input" name="item"><button>Add Item</button></form>`)
+			ret.WriteString("\n\n")
+		case !inToday && dateHeader.MatchString(line) && line < desiredHeader:
+			wroteAddItem = true
 		case inToday && strings.HasPrefix(line, "## "):
 			ret.WriteString(`<form action="/add-item" method="POST"><input type="input" name="item"><button>Add Item</button></form>`)
 			ret.WriteString("\n\n")

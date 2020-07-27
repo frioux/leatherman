@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -35,13 +36,16 @@ var eg = `{
 `
 
 func TestParseNow(t *testing.T) {
-	t.Run("1", func(t *testing.T) {
-		b, err := parseNow(strings.NewReader(eg), time.Date(2020, 7, 19, 2, 0, 0, 0, time.UTC))
-		if err != nil {
-			t.Fatalf("unexpected error: %s", err)
-		}
+	type Test struct {
+		in, expect string
+		when       time.Time
+	}
 
-		expect := `
+	tests := []Test{
+		0: {
+			when: time.Date(2020, 7, 19, 2, 0, 0, 0, time.UTC),
+			in:   eg,
+			expect: `
 
 ## Stash
 
@@ -63,17 +67,12 @@ func TestParseNow(t *testing.T) {
  * ~~dong~~
 
 
-`
-		testutil.Equal(t, string(b), expect, "parseNow renders properly")
-	})
-
-	t.Run("2", func(t *testing.T) {
-		b, err := parseNow(strings.NewReader(eg), time.Date(2020, 7, 18, 2, 0, 0, 0, time.UTC))
-		if err != nil {
-			t.Fatalf("unexpected error: %s", err)
-		}
-
-		expect := `
+`,
+		},
+		1: {
+			when: time.Date(2020, 7, 18, 2, 0, 0, 0, time.UTC),
+			in:   eg,
+			expect: `
 
 ## Stash
 
@@ -95,7 +94,47 @@ func TestParseNow(t *testing.T) {
 
 <form action="/add-item" method="POST"><input type="input" name="item"><button>Add Item</button></form>
 
-`
-		testutil.Equal(t, string(b), expect, "parseNow renders properly")
-	})
+`,
+		},
+		2: {
+			when: time.Date(2020, 7, 20, 2, 0, 0, 0, time.UTC),
+			in:   eg,
+			expect: `
+
+## Stash
+
+ * foo
+ * bar
+ * baz
+
+## 2020-07-20 ##
+
+<form action="/add-item" method="POST"><input type="input" name="item"><button>Add Item</button></form>
+
+## 2020-07-19 ##
+
+ * bong
+ * biff
+ * barp
+
+## 2020-07-18 ##
+
+ * ~~herp~~
+ * ~~dong~~
+
+
+`,
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			b, err := parseNow(strings.NewReader(tt.in), tt.when)
+			if err != nil {
+				t.Fatalf("unexpected error: %s", err)
+			}
+
+			testutil.Equal(t, string(b), tt.expect, "")
+		})
+	}
 }
