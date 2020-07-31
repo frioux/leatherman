@@ -83,6 +83,7 @@ func server() (http.Handler, error) {
 		),
 		goldmark.WithExtensions(
 			extension.Strikethrough,
+			extension.Table,
 		),
 	)
 	db, err := dropbox.NewClient(dropbox.Client{
