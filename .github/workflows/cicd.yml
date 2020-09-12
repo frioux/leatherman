@@ -30,12 +30,14 @@ jobs:
 
       - id: create_release
         uses: actions/create-release@v1
+        if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: untagged-${{ github.sha }}
           release_name: Release ${{ github.sha }}
       - uses: actions/upload-release-asset@v1
+        if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -44,6 +46,7 @@ jobs:
           asset_name: leatherman.zip
           asset_content_type: application/zip
       - uses: actions/upload-release-asset@v1
+        if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -52,6 +55,7 @@ jobs:
           asset_name: leatherman.xz
           asset_content_type: application/x-xz
       - uses: actions/upload-release-asset@v1
+        if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
