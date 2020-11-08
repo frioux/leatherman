@@ -66,9 +66,28 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
+type emojiSet map[string]bool
+
+func (s emojiSet) add(e *turtle.Emoji) {
+	if e.Category == "flags" {
+		return
+	}
+
+	s[e.Char] = true
+}
+
+func (s emojiSet) all() []string {
+	ret := make([]string, 0, len(s))
+	for e := range s {
+		ret = append(ret, e)
+	}
+
+	return ret
+}
+
 func messageToEmoji(m string) []string {
-	words := strings.Split(m, " ")
-	emoji := make(map[string]bool, len(words))
+	words := strings.Split(strings.ToLower(m), " ")
+	s := emojiSet(make(map[string]bool, len(words)))
 
 	for _, word := range words {
 		if word == "" {
@@ -76,28 +95,23 @@ func messageToEmoji(m string) []string {
 		}
 
 		if e, ok := turtle.Emojis[word]; ok {
-			emoji[e.Char] = true
+			s.add(e)
 		}
 
 		if es := turtle.Category(word); es != nil {
 			for _, e := range es {
-				emoji[e.Char] = true
+				s.add(e)
 			}
 		}
 
 		if es := turtle.Keyword(word); es != nil {
 			for _, e := range es {
-				emoji[e.Char] = true
+				s.add(e)
 			}
 		}
 
 		// don't use turtle.Search because it finds *way* too much.
 	}
 
-	ret := make([]string, 0, len(emoji))
-	for e := range emoji {
-		ret = append(ret, e)
-	}
-
-	return ret
+	return s.all()
 }
