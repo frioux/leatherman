@@ -2,6 +2,7 @@ package automoji
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -15,7 +16,14 @@ Run comments to discord and reacts to all messages with vaguely related emoji.
 
 Command: auto-emote
 */
-func Run([]string, io.Reader) error {
+func Run(args []string, _ io.Reader) error {
+	if len(args) > 1 {
+		for _, arg := range args[1:] {
+			fmt.Println(messageToEmoji(arg))
+		}
+		return nil
+	}
+
 	token := os.Getenv("LM_DISCORD_TOKEN")
 	if token == "" {
 		return errors.New("set LM_DISCORD_TOKEN to use auto-emote")
