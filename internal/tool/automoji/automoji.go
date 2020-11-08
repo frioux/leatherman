@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/hackebrot/turtle"
@@ -24,6 +26,7 @@ func Run(args []string, _ io.Reader) error {
 		return nil
 	}
 
+	rand.Seed(time.Now().UnixNano())
 	token := os.Getenv("LM_DISCORD_TOKEN")
 	if token == "" {
 		return errors.New("set LM_DISCORD_TOKEN to use auto-emote")
@@ -47,15 +50,25 @@ func Run(args []string, _ io.Reader) error {
 	return nil
 }
 
+var maxes = map[int]int{
+	0: 1,
+	1: 1,
+	2: 1,
+	3: 1,
+	4: 2,
+	5: 10,
+}
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m == nil || m.Message == nil {
+	if m == nil || m.Message == nil || rand.Intn(100) != 0 {
 		return
 	}
 
+	max := maxes[rand.Intn(6)]
 	emoji := messageToEmoji(m.Message.Content)
 	for i, e := range emoji {
 		// 20 is max, so limit to half the total amount
-		if i == 10 {
+		if i == max {
 			break
 		}
 		s.MessageReactionAdd(
