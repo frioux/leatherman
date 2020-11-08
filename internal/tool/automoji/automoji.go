@@ -137,8 +137,15 @@ func messageToEmoji(m string) []string {
 				s.add(e)
 			}
 		}
-
-		// don't use turtle.Search because it finds *way* too much.
+	}
+	if len(s) == 0 { // since this always finds too much, only use it when nothing is found
+		for _, word := range words {
+			if es := turtle.Search(word); es != nil {
+				for _, e := range es {
+					s.add(e)
+				}
+			}
+		}
 	}
 
 	return s.all()
