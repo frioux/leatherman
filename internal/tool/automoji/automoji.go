@@ -37,7 +37,9 @@ func Run(args []string, _ io.Reader) error {
 	}
 
 	dg.AddHandler(messageCreate)
-	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
+	dg.AddHandler(emojiAdd)
+
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuildMessageReactions)
 
 	if err := dg.Open(); err != nil {
 		return err
@@ -59,24 +61,37 @@ var maxes = map[int]int{
 	5: 10,
 }
 
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m == nil || m.Message == nil || rand.Intn(100) != 0 {
+func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
+	if a.Emoji.Name != "🤖" {
 		return
 	}
 
+	m, err := s.ChannelMessage(a.ChannelID, a.MessageID)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return
+	}
+
+	react(s, a.ChannelID, a.MessageID, messageToEmoji(m.Content))
+}
+
+func react(s *discordgo.Session, channelID, messageID string, emoji []string) {
 	max := maxes[rand.Intn(6)]
-	emoji := messageToEmoji(m.Message.Content)
 	for i, e := range emoji {
 		// 20 is max, so limit to half the total amount
 		if i == max {
 			break
 		}
-		s.MessageReactionAdd(
-			m.ChannelID,
-			m.ID,
-			e,
-		)
+		s.MessageReactionAdd(channelID, messageID, e)
 	}
+}
+
+func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m == nil || m.Message == nil || rand.Intn(100) != 0 {
+		return
+	}
+
+	react(s, m.ChannelID, m.ID, messageToEmoji(m.Message.Content))
 }
 
 type emojiSet map[string]bool
