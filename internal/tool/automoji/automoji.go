@@ -78,7 +78,6 @@ func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 func react(s *discordgo.Session, channelID, messageID string, emoji []string) {
 	max := maxes[rand.Intn(6)]
 	for i, e := range emoji {
-		// 20 is max, so limit to half the total amount
 		if i == max {
 			break
 		}
