@@ -62,7 +62,7 @@ var maxes = map[int]int{
 }
 
 func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
-	if a.Emoji.Name != "🤖" {
+	if a.Emoji.Name != "bot" {
 		return
 	}
 
