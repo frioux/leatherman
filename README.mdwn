@@ -106,6 +106,10 @@ DENTISTRY SYMBOL LIGHT VERTICAL AND TOP LEFT
 DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM LEFT
 ```
 
+### `auto-emote`
+
+`auto-emote` comments to discord and reacts to all messages with vaguely related emoji.
+
 ### `backlight`
 
 `backlight` is a faster version of `xbacklight` by directly writing to `/sys`.  Example:

@@ -107,6 +107,10 @@ DENTISTRY SYMBOL LIGHT VERTICAL AND TOP LEFT
 DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM LEFT
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `auto-emote` + "`" + `
+
+` + "`" + `auto-emote` + "`" + ` comments to discord and reacts to all messages with vaguely related emoji.
+
 ### ` + "`" + `backlight` + "`" + `
 
 ` + "`" + `backlight` + "`" + ` is a faster version of ` + "`" + `xbacklight` + "`" + ` by directly writing to ` + "`" + `/sys` + "`" + `.  Example:
@@ -491,64 +495,66 @@ func init() {
 
 		"alluni": readme[2642:3468],
 
-		"backlight": readme[3468:3670],
+		"auto-emote": readme[3468:3575],
 
-		"clocks": readme[3670:3886],
+		"backlight": readme[3575:3777],
 
-		"csv2json": readme[3886:4026],
+		"clocks": readme[3777:3993],
 
-		"csv2md": readme[4026:4100],
+		"csv2json": readme[3993:4133],
 
-		"debounce": readme[4100:4444],
+		"csv2md": readme[4133:4207],
 
-		"dump-mozlz4": readme[4444:4627],
+		"debounce": readme[4207:4551],
 
-		"email2json": readme[4627:5342],
+		"dump-mozlz4": readme[4551:4734],
 
-		"expand-url": readme[5342:5518],
+		"email2json": readme[4734:5449],
 
-		"export-bamboohr": readme[5518:5602],
+		"expand-url": readme[5449:5625],
 
-		"export-bamboohr-tree": readme[5602:5689],
+		"export-bamboohr": readme[5625:5709],
 
-		"fn": readme[5689:5825],
+		"export-bamboohr-tree": readme[5709:5796],
 
-		"group-by-date": readme[5825:6043],
+		"fn": readme[5796:5932],
 
-		"minotaur": readme[6043:7862],
+		"group-by-date": readme[5932:6150],
 
-		"name2rune": readme[7862:7967],
+		"minotaur": readme[6150:7969],
 
-		"netrc-password": readme[7967:8132],
+		"name2rune": readme[7969:8074],
 
-		"notes": readme[8132:8268],
+		"netrc-password": readme[8074:8239],
 
-		"pomotimer": readme[8268:8760],
+		"notes": readme[8239:8375],
 
-		"prepend-hist": readme[8760:9001],
+		"pomotimer": readme[8375:8867],
 
-		"proj": readme[9001:10320],
+		"prepend-hist": readme[8867:9108],
 
-		"render-mail": readme[10320:10454],
+		"proj": readme[9108:10427],
 
-		"replace-unzip": readme[10454:10684],
+		"render-mail": readme[10427:10561],
 
-		"slack-deaddrop": readme[10684:10904],
+		"replace-unzip": readme[10561:10791],
 
-		"slack-open": readme[10904:11038],
+		"slack-deaddrop": readme[10791:11011],
 
-		"slack-status": readme[11038:11183],
+		"slack-open": readme[11011:11145],
 
-		"sm-list": readme[11183:11459],
+		"slack-status": readme[11145:11290],
 
-		"srv": readme[11459:11942],
+		"sm-list": readme[11290:11566],
 
-		"status": readme[11942:12399],
+		"srv": readme[11566:12049],
 
-		"toml2json": readme[12399:12574],
+		"status": readme[12049:12506],
 
-		"uni": readme[12574:12736],
+		"toml2json": readme[12506:12681],
 
-		"yaml2json": readme[12736:12813],
+		"uni": readme[12681:12843],
+
+		"yaml2json": readme[12843:12920],
 	}
 }

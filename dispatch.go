@@ -5,6 +5,7 @@ package main
 import (
 	"io"
 
+	"github.com/frioux/leatherman/internal/tool/automoji"
 	"github.com/frioux/leatherman/internal/tool/backlight"
 	"github.com/frioux/leatherman/internal/tool/bamboo"
 	"github.com/frioux/leatherman/internal/tool/clocks"
@@ -36,6 +37,7 @@ func init() {
 		"addrs":                email.Addrs,
 		"addrspec-to-tabs":     email.ToTabs,
 		"alluni":               uni.All,
+		"auto-emote":           automoji.Run,
 		"backlight":            backlight.Run,
 		"clocks":               clocks.Run,
 		"csv2json":             csv.ToJSON,
