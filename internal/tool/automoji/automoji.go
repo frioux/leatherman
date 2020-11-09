@@ -96,7 +96,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 type emojiSet map[string]bool
 
 func (s emojiSet) add(e *turtle.Emoji) {
-	if e.Category == "flags" {
+	t := time.Now().Local()
+	isFlagDay := t.Month() == 6 && t.Day() == 14
+
+	// not flag day, don't include flags
+	if !isFlagDay && e.Category == "flags" {
+		return
+	}
+
+	// flag day, *only* include flags
+	if isFlagDay && e.Category != "flags" {
 		return
 	}
 
