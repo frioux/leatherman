@@ -91,6 +91,7 @@ github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3 h1:rdtXEo9yffOjh4
 github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3/go.mod h1:STqf+YV0ADdzk4ejtXFsGqDpATP9JoL0OB+hiFQbkdE=
 github.com/yuin/goldmark v1.1.33 h1:Q0PzHNn2h69wYmmE2SukzuQe0VBwErZrgJ5ZB8od6zQ=
 github.com/yuin/goldmark v1.1.33/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
+github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2 h1:VklqNMn3ovrHsnt90PveolxSbWFaJdECFbxSq0Mqo2M=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
