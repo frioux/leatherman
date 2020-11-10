@@ -6,6 +6,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -121,8 +122,12 @@ func (s emojiSet) all() []string {
 	return ret
 }
 
+var nonNameRE = regexp.MustCompile(`[^a-z_]+`)
+
 func messageToEmoji(m string) []string {
-	words := strings.Split(strings.ToLower(m), " ")
+	m = strings.ToLower(m)
+	m = nonNameRE.ReplaceAllString(m, " ")
+	words := strings.Split(m, " ")
 	s := emojiSet(make(map[string]bool, len(words)))
 
 	for _, word := range words {
