@@ -122,13 +122,23 @@ func (s emojiSet) all() []string {
 	return ret
 }
 
-var nonNameRE = regexp.MustCompile(`[^a-z_]+`)
+var (
+	nonNameRE = regexp.MustCompile(`[^a-z_]+`)
+	secretRE  = regexp.MustCompile(`\|\|.+\|\|`)
+)
 
 func messageToEmoji(m string) []string {
+	s := emojiSet(make(map[string]bool))
+
 	m = strings.ToLower(m)
+
+	if secretRE.MatchString(m) {
+		s.add(turtle.Emojis["see_no_evil"])
+		m = secretRE.ReplaceAllString(m, " ")
+	}
+
 	m = nonNameRE.ReplaceAllString(m, " ")
 	words := strings.Split(m, " ")
-	s := emojiSet(make(map[string]bool, len(words)))
 
 	for _, word := range words {
 		if word == "" {
