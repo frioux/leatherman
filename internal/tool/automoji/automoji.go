@@ -6,12 +6,9 @@ import (
 	"io"
 	"math/rand"
 	"os"
-	"regexp"
-	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/hackebrot/turtle"
 )
 
 /*
@@ -22,7 +19,7 @@ Command: auto-emote
 func Run(args []string, _ io.Reader) error {
 	if len(args) > 1 {
 		for _, arg := range args[1:] {
-			fmt.Println(messageToEmoji(arg))
+			fmt.Println(newEmojiSet(arg).all(0))
 		}
 		return nil
 	}
@@ -62,6 +59,17 @@ var maxes = map[int]int{
 	5: 10,
 }
 
+func react(s *discordgo.Session, channelID, messageID string, es *emojiSet) {
+	max := maxes[rand.Intn(6)]
+	for i, e := range es.all(max) {
+		// the 20 here is to limit to possibly fewer than were returned
+		if i == max || i == 20 {
+			break
+		}
+		s.MessageReactionAdd(channelID, messageID, e)
+	}
+}
+
 func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 	if a.Emoji.Name != "bot" {
 		return
@@ -73,103 +81,21 @@ func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 		return
 	}
 
-	react(s, a.ChannelID, a.MessageID, messageToEmoji(m.Content))
-}
-
-func react(s *discordgo.Session, channelID, messageID string, emoji []string) {
-	max := maxes[rand.Intn(6)]
-	for i, e := range emoji {
-		if i == max {
-			break
-		}
-		s.MessageReactionAdd(channelID, messageID, e)
-	}
+	react(s, a.ChannelID, a.MessageID, newEmojiSet(m.Content))
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m == nil || m.Message == nil || rand.Intn(100) != 0 {
+	es := newEmojiSet(m.Message.Content)
+
+	lucky := rand.Intn(100) == 0
+
+	if m == nil || m.Message == nil || !lucky {
 		return
 	}
 
-	react(s, m.ChannelID, m.ID, messageToEmoji(m.Message.Content))
-}
-
-type emojiSet map[string]bool
-
-func (s emojiSet) add(e *turtle.Emoji) {
-	t := time.Now().Local()
-	isFlagDay := t.Month() == 6 && t.Day() == 14
-
-	// not flag day, don't include flags
-	if !isFlagDay && e.Category == "flags" {
-		return
+	if lucky {
+		es.required = append(es.required, "🎰")
 	}
 
-	// flag day, *only* include flags
-	if isFlagDay && e.Category != "flags" {
-		return
-	}
-
-	s[e.Char] = true
-}
-
-func (s emojiSet) all() []string {
-	ret := make([]string, 0, len(s))
-	for e := range s {
-		ret = append(ret, e)
-	}
-
-	return ret
-}
-
-var (
-	nonNameRE = regexp.MustCompile(`[^a-z_]+`)
-	secretRE  = regexp.MustCompile(`\|\|.+\|\|`)
-)
-
-func messageToEmoji(m string) []string {
-	s := emojiSet(make(map[string]bool))
-
-	m = strings.ToLower(m)
-
-	if secretRE.MatchString(m) {
-		s.add(turtle.Emojis["see_no_evil"])
-		m = secretRE.ReplaceAllString(m, " ")
-	}
-
-	m = nonNameRE.ReplaceAllString(m, " ")
-	words := strings.Split(m, " ")
-
-	for _, word := range words {
-		if word == "" {
-			continue
-		}
-
-		if e, ok := turtle.Emojis[word]; ok {
-			s.add(e)
-		}
-
-		if es := turtle.Category(word); es != nil {
-			for _, e := range es {
-				s.add(e)
-			}
-		}
-
-		if es := turtle.Keyword(word); es != nil {
-			for _, e := range es {
-				s.add(e)
-			}
-		}
-	}
-	if len(s) == 0 { // since this always finds too much, only use it when nothing is found
-		for _, word := range words {
-			if es := turtle.Search(word); es != nil {
-				for _, e := range es {
-					s.add(e)
-				}
-			}
-		}
-	}
-
-	return s.all()
+	react(s, m.ChannelID, m.ID, es)
 }
