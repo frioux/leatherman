@@ -1,6 +1,7 @@
 package automoji
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -14,7 +15,15 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/common/expfmt"
 )
+
+var registry = prometheus.NewRegistry()
+
+func mustRegister(cs ...prometheus.Collector) {
+	registry.MustRegister(cs...)
+	prometheus.MustRegister(cs...)
+}
 
 /*
 Run comments to discord and reacts to all messages with vaguely related emoji.
@@ -75,7 +84,7 @@ var reactTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 }, []string{"max"})
 
 func init() {
-	prometheus.MustRegister(reactTotal)
+	mustRegister(reactTotal)
 }
 
 func react(s *discordgo.Session, channelID, messageID string, es *emojiSet) {
@@ -96,7 +105,7 @@ var messageReactionAddTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 }, []string{"react"})
 
 func init() {
-	prometheus.MustRegister(messageReactionAddTotal)
+	mustRegister(messageReactionAddTotal)
 }
 
 func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
@@ -121,7 +130,17 @@ var messageCreateTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Help: "counter incremented for each message create",
 }, []string{"react"})
 
+func init() {
+	mustRegister(messageCreateTotal)
+}
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.Message.Content == "||hidden knowledge||" {
+		messageCreateTotal.WithLabelValues("hidden_knowledge").Inc()
+		showMetrics(s, m.ChannelID)
+		return
+	}
+
 	es := newEmojiSet(m.Message.Content)
 
 	lucky := rand.Intn(100) == 0
@@ -140,4 +159,21 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	es.required = append(es.required, "🎰")
 
 	react(s, m.ChannelID, m.ID, es)
+}
+
+func showMetrics(s *discordgo.Session, channelID string) {
+	ms, err := registry.Gather()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return
+	}
+
+	buf := &bytes.Buffer{}
+	buf.Write([]byte("```\n"))
+	for _, m := range ms {
+		expfmt.MetricFamilyToText(buf, m)
+	}
+	buf.Write([]byte("```\n"))
+
+	s.ChannelMessageSend(channelID, buf.String())
 }
