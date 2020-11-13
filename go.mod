@@ -8,7 +8,7 @@ require (
 	github.com/bwmarrin/discordgo v0.22.0
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/google/go-cmp v0.5.2
+	github.com/google/go-cmp v0.5.3
 	github.com/hackebrot/go-repr v0.1.0 // indirect
 	github.com/hackebrot/turtle v0.1.0
 	github.com/headzoo/surf v1.0.1-0.20180909134844-a4a8c16c01dc
