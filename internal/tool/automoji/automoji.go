@@ -4,11 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
+	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 /*
@@ -23,6 +28,11 @@ func Run(args []string, _ io.Reader) error {
 		}
 		return nil
 	}
+
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}()
 
 	rand.Seed(time.Now().UnixNano())
 	token := os.Getenv("LM_DISCORD_TOKEN")
@@ -59,8 +69,18 @@ var maxes = map[int]int{
 	5: 10,
 }
 
+var reactTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	Name: "automoji_react_total",
+	Help: "counter incremented each time a message is reacted to",
+}, []string{"max"})
+
+func init() {
+	prometheus.MustRegister(reactTotal)
+}
+
 func react(s *discordgo.Session, channelID, messageID string, es *emojiSet) {
 	max := maxes[rand.Intn(6)]
+	reactTotal.WithLabelValues(strconv.Itoa(max)).Inc()
 	for i, e := range es.all(max) {
 		// the 20 here is to limit to possibly fewer than were returned
 		if i == max || i == 20 {
@@ -70,10 +90,22 @@ func react(s *discordgo.Session, channelID, messageID string, es *emojiSet) {
 	}
 }
 
+var messageReactionAddTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	Name: "automoji_message_reaction_add_total",
+	Help: "counter incremented for each message reaction add",
+}, []string{"react"})
+
+func init() {
+	prometheus.MustRegister(messageReactionAddTotal)
+}
+
 func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 	if a.Emoji.Name != "bot" {
+		messageReactionAddTotal.WithLabelValues("no").Inc()
 		return
 	}
+
+	messageReactionAddTotal.WithLabelValues("yes").Inc()
 
 	m, err := s.ChannelMessage(a.ChannelID, a.MessageID)
 	if err != nil {
@@ -84,18 +116,28 @@ func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 	react(s, a.ChannelID, a.MessageID, newEmojiSet(m.Content))
 }
 
+var messageCreateTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	Name: "automoji_message_create_total",
+	Help: "counter incremented for each message create",
+}, []string{"react"})
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	es := newEmojiSet(m.Message.Content)
 
 	lucky := rand.Intn(100) == 0
 
-	if m == nil || m.Message == nil || !lucky {
+	if m == nil || m.Message == nil {
+		messageCreateTotal.WithLabelValues("wtf").Inc()
 		return
 	}
 
-	if lucky {
-		es.required = append(es.required, "🎰")
+	if !lucky {
+		messageCreateTotal.WithLabelValues("unlucky").Inc()
+		return
 	}
+
+	messageCreateTotal.WithLabelValues("lucky").Inc()
+	es.required = append(es.required, "🎰")
 
 	react(s, m.ChannelID, m.ID, es)
 }
