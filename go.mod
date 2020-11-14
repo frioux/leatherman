@@ -17,7 +17,7 @@ require (
 	github.com/icza/mighty v0.0.0-20180919140131-cfd07d671de6 // indirect
 	github.com/pierrec/lz4/v3 v3.3.2
 	github.com/prometheus/client_golang v1.8.0
-	github.com/prometheus/common v0.15.0 // indirect
+	github.com/prometheus/common v0.15.0
 	github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3
 	github.com/yuin/goldmark v1.2.1
 	golang.org/x/text v0.3.4
