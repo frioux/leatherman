@@ -130,23 +130,23 @@ func extractMember(f *zip.File) error {
 
 	file, err := os.Create(f.Name)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't create file to extract to: %s", err)
+		fmt.Fprintf(os.Stderr, "Couldn't create file to extract to: %s\n", err)
 		return nil
 	}
 
 	_, err = io.Copy(file, rc)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't copy zip file member (%s): %s", f.Name, err)
+		fmt.Fprintf(os.Stderr, "Couldn't copy zip file member (%s): %s\n", f.Name, err)
 	}
 
 	err = file.Chmod(f.FileInfo().Mode())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't chown extracted file: %s", err)
+		fmt.Fprintf(os.Stderr, "Couldn't chown extracted file: %s\n", err)
 	}
 
 	err = file.Close()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't close extracted file: %s", err)
+		fmt.Fprintf(os.Stderr, "Couldn't close extracted file: %s\n", err)
 	}
 
 	return nil
