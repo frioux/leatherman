@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -142,6 +143,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	es := newEmojiSet(m.Message.Content)
+
+	if strings.Contains(m.Message.Content, "did no back reading") ||
+		strings.Contains(m.Message.Content, "have no back scroll") ||
+		strings.Contains(m.Message.Content, "have no scroll back") ||
+		strings.Contains(m.Message.Content, "have no scrollback") {
+		es.required = append(es.required, "costanza")
+	}
 
 	lucky := rand.Intn(100) == 0
 
