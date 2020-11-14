@@ -79,9 +79,9 @@ func Run(args []string, _ io.Reader) error {
 	}
 
 	for _, f := range ms {
-		if err := extractMember(f); err != nil {
-			fmt.Printf("  inflating: %s\n", f.Name)
+		fmt.Printf("  inflating: %s\n", f.Name)
 
+		if err := extractMember(f); err != nil {
 			return fmt.Errorf("extractMember: %w", err)
 		}
 	}
