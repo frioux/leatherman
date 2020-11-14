@@ -112,9 +112,7 @@ func sanitize(root string, ms []*zip.File) ([]*zip.File, error) {
 
 func extractMember(f *zip.File) error {
 	if f.FileInfo().IsDir() {
-		if err := os.Mkdir(f.Name, os.FileMode(0755)); err != nil {
-			return fmt.Errorf("os.Mkdir: %w", err)
-		}
+		return os.MkdirAll(f.Name, os.FileMode(0755))
 	}
 
 	rc, err := f.Open()
