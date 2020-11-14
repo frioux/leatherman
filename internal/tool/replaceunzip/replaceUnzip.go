@@ -122,9 +122,9 @@ func extractMember(f *zip.File) error {
 	defer rc.Close()
 
 	dir := filepath.Dir(f.Name)
-	err = os.MkdirAll(dir, os.FileMode(0755))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't create directory to extract to: %s", err)
+
+	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't create directory to extract to: %s\n", err)
 		return nil
 	}
 
