@@ -99,7 +99,6 @@ func sanitize(root string, ms []*zip.File) ([]*zip.File, error) {
 		}
 		segments := strings.Split(m.Name, "/")
 		for _, s := range segments {
-			fmt.Println(s)
 			if s == ".." {
 				return nil, errors.New(".. not allowed in member name (Name=" + m.Name + ")")
 			}
