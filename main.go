@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"runtime/trace"
+
+	"github.com/frioux/leatherman/internal/selfupdate"
 )
 
 //go:generate maint/generate-README
@@ -19,6 +21,8 @@ var Dispatch map[string]func([]string, io.Reader) error
 func run() bool {
 	startDebug()
 	defer stopDebug()
+
+	selfupdate.AutoUpdate()
 
 	which := filepath.Base(os.Args[0])
 	args := os.Args
