@@ -2,14 +2,14 @@ package status
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 )
 
 type retropie struct {
-	console, emu, game, command string
+	Console, Emu, Game, Command string
 }
 
 func (v *retropie) load() error {
@@ -26,13 +26,13 @@ func (v *retropie) load() error {
 
 		switch i {
 		case 1:
-			v.console = s.Text()
+			v.Console = s.Text()
 		case 2:
-			v.emu = s.Text()
+			v.Emu = s.Text()
 		case 3:
-			v.game = s.Text()
+			v.Game = s.Text()
 		case 4:
-			v.command = s.Text()
+			v.Command = s.Text()
 		default:
 			return errors.New("runcommand.info longer than expected")
 		}
@@ -43,5 +43,6 @@ func (v *retropie) load() error {
 }
 
 func (v *retropie) render(rw http.ResponseWriter) {
-	fmt.Fprintf(rw, "console=%s, emu=%s, game=%s, command=%s\n", v.console, v.emu, v.game, v.command)
+	e := json.NewEncoder(rw)
+	e.Encode(v)
 }
