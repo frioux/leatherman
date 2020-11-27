@@ -37,7 +37,7 @@ func AutoUpdate() {
 	go func() {
 		rand.Seed(time.Now().UnixNano() & int64(os.Getpid()) & int64(os.Getppid()))
 		for {
-			time.Sleep(time.Duration(rand.Intn(int(time.Minute*60))) + time.Minute*30)
+			time.Sleep(time.Duration(rand.Int63n(int64(time.Minute*60))) + time.Minute*30)
 
 			MaybeUpdate()
 		}
