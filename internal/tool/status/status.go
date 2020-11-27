@@ -38,6 +38,7 @@ func Status(args []string, _ io.Reader) error {
 	mux.Handle("/tabs", &cacher{reloadEvery: time.Second * 2, value: &tabs{}, mu: &sync.Mutex{}})
 	mux.Handle("/vpn", &cacher{reloadEvery: time.Second, value: &vpn{}, mu: &sync.Mutex{}})
 	mux.Handle("/retropie", &cacher{reloadEvery: time.Second, value: &retropie{}, mu: &sync.Mutex{}})
+	mux.Handle("/steambox", &cacher{reloadEvery: time.Second, value: &steambox{}, mu: &sync.Mutex{}})
 
 	s := &sound{}
 	soundCacher := &cacher{reloadEvery: time.Second, value: s, mu: &sync.Mutex{}}

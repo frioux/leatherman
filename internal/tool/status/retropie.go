@@ -39,7 +39,7 @@ func (v *retropie) load() error {
 
 	}
 
-	return nil
+	return s.Err()
 }
 
 func (v *retropie) render(rw http.ResponseWriter) {
