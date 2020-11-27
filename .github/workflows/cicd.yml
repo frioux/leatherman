@@ -21,6 +21,12 @@ jobs:
       - run: xz --stdout leatherman > leatherman-osx.xz
 
       - run: go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
+        env:
+          GOOS: linux
+          GOARCH: arm
+      - run: xz --stdout leatherman > leatherman.arm.xz
+
+      - run: go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
       - run: xz --stdout leatherman > leatherman.xz
 
       - uses: anothrNick/github-tag-action@1.17.2
