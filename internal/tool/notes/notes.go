@@ -2,14 +2,17 @@ package notes
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/frioux/leatherman/internal/dropbox"
@@ -153,20 +156,52 @@ func server() (http.Handler, error) {
 	}))
 
 	mux.Handle("/sup", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		resp, err := lmhttp.Get(req.Context(), "http://retropie:8081/retropie")
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
+		ctx, cancel := context.WithTimeout(req.Context(), 2*time.Second)
+		defer cancel()
+
+		wg := &sync.WaitGroup{}
+		wg.Add(2)
 
 		var rpi struct{ Game string }
-		dec := json.NewDecoder(resp.Body)
-		if err := dec.Decode(&rpi); err != nil {
-			return err
-		}
+		go func() {
+			defer wg.Done()
+			resp, err := lmhttp.Get(ctx, "http://retropie:8081/retropie")
+			if err != nil {
+				// whyyyyy
+				rpi.Game = err.Error()
+				return
+			}
+			defer resp.Body.Close()
+
+			dec := json.NewDecoder(resp.Body)
+			if err := dec.Decode(&rpi); err != nil {
+				// ugh wtf
+				rpi.Game = err.Error()
+			}
+		}()
+
+		var steamos []byte
+		go func() {
+			defer wg.Done()
+			resp, err := lmhttp.Get(ctx, "http://steamos:8081/steambox")
+			if err != nil {
+				// I don't like it
+				steamos = []byte(err.Error())
+				return
+			}
+			defer resp.Body.Close()
+
+			steamos, err = ioutil.ReadAll(resp.Body)
+			if err != nil {
+				// I should have thought this through more carefully
+				steamos = []byte(err.Error())
+			}
+		}()
+
+		wg.Wait()
 
 		fmt.Fprintf(rw, prelude, "now: sup")
-		fmt.Fprintf(rw, "retropie: %s\n", rpi.Game)
+		fmt.Fprintf(rw, "retropie: %s<br>steamos: %s", rpi.Game, steamos)
 
 		return nil
 	}))
