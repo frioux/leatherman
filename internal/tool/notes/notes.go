@@ -2,6 +2,7 @@ package notes
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/frioux/leatherman/internal/dropbox"
+	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
@@ -29,7 +31,8 @@ const prelude = `<!DOCTYPE html>
 <title>%s</title>
 <link rel="icon" href="/favicon">
 </head>
-<a href="/list">list</a> | <a href="/">now</a><br><br>
+<a href="/list">list</a> | <a href="/sup">sup</a> | <a href="/">now</a>
+<br><br>
 `
 
 /*
@@ -147,6 +150,25 @@ func server() (http.Handler, error) {
 
 		fmt.Fprintf(rw, prelude, "now: list")
 		return mdwn.Convert(buf.Bytes(), rw)
+	}))
+
+	mux.Handle("/sup", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		resp, err := lmhttp.Get(req.Context(), "http://retropie:8081/retropie")
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		var rpi struct{ Game string }
+		dec := json.NewDecoder(resp.Body)
+		if err := dec.Decode(&rpi); err != nil {
+			return err
+		}
+
+		fmt.Fprintf(rw, prelude, "now: sup")
+		fmt.Fprintf(rw, "retropie: %s\n", rpi.Game)
+
+		return nil
 	}))
 
 	mux.Handle("/render", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
