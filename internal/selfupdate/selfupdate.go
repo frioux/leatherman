@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"net/http"
 	"os"
 	"runtime"
 	"strings"
@@ -16,7 +17,9 @@ import (
 	"github.com/ulikunitz/xz"
 )
 
-// MaybeUpdate will check for an update and install it immediately.
+// MaybeUpdate will check for an update and install it immediately.  If
+// the LM_GH_TOKEN environment variable is set, it will be treated as a
+// github personal access token, instead of anonymous access.
 func MaybeUpdate() {
 	url := checkUpdate()
 	if url == "" {
@@ -28,7 +31,10 @@ func MaybeUpdate() {
 }
 
 // AutoUpdate will periodically check for an update (a little over hourly) and
-// install it unless the LM_DISABLE_SELFUPDATE env var is set.
+// install it unless the LM_DISABLE_SELFUPDATE env var is set.  If the
+// LM_GH_TOKEN environment variable is set this will check more often (closer
+// to every minute.)  The Token should have public_repo access.  The token
+// should include the `Basic ` prefix.
 func AutoUpdate() {
 	if os.Getenv("LM_DISABLE_SELFUPDATE") != "" {
 		return
@@ -37,7 +43,11 @@ func AutoUpdate() {
 	go func() {
 		rand.Seed(time.Now().UnixNano() & int64(os.Getpid()) & int64(os.Getppid()))
 		for {
-			time.Sleep(time.Duration(rand.Int63n(int64(time.Minute*60))) + time.Minute*30)
+			if os.Getenv("LM_GH_TOKEN") == "" {
+				time.Sleep(time.Duration(rand.Int63n(int64(time.Minute*60))) + time.Minute*30)
+			} else {
+				time.Sleep(time.Duration(rand.Int63n(int64(time.Second*30))) + time.Second*30)
+			}
 
 			MaybeUpdate()
 		}
@@ -125,7 +135,17 @@ func checkUpdate() string {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	resp, err := lmhttp.Get(ctx, "https://api.github.com/repos/frioux/leatherman/releases/latest")
+	req, err := lmhttp.NewRequest(ctx, "GET", "https://api.github.com/repos/frioux/leatherman/releases/latest", nil)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error creating request: %s\n", err)
+		return ""
+	}
+
+	if e := os.Getenv("LM_GH_TOKEN"); e != "" {
+		req.Header.Set("Authorization", e)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error finding latest leatherman: %s\n", err)
 		return ""
