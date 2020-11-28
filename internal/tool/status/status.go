@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/frioux/leatherman/internal/version"
+	"github.com/frioux/leatherman/internal/selfupdate"
 )
 
 /*
@@ -35,7 +35,7 @@ func Status(args []string, _ io.Reader) error {
 		}
 	}))
 
-	mux.Handle("/version", version.Handler)
+	mux.Handle("/version", selfupdate.Handler)
 	mux.Handle("/locked", &cacher{reloadEvery: time.Second, value: &locked{}, mu: &sync.Mutex{}})
 	mux.Handle("/curwindow", &cacher{reloadEvery: time.Second, value: &curWindow{}, mu: &sync.Mutex{}})
 	mux.Handle("/tabs", &cacher{reloadEvery: time.Second * 2, value: &tabs{}, mu: &sync.Mutex{}})

@@ -17,7 +17,7 @@ import (
 
 	"github.com/frioux/leatherman/internal/dropbox"
 	"github.com/frioux/leatherman/internal/lmhttp"
-	"github.com/frioux/leatherman/internal/version"
+	"github.com/frioux/leatherman/internal/selfupdate"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
@@ -113,7 +113,7 @@ func server() (http.Handler, error) {
 		fmt.Fprintln(rw, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">☕</text></svg>`)
 	}))
 
-	mux.Handle("/version", version.Handler)
+	mux.Handle("/version", selfupdate.Handler)
 
 	mux.Handle("/", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		r, err := db.Download(nowPath)

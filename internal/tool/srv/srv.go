@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/frioux/leatherman/internal/version"
+	"github.com/frioux/leatherman/internal/selfupdate"
 )
 
 /*
@@ -71,7 +71,7 @@ func logReqs(h http.Handler) http.Handler {
 		fmt.Fprintln(os.Stderr, time.Now(), r.URL)
 
 		if r.URL.Path == "/version" {
-			version.Handler.ServeHTTP(rw, r)
+			selfupdate.Handler.ServeHTTP(rw, r)
 			return
 		}
 
