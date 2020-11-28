@@ -43,7 +43,7 @@ func AutoUpdate() {
 	go func() {
 		rand.Seed(time.Now().UnixNano() & int64(os.Getpid()) & int64(os.Getppid()))
 		for {
-			if os.Getenv("LM_GH_TOKEN") == "" {
+			if token == "" {
 				time.Sleep(time.Duration(rand.Int63n(int64(time.Minute*60))) + time.Minute*30)
 			} else {
 				time.Sleep(time.Duration(rand.Int63n(int64(time.Second*30))) + time.Second*30)
@@ -131,6 +131,8 @@ func doUpdate(url string) {
 	}
 }
 
+var token = os.Getenv("LM_GH_TOKEN")
+
 func checkUpdate() string {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -141,8 +143,8 @@ func checkUpdate() string {
 		return ""
 	}
 
-	if e := os.Getenv("LM_GH_TOKEN"); e != "" {
-		req.Header.Set("Authorization", e)
+	if token != "" {
+		req.Header.Set("Authorization", token)
 	}
 
 	resp, err := http.DefaultClient.Do(req)
@@ -152,8 +154,9 @@ func checkUpdate() string {
 	}
 	defer resp.Body.Close()
 
-	if h := resp.Header.Get("X-RateLimit-Limit"); os.Getenv("LM_GH_TOKEN") != "" && h != "5000" {
-		fmt.Fprintf(os.Stderr, "X-RateLimit-Limit wasn't 5000, your auth token might be invalid (was %s)\n", h)
+	if h := resp.Header.Get("X-RateLimit-Limit"); token != "" && h != "5000" {
+		fmt.Fprintf(os.Stderr, "X-RateLimit-Limit wasn't 5000, your auth token might be invalid (was %s); disabling token\n", h)
+		token = ""
 	}
 
 	var found struct {
