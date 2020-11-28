@@ -152,7 +152,7 @@ func checkUpdate() string {
 	}
 	defer resp.Body.Close()
 
-	if h := resp.Header.Get("X-RateLimit-Limit"); h != "5000" {
+	if h := resp.Header.Get("X-RateLimit-Limit"); os.Getenv("LM_GH_TOKEN") != "" && h != "5000" {
 		fmt.Fprintf(os.Stderr, "X-RateLimit-Limit wasn't 5000, your auth token might be invalid (was %s)\n", h)
 	}
 
