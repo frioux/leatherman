@@ -14,7 +14,6 @@ jobs:
     strategy:
         matrix:
           cur:
-            - {GOOS: windows, GOARCH: amd64, outfile: leatherman.win.xz}
             - {GOOS: linux, GOARCH: amd64, outfile: leatherman.xz}
             - {GOOS: linux, GOARCH: arm, outfile: leatherman.arm.xz}
             - {GOOS: darwin, GOARCH: amd64, outfile: leatherman.mac.xz}
@@ -31,8 +30,22 @@ jobs:
           name: ${{ matrix.cur.outfile }}
           path: ${{ matrix.cur.outfile }}
 
+  build-windows:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: go build -o leatherman.exe -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
+        env:
+          GOOS: windows
+          GOARCH: amd64
+      - run: zip leatherman-windows.zip leatherman.exe
+      - uses: actions/upload-artifact@master
+        with:
+          name: leatherman.zip
+          path: leatherman.zip
+
   release:
-    needs: [test, build]
+    needs: [test, build, build-windows]
     runs-on: ubuntu-20.04
     outputs:
         upload_url: ${{ steps.create_release.outputs.upload_url}}
@@ -55,7 +68,7 @@ jobs:
     needs: [release]
     strategy:
         matrix:
-          file: ['leatherman.xz', 'leatherman.win.xz', 'leatherman.arm.xz', 'leatherman.mac.xz']
+          file: ['leatherman.xz', 'leatherman-windows.zip', 'leatherman.arm.xz', 'leatherman.mac.xz']
 
     runs-on: ubuntu-20.04
     steps:
