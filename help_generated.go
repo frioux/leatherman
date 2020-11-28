@@ -452,6 +452,12 @@ $ uni ⢾
 '⢾' @ 10430 aka BRAILLE PATTERN DOTS-234568 ( graphic | printable | symbol )
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `update` + "`" + `
+
+` + "`" + `update` + "`" + ` checks to see if there's an update from github and installs it if there
+is.  If LM_GH_TOKEN is set to a personal access token this can be called more
+frequently without exhausting github api limits.
+
 ### ` + "`" + `yaml2json` + "`" + `
 
 ` + "`" + `yaml2json` + "`" + ` reads YAML on stdin and writes JSON on stdout.
@@ -555,6 +561,8 @@ func init() {
 
 		"uni": readme[12681:12843],
 
-		"yaml2json": readme[12843:12920],
+		"update": readme[12843:13066],
+
+		"yaml2json": readme[13066:13143],
 	}
 }

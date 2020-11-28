@@ -29,6 +29,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/status"
 	"github.com/frioux/leatherman/internal/tool/toml"
 	"github.com/frioux/leatherman/internal/tool/uni"
+	"github.com/frioux/leatherman/internal/tool/update"
 	"github.com/frioux/leatherman/internal/tool/yaml"
 )
 
@@ -67,6 +68,7 @@ func init() {
 		"status":               status.Status,
 		"toml2json":            toml.ToJSON,
 		"uni":                  uni.Describe,
+		"update":               update.Update,
 		"yaml2json":            yaml.ToJSON,
 
 		"help":    Help,
