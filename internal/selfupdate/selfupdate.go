@@ -68,6 +68,8 @@ func whichFilename() string {
 	}
 }
 
+var mostRecentFailure error
+
 func doUpdate(url string) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -77,43 +79,55 @@ func doUpdate(url string) {
 		oldp = os.Args[0] + ".old"
 	)
 
+	var err error
+	defer func() {
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			mostRecentFailure = err
+		}
+	}()
+
 	f, err := os.Create(newp)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't make file to update: %s\n", err)
+		err = fmt.Errorf("couldn't make file to update: %w", err)
 		return
 	}
 	resp, err := lmhttp.Get(ctx, url)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't download update: %s\n", err)
+		err = fmt.Errorf("couldn't download update: %w", err)
 		return
 	}
 
 	xzr, err := xz.NewReader(resp.Body)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't decompress update: %s\n", err)
+		err = fmt.Errorf("couldn't decompress update: %w", err)
 		return
 	}
 
 	// download to os.Args[0] + ".new"
-	if _, err := io.Copy(f, xzr); err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't write update: %s\n", err)
+	_, err = io.Copy(f, xzr)
+	if err != nil {
+		err = fmt.Errorf("couldn't write update: %w", err)
 		return
 	}
 
-	if err := os.Chmod(newp, 0755); err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't chmod update: %s\n", err)
+	err = os.Chmod(newp, 0755)
+	if err != nil {
+		err = fmt.Errorf("couldn't chmod update: %w", err)
 		return
 	}
 
 	// move os.Args[0] to + ".old"
-	if err := os.Rename(curp, oldp); err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't rename original file: %s\n", err)
+	err = os.Rename(curp, oldp)
+	if err != nil {
+		err = fmt.Errorf("couldn't rename original file: %w", err)
 		return
 	}
 
 	// move .new
-	if err := os.Rename(newp, curp); err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't rename new file: %s\n", err)
+	err = os.Rename(newp, curp)
+	if err != nil {
+		err = fmt.Errorf("couldn't rename new file: %w", err)
 		return
 	}
 
@@ -125,8 +139,9 @@ func doUpdate(url string) {
 	}()
 
 	// remove .old
-	if err := os.Remove(os.Args[0] + ".old"); err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't remove old file: %s\n", err)
+	err = os.Remove(os.Args[0] + ".old")
+	if err != nil {
+		err = fmt.Errorf("couldn't remove old file: %w", err)
 		return
 	}
 }
@@ -137,9 +152,17 @@ func checkUpdate() string {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
+	var err error
+	defer func() {
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			mostRecentFailure = err
+		}
+	}()
+
 	req, err := lmhttp.NewRequest(ctx, "GET", "https://api.github.com/repos/frioux/leatherman/releases/latest", nil)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error creating request: %s\n", err)
+		err = fmt.Errorf("error creating request: %w", err)
 		return ""
 	}
 
@@ -149,7 +172,7 @@ func checkUpdate() string {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error finding latest leatherman: %s\n", err)
+		err = fmt.Errorf("error finding latest leatherman: %w", err)
 		return ""
 	}
 	defer resp.Body.Close()
@@ -166,8 +189,9 @@ func checkUpdate() string {
 		}
 	}
 	d := json.NewDecoder(resp.Body)
-	if err := d.Decode(&found); err != nil {
-		fmt.Fprintf(os.Stderr, "error parsing json for latest leatherman: %s\n", err)
+	err = d.Decode(&found)
+	if err != nil {
+		err = fmt.Errorf("error parsing json for latest leatherman: %w", err)
 		return ""
 	}
 

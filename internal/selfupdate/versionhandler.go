@@ -16,6 +16,10 @@ var Handler = http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 		rw.WriteHeader(500)
 	}
 
+	if mostRecentFailure != nil {
+		fmt.Fprintf(rw, "update failure: %s\n\n", mostRecentFailure)
+	}
+
 	fmt.Fprintln(rw, "version:", version.Version)
 
 	for _, dep := range bi.Deps {
