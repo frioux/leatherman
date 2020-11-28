@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/frioux/leatherman/internal/version"
 )
 
 /*
@@ -67,6 +69,12 @@ func Serve(args []string, _ io.Reader) error {
 func logReqs(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(os.Stderr, time.Now(), r.URL)
+
+		if r.URL.Path == "/version" {
+			version.Handler.ServeHTTP(rw, r)
+			return
+		}
+
 		h.ServeHTTP(rw, r)
 	})
 }

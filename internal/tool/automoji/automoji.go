@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/frioux/leatherman/internal/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/expfmt"
@@ -139,6 +140,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Message.Content == "||hidden knowledge||" {
 		messageCreateTotal.WithLabelValues("hidden_knowledge").Inc()
 		showMetrics(s, m.ChannelID)
+		return
+	}
+
+	if m.Message.Content == "||version||" {
+		messageCreateTotal.WithLabelValues("version").Inc()
+		s.ChannelMessageSend(m.ChannelID, version.Version)
 		return
 	}
 
