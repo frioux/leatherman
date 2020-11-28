@@ -146,7 +146,10 @@ func doUpdate(url string) {
 	}
 }
 
-var token = os.Getenv("LM_GH_TOKEN")
+var (
+	token        = os.Getenv("LM_GH_TOKEN")
+	invalidToken bool
+)
 
 func checkUpdate() string {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
@@ -178,6 +181,7 @@ func checkUpdate() string {
 	defer resp.Body.Close()
 
 	if h := resp.Header.Get("X-RateLimit-Limit"); token != "" && h != "5000" {
+		invalidToken = true
 		fmt.Fprintf(os.Stderr, "X-RateLimit-Limit wasn't 5000, your auth token might be invalid (was %s); disabling token\n", h)
 		token = ""
 	}

@@ -20,6 +20,10 @@ var Handler = http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 		fmt.Fprintf(rw, "update failure: %s\n\n", mostRecentFailure)
 	}
 
+	if invalidToken {
+		fmt.Fprintf(rw, "token is invalid, only updating hourly\n\n")
+	}
+
 	fmt.Fprintln(rw, "version:", version.Version)
 
 	for _, dep := range bi.Deps {
