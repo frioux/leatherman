@@ -1,7 +1,7 @@
 on: [push]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -10,25 +10,33 @@ jobs:
         env:
           TZ: America/Los_Angeles
 
-      - run: go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
+  build:
+    strategy:
+        matrix:
+          cur:
+            - {GOOS: windows, GOARCH: amd64, outfile: leatherman.win.xz}
+            - {GOOS: linux, GOARCH: amd64, outfile: leatherman.xz}
+            - {GOOS: linux, GOARCH: arm, outfile: leatherman.arm.xz}
+            - {GOOS: darwin, GOARCH: amd64, outfile: leatherman.mac.xz}
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: go build -o leatherman -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
         env:
-          GOOS: windows
-      - run: zip leatherman.zip leatherman.exe
+          GOOS: ${{ matrix.cur.GOOS }}
+          GOARCH: ${{ matrix.cur.GOARCH }}
+      - run: xz --stdout leatherman > ${{ matrix.cur.outfile}}
+      - uses: actions/upload-artifact@master
+        with:
+          name: ${{ matrix.cur.outfile }}
+          path: ${{ matrix.cur.outfile }}
 
-      - run: go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
-        env:
-          GOOS: darwin
-      - run: xz --stdout leatherman > leatherman-osx.xz
-
-      - run: go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
-        env:
-          GOOS: linux
-          GOARCH: arm
-      - run: xz --stdout leatherman > leatherman.arm.xz
-
-      - run: go build -ldflags "-X 'github.com/frioux/leatherman/internal/version.Version=$GITHUB_SHA' -X 'github.com/frioux/leatherman/internal/version.When=$(git log -1 --pretty=%cI $GITHUB_SHA 2>/dev/null)'"
-      - run: xz --stdout leatherman > leatherman.xz
-
+  release:
+    needs: [test, build]
+    runs-on: ubuntu-20.04
+    outputs:
+        upload_url: ${{ steps.create_release.outputs.upload_url}}
+    steps:
       - uses: anothrNick/github-tag-action@1.17.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -42,39 +50,26 @@ jobs:
         with:
           tag_name: untagged-${{ github.sha }}
           release_name: Release ${{ github.sha }}
+
+  upload:
+    needs: [release]
+    strategy:
+        matrix:
+          file: ['leatherman.xz', 'leatherman.win.xz', 'leatherman.arm.xz', 'leatherman.mac.xz']
+
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: ${{ matrix.file }}
+          path: ${{ matrix.file }}
+
       - uses: actions/upload-release-asset@v1
         if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./leatherman.zip
-          asset_name: leatherman.zip
-          asset_content_type: application/zip
-      - uses: actions/upload-release-asset@v1
-        if: github.ref == 'refs/heads/main'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./leatherman.xz
-          asset_name: leatherman.xz
-          asset_content_type: application/x-xz
-      - uses: actions/upload-release-asset@v1
-        if: github.ref == 'refs/heads/main'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./leatherman-osx.xz
-          asset_name: leatherman-osx.xz
-          asset_content_type: application/x-xz
-      - uses: actions/upload-release-asset@v1
-        if: github.ref == 'refs/heads/main'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./leatherman.arm.xz
-          asset_name: leatherman.arm.xz
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./${{ matrix.file }}
+          asset_name: ${{ matrix.file }}
           asset_content_type: application/x-xz
