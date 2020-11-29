@@ -34,3 +34,7 @@ var Handler = http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 		}
 	}
 })
+
+func init() {
+	http.DefaultServeMux.Handle("/version", Handler)
+}
