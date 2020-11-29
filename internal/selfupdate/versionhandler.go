@@ -3,6 +3,7 @@ package selfupdate
 import (
 	"fmt"
 	"net/http"
+	"runtime"
 	"runtime/debug"
 
 	"github.com/frioux/leatherman/internal/version"
@@ -24,7 +25,8 @@ var Handler = http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 		fmt.Fprintf(rw, "token is invalid, only updating hourly\n\n")
 	}
 
-	fmt.Fprintln(rw, "version:", version.Version)
+	fmt.Fprintf(rw, "Leatherman built from %s on %s by with %s\n",
+		version.Version, version.When, runtime.Version())
 
 	for _, dep := range bi.Deps {
 		fmt.Fprintf(rw, "%s@%s (%s)\n", dep.Path, dep.Version, dep.Sum)
