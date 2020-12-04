@@ -4,14 +4,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	corehtml "html"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -229,7 +232,65 @@ func server() (http.Handler, error) {
 		}
 
 		fmt.Fprintf(rw, prelude, "now: "+a.Title)
+		fmt.Fprintf(rw, `<br><a href="/update?file=%s">Update %s</a><br>`, f, f)
 		return mdwn.Convert(a.Body, rw)
+	}))
+
+	mux.Handle("/update", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		switch req.Method {
+		case "GET":
+			f := req.URL.Query().Get("file")
+			if f == "" {
+				return errors.New("file parameter required")
+			}
+
+			r, err := db.Download(dir + f)
+			if err != nil {
+				return err
+			}
+
+			b, err := ioutil.ReadAll(r)
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(rw, prelude, "now: update "+f)
+			const form = `
+<form action="/update" method="post">
+	<input type="hidden" name="file" value="%s" />
+	<textarea rows="50" cols="80" name="value">%s</textarea>
+	<button>Save</button>
+</form>
+			`
+			fmt.Fprintf(rw, form, f, corehtml.EscapeString(string(b)))
+			return nil
+		case "POST":
+			f := req.FormValue("file")
+			if f == "" {
+				return errors.New("file parameter required")
+			}
+
+			b := req.FormValue("value")
+			if b == "" {
+				return errors.New("value parameter required")
+			}
+
+			b = strings.ReplaceAll(b, "\r", "") // unix files only!
+			err = db.Create(dropbox.UploadParams{
+				Path: dir + f,
+				Mode: "overwrite",
+			}, strings.NewReader(b))
+			if err != nil {
+				return err
+			}
+			rw.Header().Add("Location", "/render?file="+f)
+			rw.WriteHeader(303)
+			fmt.Fprint(rw, "Successfully updated")
+			return nil
+		default:
+			return errors.New("invalid method for /update")
+		}
+		return nil
 	}))
 
 	mux.Handle("/toggle", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
