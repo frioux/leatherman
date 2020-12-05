@@ -46,7 +46,7 @@ func AutoUpdate() {
 		h.WriteByte(byte(os.Getpid()))
 		h.WriteByte(byte(os.Getppid()))
 		if n, err := os.Hostname(); err == nil {
-			h.Write([]byte(n))
+			h.WriteString(n)
 		}
 
 		rand.Seed(int64(h.Sum64()))
