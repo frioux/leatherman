@@ -15,6 +15,10 @@ type retropie struct {
 func (v *retropie) load() error {
 	f, err := os.Open("/run/shm/runcommand.info")
 	if err != nil {
+		if os.IsNotExist(err) {
+			v.Game = "n/a"
+			return nil
+		}
 		return err
 	}
 
