@@ -206,7 +206,7 @@ func BenchmarkLoadNilNil(b *testing.B) {
 		if err != nil {
 			b.Fatalf("couldn't create zine: %s", err)
 		}
-		z.root = "../content"
+		z.root = "testdata"
 
 		b.StartTimer()
 		if err := z.load(nil); err != nil {
@@ -231,7 +231,7 @@ func BenchmarkLoadXY(b *testing.B) {
 		if err != nil {
 			b.Fatalf("couldn't create zine: %s", err)
 		}
-		z.root = "../content"
+		z.root = "testdata"
 
 		b.StartTimer()
 		var as []article
