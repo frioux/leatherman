@@ -462,6 +462,10 @@ frequently without exhausting github api limits.
 
 ` + "`" + `yaml2json` + "`" + ` reads YAML on stdin and writes JSON on stdout.
 
+### ` + "`" + `zine` + "`" + `
+
+` + "`" + `zine` + "`" + ` does read only operations on notes.
+
 ## Debugging
 
 In an effort to make debugging simpler, I've created three ways to see what
@@ -564,5 +568,7 @@ func init() {
 		"update": readme[12843:13066],
 
 		"yaml2json": readme[13066:13143],
+
+		"zine": readme[13143:13199],
 	}
 }
