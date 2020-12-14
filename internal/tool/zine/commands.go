@@ -1,0 +1,232 @@
+package zine
+
+import (
+	"bytes"
+	"errors"
+	"flag"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"text/template"
+)
+
+var commands = map[string]func([]string) error{
+	"render": Render,
+	"q":      Q,
+	"debug":  Debug,
+}
+
+/*
+Run does read only operations on notes.
+
+Command: zine
+*/
+func Run(args []string, _ io.Reader) error {
+	command := "render"
+	if len(args) > 1 {
+		command = args[1]
+	}
+
+	cmd, ok := commands[command]
+	if !ok {
+		return fmt.Errorf("unknown command «%s»; valid commands are 'render' and 'q'\n", command)
+	}
+
+	if err := cmd(args[1:]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Q runs a query against the corpus.
+func Q(args []string) error {
+	var root, sql, tpl string
+
+	flags := flag.NewFlagSet("q", flag.ContinueOnError)
+	flags.StringVar(&root, "root", "./content", "root input directory")
+	flags.StringVar(&sql, "sql", "SELECT * FROM _", "sql to run")
+	flags.StringVar(&tpl, "tpl", `{{join . "\t"}}`, "template to run")
+	if err := flags.Parse(args[1:]); err != nil {
+		return err
+	}
+
+	t := template.New("x")
+	t.Funcs(template.FuncMap{
+		"join": func(is map[string]interface{}, sep string) string {
+			s := make([]string, 0, len(is))
+			for i := range is {
+				s = append(s, fmt.Sprint(is[i]))
+			}
+			return strings.Join(s, sep)
+		},
+	})
+
+	t, err := t.Parse(tpl)
+	if err != nil {
+		return err
+	}
+
+	z, err := newZine()
+	if err != nil {
+		return err
+	}
+	z.root = root
+	if err := z.load(nil); err != nil {
+		return err
+	}
+
+	ret, err := z.q(sql, flags.Args()...)
+	if err != nil {
+		return err
+	}
+
+	for _, out := range ret {
+		if err := t.Execute(os.Stdout, out); err != nil {
+			return err
+		}
+		fmt.Println()
+	}
+	return nil
+}
+
+// Render will convert the corpus to html.
+func Render(args []string) error {
+	var root, out, static string
+
+	flags := flag.NewFlagSet("render", flag.ContinueOnError)
+	flags.StringVar(&root, "root", "./content", "root input directory")
+	flags.StringVar(&out, "out", "./public", "directory to render output to")
+	flags.StringVar(&static, "static", "./static", "directory to prepopulate out with")
+	if err := flags.Parse(args[1:]); err != nil {
+		return err
+	}
+
+	z, err := newZine()
+	if err != nil {
+		return err
+	}
+	z.root = root
+
+	metas := []article{}
+	if err := z.load(&metas); err != nil {
+		return err
+	}
+
+	if err := os.RemoveAll(out); err != nil {
+		return err
+	}
+
+	if err := filepath.Walk(static, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+
+		rel, err := filepath.Rel(static, path)
+		if err != nil {
+			return err
+		}
+		dir := filepath.Dir(rel)
+		if err := os.MkdirAll(filepath.Join(out, dir), 0755); err != nil {
+			return err
+		}
+
+		from, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer from.Close()
+
+		to, err := os.Create(filepath.Join(out, rel))
+		if err != nil {
+			return err
+		}
+		defer to.Close()
+
+		if _, err := io.Copy(to, from); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	for i := range metas {
+		// don't be running on windows
+		dir := filepath.Join(out, metas[i].URL)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return fmt.Errorf("couldn't create dir for %s: %w", metas[i].Filename, err)
+		}
+
+		b, err := z.render(metas[i])
+		if err != nil {
+			return fmt.Errorf("couldn't render %s: %w", metas[i].Filename, err)
+		}
+
+		f, err := os.Create(filepath.Join(dir, "index.html"))
+		if err != nil {
+			return fmt.Errorf("couldn't create %s: %w", filepath.Join(dir, "index.html"), err)
+		}
+
+		if _, err := io.Copy(f, bytes.NewReader(b)); err != nil {
+			return fmt.Errorf("couldn't copy: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func Debug(args []string) error {
+	var root, file string
+
+	flags := flag.NewFlagSet("debug", flag.ContinueOnError)
+	flags.StringVar(&root, "root", "./content", "root input directory")
+	flags.StringVar(&file, "file", "", "file to render to markdown")
+	if err := flags.Parse(args[1:]); err != nil {
+		return err
+	}
+
+	if file == "" {
+		return errors.New("-file argument is required")
+	}
+
+	fileMatcher, err := regexp.Compile(file)
+	if err != nil {
+		return err
+	}
+
+	z, err := newZine()
+	if err != nil {
+		return err
+	}
+	z.root = root
+
+	metas := []article{}
+	if err := z.load(&metas); err != nil {
+		return err
+	}
+
+	for i := range metas {
+		if !fileMatcher.MatchString(metas[i].Filename) {
+			continue
+		}
+
+		b, err := z.renderToMarkdown(metas[i])
+		if err != nil {
+			return fmt.Errorf("couldn't render %s: %w", metas[i].Filename, err)
+		}
+
+		if _, err := io.Copy(os.Stdout, bytes.NewReader(b)); err != nil {
+			return fmt.Errorf("couldn't copy: %w", err)
+		}
+	}
+
+	return nil
+}

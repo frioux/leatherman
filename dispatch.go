@@ -31,6 +31,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/uni"
 	"github.com/frioux/leatherman/internal/tool/update"
 	"github.com/frioux/leatherman/internal/tool/yaml"
+	"github.com/frioux/leatherman/internal/tool/zine"
 )
 
 func init() {
@@ -70,6 +71,7 @@ func init() {
 		"uni":                  uni.Describe,
 		"update":               update.Update,
 		"yaml2json":            yaml.ToJSON,
+		"zine":                 zine.Run,
 
 		"help":    Help,
 		"version": Version,

@@ -15,6 +15,8 @@ require (
 	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
 	github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f
 	github.com/icza/mighty v0.0.0-20180919140131-cfd07d671de6 // indirect
+	github.com/jmoiron/sqlx v1.2.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.5 // indirect
 	github.com/pierrec/lz4/v3 v3.3.2
 	github.com/prometheus/client_golang v1.8.0
 	github.com/prometheus/common v0.15.0
