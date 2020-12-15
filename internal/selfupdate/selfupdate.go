@@ -79,21 +79,27 @@ func whichFilename() string {
 var mostRecentFailure error
 
 func doUpdate(url string) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-	var (
-		curp = os.Args[0]
-		newp = os.Args[0] + ".new"
-		oldp = os.Args[0] + ".old"
-	)
-
 	var err error
+
 	defer func() {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			mostRecentFailure = err
 		}
 	}()
+
+	curp, err := os.Executable()
+	if err != nil {
+		err = fmt.Errorf("couldn't get os.Executable: %w", err)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	var (
+		newp = curp + ".new"
+		oldp = curp + ".old"
+	)
 
 	f, err := os.Create(newp)
 	if err != nil {
