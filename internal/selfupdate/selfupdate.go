@@ -41,6 +41,17 @@ func AutoUpdate() {
 		return
 	}
 
+	// if there's a tty connected do not do auto-update, since it could
+	// restart the process.  Let that happen either to a service or
+	// intentionally by the user.
+	if fi, _ := os.Stdout.Stat(); fi.Mode()&os.ModeCharDevice != 0 {
+		return
+	}
+
+	if fi, _ := os.Stdin.Stat(); fi.Mode()&os.ModeCharDevice != 0 {
+		return
+	}
+
 	go func() {
 		h := &maphash.Hash{}
 		h.WriteByte(byte(os.Getpid()))
