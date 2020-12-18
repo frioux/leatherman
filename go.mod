@@ -21,7 +21,7 @@ require (
 	github.com/prometheus/client_golang v1.9.0
 	github.com/prometheus/common v0.15.0
 	github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3
-	github.com/ulikunitz/xz v0.5.8
+	github.com/ulikunitz/xz v0.5.9
 	github.com/yuin/goldmark v1.3.0
 	golang.org/x/text v0.3.4
 )
