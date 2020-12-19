@@ -1,11 +1,12 @@
 package zine
 
-
 import (
 	"database/sql"
 	"os"
 
 	"github.com/jmoiron/sqlx"
+
+	_ "modernc.org/sqlite"
 )
 
 type db struct {
@@ -26,8 +27,26 @@ func newDB() (*db, error) {
 		return nil, err
 	}
 
-	dbh, err = sqlx.Open("sqlite3", "file:.posts.db?_sync=OFF&_journal=OFF&_vacuum=0")
+	dbh, err = sqlx.Open("sqlite", "file:.posts.db?_sync=OFF&_journal=OFF&_vacuum=0")
 	if err != nil {
+		return nil, err
+	}
+
+	if _, err := dbh.Exec(`
+		PRAGMA journal_mode = OFF
+	`); err != nil {
+		return nil, err
+	}
+
+	if _, err := dbh.Exec(`
+		PRAGMA synchronous = OFF
+	`); err != nil {
+		return nil, err
+	}
+
+	if _, err := dbh.Exec(`
+		PRAGMA auto_vacuum = OFF
+	`); err != nil {
 		return nil, err
 	}
 

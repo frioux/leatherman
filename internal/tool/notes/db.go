@@ -6,7 +6,8 @@ import (
 
 	"github.com/frioux/leatherman/internal/dropbox"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
+
+	_ "modernc.org/sqlite"
 )
 
 func loadDB(cl dropbox.Client) (*sqlx.DB, func(), error) {
@@ -30,8 +31,26 @@ func loadDB(cl dropbox.Client) (*sqlx.DB, func(), error) {
 		return nil, cleanup, err
 	}
 
-	dbh, err := sqlx.Open("sqlite3", "file:"+d+"/.posts.db?_sync=OFF&_journal=OFF&_vacuum=0")
+	dbh, err := sqlx.Open("sqlite", "file:"+d+"/.posts.db")
 	if err != nil {
+		return nil, cleanup, err
+	}
+
+	if _, err := dbh.Exec(`
+		PRAGMA journal_mode = OFF
+	`); err != nil {
+		return nil, cleanup, err
+	}
+
+	if _, err := dbh.Exec(`
+		PRAGMA synchronous = OFF
+	`); err != nil {
+		return nil, cleanup, err
+	}
+
+	if _, err := dbh.Exec(`
+		PRAGMA auto_vacuum = OFF
+	`); err != nil {
 		return nil, cleanup, err
 	}
 

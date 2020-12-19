@@ -16,7 +16,6 @@ require (
 	github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f
 	github.com/icza/mighty v0.0.0-20180919140131-cfd07d671de6 // indirect
 	github.com/jmoiron/sqlx v1.2.0
-	github.com/mattn/go-sqlite3 v1.14.5
 	github.com/pierrec/lz4/v3 v3.3.2
 	github.com/prometheus/client_golang v1.9.0
 	github.com/prometheus/common v0.15.0
@@ -24,6 +23,7 @@ require (
 	github.com/ulikunitz/xz v0.5.9
 	github.com/yuin/goldmark v1.3.0
 	golang.org/x/text v0.3.4
+	modernc.org/sqlite v1.7.5
 )
 
 go 1.14

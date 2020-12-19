@@ -10,7 +10,6 @@ import (
 	"strings"
 	"text/template"
 
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/tailscale/hujson"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
