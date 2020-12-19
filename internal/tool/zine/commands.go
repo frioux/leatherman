@@ -14,36 +14,13 @@ import (
 )
 
 var commands = map[string]func([]string) error{
-	"render": Render,
-	"q":      Q,
-	"debug":  Debug,
+	"render": render,
+	"q":      q,
+	"debug":  debug,
 }
 
-/*
-Run does read only operations on notes.
-
-Command: zine
-*/
-func Run(args []string, _ io.Reader) error {
-	command := "render"
-	if len(args) > 1 {
-		command = args[1]
-	}
-
-	cmd, ok := commands[command]
-	if !ok {
-		return fmt.Errorf("unknown command «%s»; valid commands are 'render' and 'q'\n", command)
-	}
-
-	if err := cmd(args[1:]); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Q runs a query against the corpus.
-func Q(args []string) error {
+// q runs a query against the corpus.
+func q(args []string) error {
 	var root, sql, tpl string
 
 	flags := flag.NewFlagSet("q", flag.ContinueOnError)
@@ -93,8 +70,8 @@ func Q(args []string) error {
 	return nil
 }
 
-// Render will convert the corpus to html.
-func Render(args []string) error {
+// render will convert the corpus to html.
+func render(args []string) error {
 	var root, out, static string
 
 	flags := flag.NewFlagSet("render", flag.ContinueOnError)
@@ -183,7 +160,7 @@ func Render(args []string) error {
 	return nil
 }
 
-func Debug(args []string) error {
+func debug(args []string) error {
 	var root, file string
 
 	flags := flag.NewFlagSet("debug", flag.ContinueOnError)

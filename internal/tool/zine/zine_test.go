@@ -253,7 +253,7 @@ func TestFullRender(t *testing.T) {
 	}
 	defer os.RemoveAll(d)
 
-	if err := Render([]string{"render", "-static", "./testdata", "-root", "./testdata", "-out", d}); err != nil {
+	if err := render([]string{"render", "-static", "./testdata", "-root", "./testdata", "-out", d}); err != nil {
 		t.Errorf("Rendered produced unexpected error: %s", err)
 	}
 
