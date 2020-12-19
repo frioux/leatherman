@@ -6,8 +6,6 @@ import (
 
 	"github.com/frioux/leatherman/internal/dropbox"
 	"github.com/jmoiron/sqlx"
-
-	_ "modernc.org/sqlite"
 )
 
 func loadDB(cl dropbox.Client) (*sqlx.DB, func(), error) {
