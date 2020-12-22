@@ -26,4 +26,4 @@ require (
 	modernc.org/sqlite v1.7.5
 )
 
-go 1.14
+go 1.15
