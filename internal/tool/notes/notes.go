@@ -133,8 +133,8 @@ func server() (http.Handler, error) {
 		defer cancel()
 
 		wg := &sync.WaitGroup{}
-		wg.Add(2)
 
+		wg.Add(1)
 		var rpi struct{ Game string }
 		go func() {
 			defer wg.Done()
@@ -153,6 +153,7 @@ func server() (http.Handler, error) {
 			}
 		}()
 
+		wg.Add(1)
 		var steamos []byte
 		go func() {
 			defer wg.Done()
@@ -171,10 +172,29 @@ func server() (http.Handler, error) {
 			}
 		}()
 
+		wg.Add(1)
+		var pi400 []byte
+		go func() {
+			defer wg.Done()
+			resp, err := lmhttp.Get(ctx, "http://pi400:8081/x11title")
+			if err != nil {
+				// I don't like it
+				pi400 = []byte(err.Error())
+				return
+			}
+			defer resp.Body.Close()
+
+			steamos, err = ioutil.ReadAll(resp.Body)
+			if err != nil {
+				// I should have thought this through more carefully
+				pi400 = []byte(err.Error())
+			}
+		}()
+
 		wg.Wait()
 
 		fmt.Fprintf(rw, prelude, "now: sup")
-		fmt.Fprintf(rw, "retropie: %s<br>steamos: %s", rpi.Game, steamos)
+		fmt.Fprintf(rw, "retropie: %s<br>steamos: %s<br>pi400: %s", rpi.Game, steamos, pi400)
 
 		return nil
 	}))
