@@ -2,13 +2,13 @@ package status
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"os"
 	"os/exec"
-	"strconv"
 	"sync"
 	"time"
 
@@ -27,6 +27,13 @@ It turns the light green when I'm in a meeting and red when audio is playing.
 Command: status
 */
 func Status(args []string, _ io.Reader) error {
+	fs := flag.NewFlagSet(args[0], flag.ContinueOnError)
+	var listen string
+	fs.StringVar(&listen, "listen", ":8081", "addres:port to listen on")
+	if err := fs.Parse(args[1:]); err != nil {
+		return err
+	}
+
 	mux := http.NewServeMux()
 
 	mux.Handle("/", http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
@@ -42,6 +49,7 @@ func Status(args []string, _ io.Reader) error {
 	mux.Handle("/vpn", &cacher{reloadEvery: time.Second, value: &vpn{}, mu: &sync.Mutex{}})
 	mux.Handle("/retropie", &cacher{reloadEvery: time.Second, value: &retropie{}, mu: &sync.Mutex{}})
 	mux.Handle("/steambox", &cacher{reloadEvery: time.Second, value: &steambox{}, mu: &sync.Mutex{}})
+	mux.Handle("/x11title", &cacher{reloadEvery: time.Second, value: &x11title{}, mu: &sync.Mutex{}})
 
 	s := &sound{}
 	soundCacher := &cacher{reloadEvery: time.Second, value: s, mu: &sync.Mutex{}}
@@ -60,8 +68,7 @@ func Status(args []string, _ io.Reader) error {
 		}
 	}()
 
-	port := 8081
-	listener, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+	listener, err := net.Listen("tcp", listen)
 	if err != nil {
 		return fmt.Errorf("net.Listen: %w", err)
 	}
