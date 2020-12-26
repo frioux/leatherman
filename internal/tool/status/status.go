@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/frioux/leatherman/internal/selfupdate"
 )
 
@@ -34,13 +35,7 @@ func Status(args []string, _ io.Reader) error {
 		return err
 	}
 
-	mux := http.NewServeMux()
-
-	mux.Handle("/", http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		for _, s := range []string{"cam", "curwindow", "sound", "tabs", "vpn", "locked"} {
-			fmt.Fprintf(rw, " * /%s\n", s)
-		}
-	}))
+	mux := lmhttp.NewClearMux()
 
 	mux.Handle("/version", selfupdate.Handler)
 	mux.Handle("/locked", &cacher{reloadEvery: time.Second, value: &locked{}, mu: &sync.Mutex{}})
