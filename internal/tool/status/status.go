@@ -29,8 +29,12 @@ Command: status
 */
 func Status(args []string, _ io.Reader) error {
 	fs := flag.NewFlagSet(args[0], flag.ContinueOnError)
-	var listen string
+	var (
+		listen                string
+		enableLightManagement bool
+	)
 	fs.StringVar(&listen, "listen", ":8081", "addres:port to listen on")
+	fs.BoolVar(&enableLightManagement, "manage-light", false, "manage the blink(1) light")
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
@@ -54,14 +58,16 @@ func Status(args []string, _ io.Reader) error {
 	camCacher := &cacher{reloadEvery: time.Minute, value: c, mu: &sync.Mutex{}}
 	mux.Handle("/cam", camCacher)
 
-	go func() {
-		for {
-			if err := manageLight(soundCacher.mu, camCacher.mu, c, s); err != nil {
-				fmt.Fprintf(os.Stderr, "couldn't manage light: %s\n", err)
+	if enableLightManagement {
+		go func() {
+			for {
+				if err := manageLight(soundCacher.mu, camCacher.mu, c, s); err != nil {
+					fmt.Fprintf(os.Stderr, "couldn't manage light: %s\n", err)
+				}
+				time.Sleep(time.Second)
 			}
-			time.Sleep(time.Second)
-		}
-	}()
+		}()
+	}
 
 	listener, err := net.Listen("tcp", listen)
 	if err != nil {
