@@ -149,7 +149,7 @@ func server() (http.Handler, error) {
 			dec := json.NewDecoder(resp.Body)
 			if err := dec.Decode(&rpi); err != nil {
 				// ugh wtf
-				rpi.Game = err.Error()
+				rpi.Game = "ERR: " + err.Error()
 			}
 		}()
 
@@ -168,7 +168,7 @@ func server() (http.Handler, error) {
 			steamos, err = ioutil.ReadAll(resp.Body)
 			if err != nil {
 				// I should have thought this through more carefully
-				steamos = []byte(err.Error())
+				steamos = []byte("ERR: " + err.Error())
 			}
 		}()
 
@@ -184,17 +184,19 @@ func server() (http.Handler, error) {
 			}
 			defer resp.Body.Close()
 
-			steamos, err = ioutil.ReadAll(resp.Body)
+			pi400, err = ioutil.ReadAll(resp.Body)
 			if err != nil {
 				// I should have thought this through more carefully
-				pi400 = []byte(err.Error())
+				pi400 = []byte("ERR: " + err.Error())
 			}
 		}()
 
 		wg.Wait()
 
 		fmt.Fprintf(rw, prelude, "now: sup")
-		fmt.Fprintf(rw, "retropie: %s<br>steamos: %s<br>pi400: %s", rpi.Game, steamos, pi400)
+		fmt.Fprintf(rw, "retropie: %s<br>", rpi.Game)
+		fmt.Fprintf(rw, "steamos: %s<br>", steamos)
+		fmt.Fprintf(rw, "pi400: %s<br>", pi400)
 
 		return nil
 	}))
