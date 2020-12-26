@@ -15,8 +15,8 @@ import (
 
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/frioux/leatherman/internal/version"
+	"github.com/mattn/go-isatty"
 	"github.com/ulikunitz/xz"
-	"golang.org/x/term"
 )
 
 // MaybeUpdate will check for an update and install it immediately.  If
@@ -45,11 +45,11 @@ func AutoUpdate() {
 	// if there's a tty connected do not do auto-update, since it could
 	// restart the process.  Let that happen either to a service or
 	// intentionally by the user.
-	if term.IsTerminal(int(os.Stdout.Fd())) {
+	if isatty.IsTerminal(os.Stdout.Fd()) {
 		return
 	}
 
-	if term.IsTerminal(int(os.Stdin.Fd())) {
+	if isatty.IsTerminal(os.Stdin.Fd()) {
 		return
 	}
 
