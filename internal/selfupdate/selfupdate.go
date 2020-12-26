@@ -16,6 +16,7 @@ import (
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/frioux/leatherman/internal/version"
 	"github.com/ulikunitz/xz"
+	"golang.org/x/term"
 )
 
 // MaybeUpdate will check for an update and install it immediately.  If
@@ -44,11 +45,11 @@ func AutoUpdate() {
 	// if there's a tty connected do not do auto-update, since it could
 	// restart the process.  Let that happen either to a service or
 	// intentionally by the user.
-	if fi, _ := os.Stdout.Stat(); fi.Mode()&os.ModeCharDevice != 0 {
+	if term.IsTerminal(int(os.Stdout.Fd())) {
 		return
 	}
 
-	if fi, _ := os.Stdin.Stat(); fi.Mode()&os.ModeCharDevice != 0 {
+	if term.IsTerminal(int(os.Stdin.Fd())) {
 		return
 	}
 
