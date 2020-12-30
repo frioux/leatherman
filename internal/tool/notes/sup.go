@@ -1,16 +1,64 @@
 package notes
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os/exec"
 	"sync"
 	"time"
 
 	"github.com/frioux/leatherman/internal/lmhttp"
 )
+
+func loadPeers() ([]string, error) {
+	var tsStatus struct {
+		Peer map[string]struct {
+			DNSName string
+		}
+	}
+
+	cmd := exec.Command("tailscale status")
+	b, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal(b, &tsStatus); err != nil {
+		return nil, err
+	}
+
+	ret := make([]string, 0, len(tsStatus.Peer))
+	for _, p := range tsStatus.Peer {
+		ret = append(ret, p.DNSName)
+	}
+
+	return ret, nil
+}
+
+func allVersions() []byte {
+	peers, err := loadPeers()
+	if err != nil {
+		return []byte("couldn't load peers: " + err.Error())
+	}
+
+	wg := &sync.WaitGroup{}
+	wg.Add(len(peers))
+
+	buf := &bytes.Buffer{}
+
+	for _, p := range peers {
+		go func(p string) {
+
+		}(p)
+
+	}
+
+	return buf.Bytes()
+}
 
 func sup(rw http.ResponseWriter, req *http.Request) error {
 	ctx, cancel := context.WithTimeout(req.Context(), 2*time.Second)
