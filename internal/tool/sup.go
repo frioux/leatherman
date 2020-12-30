@@ -72,6 +72,8 @@ func sup(rw http.ResponseWriter, req *http.Request) error {
 		if err != nil {
 			// I should have thought this through more carefully
 			pi400 = []byte("ERR: " + err.Error())
+		} else {
+			pi400 = []byte(`<a href="http://pi400:8081/x11shot">` + string(pi400) + `</a>`)
 		}
 	}()
 
