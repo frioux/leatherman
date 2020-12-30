@@ -1,13 +1,14 @@
 package notes
 
 import (
-	"bytes"
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
+	"sort"
 	"sync"
 	"time"
 
@@ -21,7 +22,7 @@ func loadPeers() ([]string, error) {
 		}
 	}
 
-	cmd := exec.Command("tailscale status")
+	cmd := exec.Command("tailscale", "status", "-json")
 	b, err := cmd.Output()
 	if err != nil {
 		return nil, err
@@ -36,28 +37,48 @@ func loadPeers() ([]string, error) {
 		ret = append(ret, p.DNSName)
 	}
 
+	sort.Strings(ret)
+
 	return ret, nil
 }
 
-func allVersions() []byte {
+func peerVersion(ctx context.Context, hostname string) (ret string) {
+	defer func() { ret = hostname + ": " + ret }()
+	resp, err := lmhttp.Get(ctx, "http://"+hostname+":8081/version")
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+
+	s := bufio.NewScanner(resp.Body)
+	for s.Scan() {
+		return s.Text() // silly, return first line
+	}
+
+	return "???"
+}
+
+func allVersions(ctx context.Context) []string {
 	peers, err := loadPeers()
 	if err != nil {
-		return []byte("couldn't load peers: " + err.Error())
+		return []string{"couldn't load peers: " + err.Error()}
 	}
 
 	wg := &sync.WaitGroup{}
 	wg.Add(len(peers))
 
-	buf := &bytes.Buffer{}
+	ret := make([]string, len(peers))
 
-	for _, p := range peers {
-		go func(p string) {
-
-		}(p)
-
+	for i, p := range peers {
+		go func(i int, p string) {
+			defer wg.Done()
+			ret[i] = peerVersion(ctx, p)
+		}(i, p)
 	}
 
-	return buf.Bytes()
+	wg.Wait()
+
+	return ret
 }
 
 func sup(rw http.ResponseWriter, req *http.Request) error {
@@ -125,12 +146,24 @@ func sup(rw http.ResponseWriter, req *http.Request) error {
 		}
 	}()
 
+	wg.Add(1)
+	var versions []string
+	go func() {
+		defer wg.Done()
+		versions = allVersions(ctx)
+	}()
+
 	wg.Wait()
 
 	fmt.Fprintf(rw, prelude, "now: sup")
-	fmt.Fprintf(rw, "retropie: %s<br>", rpi.Game)
-	fmt.Fprintf(rw, "steamos: %s<br>", steamos)
-	fmt.Fprintf(rw, "pi400: %s<br>", pi400)
+	fmt.Fprintf(rw, "retropie: %s<br>\n", rpi.Game)
+	fmt.Fprintf(rw, "steamos: %s<br>\n", steamos)
+	fmt.Fprintf(rw, "pi400: %s<br>\n", pi400)
+	fmt.Fprintln(rw, "\n<br>versions:<br><ul>")
+	for _, v := range versions {
+		fmt.Fprintf(rw, "<li>%s</li>\n", v)
+	}
+	fmt.Fprintln(rw, "</ul>")
 
 	return nil
 }
