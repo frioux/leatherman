@@ -33,9 +33,10 @@ type matcher struct {
 	// JSONRE matches against input
 	JSONRE JSONRE
 
-	// emoji to add to the response; use just the emoji (☃)
-	// to add standard responses, or a string (constanza) to
-	// use one of the custom emoji
+	// emoji to add to the response; use just the emoji (☃) to add standard
+	// responses, or a string (:constanza:920343920483092840) to use one of
+	// the custom emoji.  To get the id in the custom one above go on discord
+	// and type `\:whatever:` and you'll see the id printed out.
 	Emoji string
 }
 

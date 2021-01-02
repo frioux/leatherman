@@ -2,6 +2,7 @@ package automoji
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -9,8 +10,9 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
-	"strings"
+	"sync"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -40,21 +42,45 @@ The following env vars should be set:
 Command: auto-emote
 */
 func Run(args []string, _ io.Reader) error {
+	var dbCl dropbox.Client
 	if p := os.Getenv("LM_RESPONSES_PATH"); p != "" {
-		dbCl, err := dropbox.NewClient(dropbox.Client{Token: os.Getenv("LM_DROPBOX_TOKEN")})
+		var err error
+		dbCl, err = dropbox.NewClient(dropbox.Client{Token: os.Getenv("LM_DROPBOX_TOKEN")})
 		if err != nil {
 			return err
 		}
+		matchersMu.Lock()
 		matchers, err = loadMatchers(dbCl, p)
 		if err != nil {
+			matchersMu.Unlock()
 			return err
 		}
+		matchersMu.Unlock()
 	}
 	if len(args) > 1 {
 		for _, arg := range args[1:] {
-			fmt.Println(newEmojiSet(arg, matchers).all(0))
+			fmt.Println(newEmojiSet(arg).all(0))
 		}
 		return nil
+	}
+
+	if p := os.Getenv("LM_RESPONSES_PATH"); p != "" {
+		responsesChanged := make(chan struct{})
+		go func() {
+			for range responsesChanged {
+				var err error
+				matchersMu.Lock()
+				matchers, err = loadMatchers(dbCl, p)
+				if err != nil {
+					fmt.Fprintln(os.Stderr, err)
+					matchersMu.Unlock()
+					continue
+				}
+				fmt.Fprintf(os.Stderr, "updated matchers (%d)\n", len(matchers))
+				matchersMu.Unlock()
+			}
+		}()
+		go dbCl.Longpoll(context.Background(), filepath.Dir(p), responsesChanged)
 	}
 
 	go func() {
@@ -143,7 +169,7 @@ func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 		return
 	}
 
-	react(s, a.ChannelID, a.MessageID, newEmojiSet(m.Content, matchers))
+	react(s, a.ChannelID, a.MessageID, newEmojiSet(m.Content))
 }
 
 var messageCreateTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
@@ -156,6 +182,7 @@ func init() {
 }
 
 var matchers []matcher
+var matchersMu = &sync.Mutex{}
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Message.Content == "||hidden knowledge||" {
@@ -172,14 +199,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	es := newEmojiSet(m.Message.Content, matchers)
-
-	if strings.Contains(m.Message.Content, "did no back reading") ||
-		strings.Contains(m.Message.Content, "have no back scroll") ||
-		strings.Contains(m.Message.Content, "have no scroll back") ||
-		strings.Contains(m.Message.Content, "have no scrollback") {
-		es.required = append(es.required, "costanza")
-	}
+	es := newEmojiSet(m.Message.Content)
 
 	lucky := rand.Intn(100) == 0
 
@@ -188,13 +208,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if !lucky {
+	if !lucky && len(es.required) == 0 {
 		messageCreateTotal.WithLabelValues("unlucky").Inc()
 		return
 	}
 
-	messageCreateTotal.WithLabelValues("lucky").Inc()
-	es.required = append(es.required, "🎰")
+	if len(es.required) == 0 {
+		messageCreateTotal.WithLabelValues("lucky").Inc()
+		es.required = append(es.required, "🎰")
+	}
 
 	react(s, m.ChannelID, m.ID, es)
 }

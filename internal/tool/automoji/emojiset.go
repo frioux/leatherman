@@ -13,7 +13,10 @@ var (
 	secretRE  = regexp.MustCompile(`\|\|.+\|\|`)
 )
 
-func newEmojiSet(m string, matchers []matcher) *emojiSet {
+func newEmojiSet(m string) *emojiSet {
+	defer matchersMu.Unlock()
+	matchersMu.Lock()
+
 	s := &emojiSet{optional: make(map[string]bool)}
 
 	for _, r := range matchers {
