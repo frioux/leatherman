@@ -35,7 +35,7 @@ Command: auto-emote
 func Run(args []string, _ io.Reader) error {
 	if len(args) > 1 {
 		for _, arg := range args[1:] {
-			fmt.Println(newEmojiSet(arg).all(0))
+			fmt.Println(newEmojiSet(arg, matchers).all(0))
 		}
 		return nil
 	}
@@ -124,7 +124,7 @@ func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 		return
 	}
 
-	react(s, a.ChannelID, a.MessageID, newEmojiSet(m.Content))
+	react(s, a.ChannelID, a.MessageID, newEmojiSet(m.Content, matchers))
 }
 
 var messageCreateTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
@@ -134,6 +134,16 @@ var messageCreateTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 
 func init() {
 	mustRegister(messageCreateTotal)
+}
+
+var matchers []matcher
+
+func init() {
+	var err error
+	matchers, err = loadMatchers()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -149,7 +159,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	es := newEmojiSet(m.Message.Content)
+	es := newEmojiSet(m.Message.Content, matchers)
 
 	if strings.Contains(m.Message.Content, "did no back reading") ||
 		strings.Contains(m.Message.Content, "have no back scroll") ||
