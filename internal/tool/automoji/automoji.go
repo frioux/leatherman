@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/frioux/leatherman/internal/dropbox"
 	"github.com/frioux/leatherman/internal/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -30,9 +31,25 @@ func mustRegister(cs ...prometheus.Collector) {
 /*
 Run comments to discord and reacts to all messages with vaguely related emoji.
 
+The following env vars should be set:
+
+ * LM_DROPBOX_TOKEN should be set to load a responses.json.
+ * LM_RESPONSES_PATH should be set to the location of responses.json within dropbox.
+ * LM_DISCORD_TOKEN should be set for this to actually function.
+
 Command: auto-emote
 */
 func Run(args []string, _ io.Reader) error {
+	if p := os.Getenv("LM_RESPONSES_PATH"); p != "" {
+		dbCl, err := dropbox.NewClient(dropbox.Client{Token: os.Getenv("LM_DROPBOX_TOKEN")})
+		if err != nil {
+			return err
+		}
+		matchers, err = loadMatchers(dbCl, p)
+		if err != nil {
+			return err
+		}
+	}
 	if len(args) > 1 {
 		for _, arg := range args[1:] {
 			fmt.Println(newEmojiSet(arg, matchers).all(0))
@@ -137,14 +154,6 @@ func init() {
 }
 
 var matchers []matcher
-
-func init() {
-	var err error
-	matchers, err = loadMatchers()
-	if err != nil {
-		panic(err)
-	}
-}
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Message.Content == "||hidden knowledge||" {
