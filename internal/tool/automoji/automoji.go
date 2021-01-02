@@ -114,7 +114,9 @@ func react(s *discordgo.Session, channelID, messageID string, es *emojiSet) {
 		if i == max || i == 20 {
 			break
 		}
-		s.MessageReactionAdd(channelID, messageID, e)
+		if err := s.MessageReactionAdd(channelID, messageID, e); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		}
 	}
 }
 
@@ -164,7 +166,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Message.Content == "||version||" {
 		messageCreateTotal.WithLabelValues("version").Inc()
-		s.ChannelMessageSend(m.ChannelID, version.Version)
+		if _, err := s.ChannelMessageSend(m.ChannelID, version.Version); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		}
 		return
 	}
 
@@ -209,5 +213,7 @@ func showMetrics(s *discordgo.Session, channelID string) {
 	}
 	buf.Write([]byte("```\n"))
 
-	s.ChannelMessageSend(channelID, buf.String())
+	if _, err := s.ChannelMessageSend(channelID, buf.String()); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
 }
