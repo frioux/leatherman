@@ -14,46 +14,6 @@ import (
 	"github.com/frioux/leatherman/internal/dropbox"
 )
 
-func longpoll(db dropbox.Client, dir string, ch chan<- struct{}) {
-	ctx := context.TODO()
-
-	for {
-		res, err := db.ListFolder(dropbox.ListFolderParams{
-			Path: dir,
-		})
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "ListFolder:", err)
-			continue
-		}
-
-		for res.HasMore {
-			res, err = db.ListFolderContinue(res.Cursor)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "ListFolderContinue:", err)
-				continue
-			}
-		}
-
-		cu := res.Cursor
-
-		changed, backoff, err := db.ListFolderLongPoll(ctx, cu, 480)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "ListFolderLongPoll:", err)
-			continue
-		}
-
-		if backoff != 0 {
-			time.Sleep(time.Second * time.Duration(backoff))
-		}
-
-		if !changed {
-			continue
-		}
-
-		ch <- struct{}{}
-	}
-}
-
 var errARGone = errors.New("auto-reload channel closed")
 
 func doReload(ch <-chan struct{}, dir string, generation *chan bool) error {
@@ -77,7 +37,7 @@ func doReload(ch <-chan struct{}, dir string, generation *chan bool) error {
 func autoReload(db dropbox.Client, h http.Handler, dir string) (handler http.Handler, err error) {
 	watcher := make(chan struct{})
 	generation := make(chan bool)
-	go func() { longpoll(db, dir, watcher) }()
+	go func() { db.Longpoll(context.Background(), dir, watcher) }()
 	go func() {
 		for range watcher {
 			close(generation)
