@@ -137,7 +137,7 @@ func react(s *discordgo.Session, channelID, messageID string, es *emojiSet) {
 	reactTotal.WithLabelValues(strconv.Itoa(max)).Inc()
 	for i, e := range es.all(max) {
 		// the 20 here is to limit to possibly fewer than were returned
-		if i == max || i == 20 {
+		if i == 20 {
 			break
 		}
 		if err := s.MessageReactionAdd(channelID, messageID, e); err != nil {
