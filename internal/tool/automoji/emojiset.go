@@ -104,11 +104,9 @@ func (s *emojiSet) alwaysAdd(e string) {
 }
 
 func (s *emojiSet) all(c int) []string {
-	ret := make([]string, 0, c+len(s.required))
+	ret := make([]string, len(s.required), c+len(s.required))
 
-	for _, e := range s.required {
-		ret = append(ret, e)
-	}
+	copy(ret, s.required)
 
 	for e := range s.optional {
 		if c != 0 && len(ret) == cap(ret) {
