@@ -17,7 +17,10 @@ func newEmojiSet(m string) *emojiSet {
 	defer matchersMu.Unlock()
 	matchersMu.Lock()
 
-	s := &emojiSet{optional: make(map[string]bool)}
+	s := &emojiSet{
+		message:  m,
+		optional: make(map[string]bool),
+	}
 
 	for _, r := range matchers {
 		if r.MatchString(m) {
@@ -37,9 +40,9 @@ func newEmojiSet(m string) *emojiSet {
 	}
 
 	m = nonNameRE.ReplaceAllString(m, " ")
-	words := strings.Split(m, " ")
+	s.words = strings.Split(m, " ")
 
-	for _, word := range words {
+	for _, word := range s.words {
 		if word == "" {
 			continue
 		}
@@ -61,7 +64,7 @@ func newEmojiSet(m string) *emojiSet {
 		}
 	}
 	if len(s.optional) == 0 { // since this always finds too much, only use it when nothing is found
-		for _, word := range words {
+		for _, word := range s.words {
 			if es := turtle.Search(word); es != nil {
 				for _, e := range es {
 					s.add(e)
@@ -74,6 +77,8 @@ func newEmojiSet(m string) *emojiSet {
 }
 
 type emojiSet struct {
+	message  string
+	words    []string
 	optional map[string]bool
 	required []string
 }

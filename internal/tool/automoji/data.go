@@ -2,6 +2,7 @@ package automoji
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"regexp"
 
 	"github.com/frioux/leatherman/internal/dropbox"
@@ -58,4 +59,18 @@ func loadMatchers(dbCl dropbox.Client, path string) ([]matcher, error) {
 	}
 
 	return m, nil
+}
+
+func loadLua(dbCl dropbox.Client, path string) (string, error) {
+	r, err := dbCl.Download(path)
+	if err != nil {
+		return "", err
+	}
+
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), err
 }

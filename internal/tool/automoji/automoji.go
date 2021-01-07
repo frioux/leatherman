@@ -37,6 +37,7 @@ The following env vars should be set:
 
  * LM_DROPBOX_TOKEN should be set to load a responses.json.
  * LM_RESPONSES_PATH should be set to the location of responses.json within dropbox.
+ * LM_BOT_LUA_PATH should be set to the location of lua to process emoji data within dropbox.
  * LM_DISCORD_TOKEN should be set for this to actually function.
 
 Command: auto-emote
@@ -55,16 +56,30 @@ func Run(args []string, _ io.Reader) error {
 			matchersMu.Unlock()
 			return err
 		}
+		if lp := os.Getenv("LM_BOT_LUA_PATH"); lp != "" {
+			luaC, err = loadLua(dbCl, lp)
+			if err != nil {
+				matchersMu.Unlock()
+				return err
+			}
+		}
 		matchersMu.Unlock()
 	}
 	if len(args) > 1 {
 		for _, arg := range args[1:] {
-			fmt.Println(newEmojiSet(arg).all(0))
+			es := newEmojiSet(arg)
+
+			if err := luaEval(es, luaC); err != nil {
+				return err
+			}
+
+			fmt.Println(es.all(0))
 		}
 		return nil
 	}
 
 	if p := os.Getenv("LM_RESPONSES_PATH"); p != "" {
+		lp := os.Getenv("LM_BOT_LUA_PATH")
 		responsesChanged := make(chan struct{})
 		go func() {
 			for range responsesChanged {
@@ -77,6 +92,16 @@ func Run(args []string, _ io.Reader) error {
 					continue
 				}
 				fmt.Fprintf(os.Stderr, "updated matchers (%d)\n", len(matchers))
+
+				if lp != "" {
+					luaC, err = loadLua(dbCl, lp)
+					if err != nil {
+						fmt.Fprintln(os.Stderr, err)
+						matchersMu.Unlock()
+						continue
+					}
+					fmt.Fprintf(os.Stderr, "updated lua (%d bytes)\n", len(luaC))
+				}
 				matchersMu.Unlock()
 			}
 		}()
@@ -169,7 +194,12 @@ func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 		return
 	}
 
-	react(s, a.ChannelID, a.MessageID, newEmojiSet(m.Content))
+	es := newEmojiSet(m.Content)
+	if err := luaEval(es, luaC); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return
+	}
+	react(s, a.ChannelID, a.MessageID, es)
 }
 
 var messageCreateTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
@@ -182,6 +212,7 @@ func init() {
 }
 
 var matchers []matcher
+var luaC string
 var matchersMu = &sync.Mutex{}
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -200,6 +231,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	es := newEmojiSet(m.Message.Content)
+	if err := luaEval(es, luaC); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return
+	}
 
 	lucky := rand.Intn(100) == 0
 
