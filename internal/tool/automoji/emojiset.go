@@ -91,10 +91,6 @@ func (s *emojiSet) add(e *turtle.Emoji) {
 	s.optional[e.Char] = true
 }
 
-func (s *emojiSet) alwaysAdd(e string) {
-
-}
-
 func (s *emojiSet) all(c int) []string {
 	ret := make([]string, len(s.required), c+len(s.required))
 
