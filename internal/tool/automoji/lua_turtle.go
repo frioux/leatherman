@@ -16,8 +16,14 @@ func registerTurtleType(L *lua.LState) {
 func findTurtleByName(L *lua.LState) int {
 	name := L.CheckString(1)
 
+	v, ok := turtle.Emojis[name]
+	if !ok {
+		L.Push(lua.LNil)
+		return 1
+	}
+
 	ud := L.NewUserData()
-	ud.Value = turtle.Emojis[name]
+	ud.Value = v
 	L.SetMetatable(ud, L.GetTypeMetatable("turtleemoji"))
 	L.Push(ud)
 	return 1
@@ -26,8 +32,14 @@ func findTurtleByName(L *lua.LState) int {
 func findTurtleByChar(L *lua.LState) int {
 	name := L.CheckString(1)
 
+	v, ok := turtle.EmojisByChar[name]
+	if !ok {
+		L.Push(lua.LNil)
+		return 1
+	}
+
 	ud := L.NewUserData()
-	ud.Value = turtle.EmojisByChar[name]
+	ud.Value = v
 	L.SetMetatable(ud, L.GetTypeMetatable("turtleemoji"))
 	L.Push(ud)
 	return 1
