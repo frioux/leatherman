@@ -111,6 +111,72 @@ DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM LEFT
 
 ` + "`" + `auto-emote` + "`" + ` comments to discord and reacts to all messages with vaguely related emoji.
 
+The following env vars should be set:
+
+ * LM_DROPBOX_TOKEN should be set to load a responses.json.
+ * LM_BOT_LUA_PATH should be set to the location of lua to process emoji data within dropbox.
+ * LM_DISCORD_TOKEN should be set for this to actually function.
+
+Here's an example of lua code that works for this:
+
+	if es:messagematches("cronos") then
+		es:addrequired("👶")
+		es:addrequired("🥘")
+	end
+
+The lua code has a global var called ` + "`" + `es` + "`" + ` (for emoji set) and an imported
+package called ` + "`" + `turtleemoji` + "`" + `.  ` + "`" + `es` + "`" + ` is how you access the current message,
+currently added emoji, etc.  Here are the methods on ` + "`" + `es` + "`" + `:
+
+#### ` + "`" + `es:addoptional("💀")` + "`" + `
+
+Adds an emoji to randomly include in the reaction.
+
+#### ` + "`" + `es:hasoptional("💀") // bool` + "`" + `
+
+Returns true of the passed emoji is in the list of optional emoji to include
+(at random) on the reaction.
+
+#### ` + "`" + `es:removeoptional("💀")` + "`" + `
+
+Remove the passed emoji from the optionally included emoji.
+
+#### ` + "`" + `es:hasrequired("💀")` + "`" + ` // bool
+
+Returns true if the passed emoji is going to be included in the reaction.
+
+#### ` + "`" + `es:addrequired("💀")` + "`" + `
+
+Add an emoji to the reaction.
+
+#### ` + "`" + `es:removerequired("💀")` + "`" + `
+
+Remove an emoji that is going to be included in the reaction.
+
+#### ` + "`" + `es:message()` + "`" + ` // string
+
+Returns the message that triggered the reaction.
+
+#### ` + "`" + `es:messagematches("regexp")` + "`" + ` // bool
+
+True if the message matches the passed regex.
+[Docs for regex syntax are here](https://golang.org/pkg/regexp/syntax/).
+
+#### ` + "`" + `es:hasword("word")` + "`" + ` // bool
+
+True if the word is included in the message.  Tokenization of words happens on
+all non-alpha characters and the message is lowerecased.
+
+All of the following are thin veneers atop
+[github.com/hackebrot/turtle](https://github.com/hackebrot/turtle):
+
+ * ` + "`" + `turtle.findbyname("skull")` + "`" + ` // turtleemoji
+ * ` + "`" + `turtle.findbychar("💀")` + "`" + ` // turtleemoji
+ * ` + "`" + `turtleemoji#name()` + "`" + ` // string
+ * ` + "`" + `turtleemoji#category()` + "`" + ` // string
+ * ` + "`" + `turtleemoji#char()` + "`" + ` // string
+ * ` + "`" + `turtleemoji#haskeyword("keyword")` + "`" + ` // bool
+
 ### ` + "`" + `backlight` + "`" + `
 
 ` + "`" + `backlight` + "`" + ` is a faster version of ` + "`" + `xbacklight` + "`" + ` by directly writing to ` + "`" + `/sys` + "`" + `.  Example:
@@ -505,70 +571,70 @@ func init() {
 
 		"alluni": readme[2642:3468],
 
-		"auto-emote": readme[3468:3575],
+		"auto-emote": readme[3468:5561],
 
-		"backlight": readme[3575:3777],
+		"backlight": readme[5561:5763],
 
-		"clocks": readme[3777:3993],
+		"clocks": readme[5763:5979],
 
-		"csv2json": readme[3993:4133],
+		"csv2json": readme[5979:6119],
 
-		"csv2md": readme[4133:4207],
+		"csv2md": readme[6119:6193],
 
-		"debounce": readme[4207:4551],
+		"debounce": readme[6193:6537],
 
-		"dump-mozlz4": readme[4551:4734],
+		"dump-mozlz4": readme[6537:6720],
 
-		"email2json": readme[4734:5449],
+		"email2json": readme[6720:7435],
 
-		"expand-url": readme[5449:5625],
+		"expand-url": readme[7435:7611],
 
-		"export-bamboohr": readme[5625:5709],
+		"export-bamboohr": readme[7611:7695],
 
-		"export-bamboohr-tree": readme[5709:5796],
+		"export-bamboohr-tree": readme[7695:7782],
 
-		"fn": readme[5796:5932],
+		"fn": readme[7782:7918],
 
-		"group-by-date": readme[5932:6150],
+		"group-by-date": readme[7918:8136],
 
-		"minotaur": readme[6150:7969],
+		"minotaur": readme[8136:9955],
 
-		"name2rune": readme[7969:8074],
+		"name2rune": readme[9955:10060],
 
-		"netrc-password": readme[8074:8239],
+		"netrc-password": readme[10060:10225],
 
-		"notes": readme[8239:8375],
+		"notes": readme[10225:10361],
 
-		"pomotimer": readme[8375:8867],
+		"pomotimer": readme[10361:10853],
 
-		"prepend-hist": readme[8867:9108],
+		"prepend-hist": readme[10853:11094],
 
-		"proj": readme[9108:10427],
+		"proj": readme[11094:12413],
 
-		"render-mail": readme[10427:10561],
+		"render-mail": readme[12413:12547],
 
-		"replace-unzip": readme[10561:10791],
+		"replace-unzip": readme[12547:12777],
 
-		"slack-deaddrop": readme[10791:11011],
+		"slack-deaddrop": readme[12777:12997],
 
-		"slack-open": readme[11011:11145],
+		"slack-open": readme[12997:13131],
 
-		"slack-status": readme[11145:11290],
+		"slack-status": readme[13131:13276],
 
-		"sm-list": readme[11290:11566],
+		"sm-list": readme[13276:13552],
 
-		"srv": readme[11566:12049],
+		"srv": readme[13552:14035],
 
-		"status": readme[12049:12506],
+		"status": readme[14035:14492],
 
-		"toml2json": readme[12506:12681],
+		"toml2json": readme[14492:14667],
 
-		"uni": readme[12681:12843],
+		"uni": readme[14667:14829],
 
-		"update": readme[12843:13066],
+		"update": readme[14829:15052],
 
-		"yaml2json": readme[13066:13143],
+		"yaml2json": readme[15052:15129],
 
-		"zine": readme[13143:13199],
+		"zine": readme[15129:15185],
 	}
 }
