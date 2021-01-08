@@ -6,12 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -118,18 +120,27 @@ Command: auto-emote
 func Run(args []string, _ io.Reader) error {
 	var dbCl dropbox.Client
 	if p := os.Getenv("LM_BOT_LUA_PATH"); p != "" {
-		var err error
-		dbCl, err = dropbox.NewClient(dropbox.Client{Token: os.Getenv("LM_DROPBOX_TOKEN")})
-		if err != nil {
-			return err
-		}
-		luaMu.Lock()
-		luaC, err = loadLua(dbCl, p)
-		if err != nil {
+		if strings.HasPrefix(p, "file://") {
+			p = strings.TrimPrefix(p, "file://")
+			b, err := ioutil.ReadFile(p)
+			if err != nil {
+				return err
+			}
+			luaC = string(b)
+		} else {
+			var err error
+			dbCl, err = dropbox.NewClient(dropbox.Client{Token: os.Getenv("LM_DROPBOX_TOKEN")})
+			if err != nil {
+				return err
+			}
+			luaMu.Lock()
+			luaC, err = loadLua(dbCl, p)
+			if err != nil {
+				luaMu.Unlock()
+				return err
+			}
 			luaMu.Unlock()
-			return err
 		}
-		luaMu.Unlock()
 	}
 	if len(args) > 1 {
 		for _, arg := range args[1:] {
