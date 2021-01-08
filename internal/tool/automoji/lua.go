@@ -46,6 +46,15 @@ func checkEmojiSet(L *lua.LState) *emojiSet {
 }
 
 var emojiSetMethods = map[string]lua.LGFunction{
+	"optional": func(L *lua.LState) int {
+		es := checkEmojiSet(L)
+		optional := L.CreateTable(0, len(es.optional))
+		for w, v := range es.optional {
+			optional.RawSetString(w, lua.LBool(v))
+		}
+		L.Push(optional)
+		return 1
+	},
 	"hasoptional": func(L *lua.LState) int {
 		es := checkEmojiSet(L)
 		e := L.CheckString(2)
@@ -65,6 +74,15 @@ var emojiSetMethods = map[string]lua.LGFunction{
 		return 0
 	},
 
+	"required": func(L *lua.LState) int {
+		es := checkEmojiSet(L)
+		required := L.CreateTable(len(es.required), 0)
+		for i, s := range es.required {
+			required.Insert(i+1, lua.LString(s))
+		}
+		L.Push(required)
+		return 1
+	},
 	"hasrequired": func(L *lua.LState) int {
 		es := checkEmojiSet(L)
 		e := L.CheckString(2)
@@ -120,6 +138,15 @@ var emojiSetMethods = map[string]lua.LGFunction{
 			}
 		}
 		L.Push(lua.LBool(false))
+		return 1
+	},
+	"words": func(L *lua.LState) int {
+		es := checkEmojiSet(L)
+		words := L.CreateTable(len(es.words), 0)
+		for i, s := range es.words {
+			words.Insert(i+1, lua.LString(s))
+		}
+		L.Push(words)
 		return 1
 	},
 }

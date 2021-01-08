@@ -50,11 +50,16 @@ The lua code has a global var called `es` (for emoji set) and an imported
 package called `turtleemoji`.  `es` is how you access the current message,
 currently added emoji, etc.  Here are the methods on `es`:
 
+#### `es:optional()` // table of string to bool
+
+Returns a copy of the optional emoji.  Modifications of the table will not
+affect the final result; other methods should be used for modification.
+
 #### `es:addoptional("💀")`
 
 Adds an emoji to randomly include in the reaction.
 
-#### `es:hasoptional("💀") // bool`
+#### `es:hasoptional("💀")` // bool
 
 Returns true of the passed emoji is in the list of optional emoji to include
 (at random) on the reaction.
@@ -62,6 +67,11 @@ Returns true of the passed emoji is in the list of optional emoji to include
 #### `es:removeoptional("💀")`
 
 Remove the passed emoji from the optionally included emoji.
+
+#### `es:required()` // table of required emoji
+
+Returns a copy of the required emoji.  Modifications of the table will not
+affect the final result; other methods should be used for modification.
 
 #### `es:hasrequired("💀")` // bool
 
@@ -84,10 +94,14 @@ Returns the message that triggered the reaction.
 True if the message matches the passed regex.
 [Docs for regex syntax are here](https://golang.org/pkg/regexp/syntax/).
 
+#### `es:words()` // table of tokenized words
+
+Returns a copy of the tokenized words.  Tokenization of words happens on all
+non-alpha characters and the message is lowerecased.
+
 #### `es:hasword("word")` // bool
 
-True if the word is included in the message.  Tokenization of words happens on
-all non-alpha characters and the message is lowerecased.
+True if the word is included in the message.
 
 All of the following are thin veneers atop
 [github.com/hackebrot/turtle](https://github.com/hackebrot/turtle):
