@@ -14,22 +14,9 @@ var (
 )
 
 func newEmojiSet(m string) *emojiSet {
-	defer matchersMu.Unlock()
-	matchersMu.Lock()
-
 	s := &emojiSet{
 		message:  m,
 		optional: make(map[string]bool),
-	}
-
-	for _, r := range matchers {
-		if r.MatchString(m) {
-			if r.Required {
-				s.required = append(s.required, r.Emoji)
-			} else {
-				s.optional[r.Emoji] = true
-			}
-		}
 	}
 
 	m = strings.ToLower(m)

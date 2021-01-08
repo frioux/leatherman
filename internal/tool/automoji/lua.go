@@ -1,10 +1,26 @@
 package automoji
 
 import (
+	"io/ioutil"
 	"regexp"
 
+	"github.com/frioux/leatherman/internal/dropbox"
 	lua "github.com/yuin/gopher-lua"
 )
+
+func loadLua(dbCl dropbox.Client, path string) (string, error) {
+	r, err := dbCl.Download(path)
+	if err != nil {
+		return "", err
+	}
+
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), err
+}
 
 func registerEmojiSetType(L *lua.LState) {
 	mt := L.NewTypeMetatable("emojiset")

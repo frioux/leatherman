@@ -36,7 +36,6 @@ Run comments to discord and reacts to all messages with vaguely related emoji.
 The following env vars should be set:
 
  * LM_DROPBOX_TOKEN should be set to load a responses.json.
- * LM_RESPONSES_PATH should be set to the location of responses.json within dropbox.
  * LM_BOT_LUA_PATH should be set to the location of lua to process emoji data within dropbox.
  * LM_DISCORD_TOKEN should be set for this to actually function.
 
@@ -44,26 +43,19 @@ Command: auto-emote
 */
 func Run(args []string, _ io.Reader) error {
 	var dbCl dropbox.Client
-	if p := os.Getenv("LM_RESPONSES_PATH"); p != "" {
+	if p := os.Getenv("LM_BOT_LUA_PATH"); p != "" {
 		var err error
 		dbCl, err = dropbox.NewClient(dropbox.Client{Token: os.Getenv("LM_DROPBOX_TOKEN")})
 		if err != nil {
 			return err
 		}
-		matchersMu.Lock()
-		matchers, err = loadMatchers(dbCl, p)
+		luaMu.Lock()
+		luaC, err = loadLua(dbCl, p)
 		if err != nil {
-			matchersMu.Unlock()
+			luaMu.Unlock()
 			return err
 		}
-		if lp := os.Getenv("LM_BOT_LUA_PATH"); lp != "" {
-			luaC, err = loadLua(dbCl, lp)
-			if err != nil {
-				matchersMu.Unlock()
-				return err
-			}
-		}
-		matchersMu.Unlock()
+		luaMu.Unlock()
 	}
 	if len(args) > 1 {
 		for _, arg := range args[1:] {
@@ -78,31 +70,21 @@ func Run(args []string, _ io.Reader) error {
 		return nil
 	}
 
-	if p := os.Getenv("LM_RESPONSES_PATH"); p != "" {
-		lp := os.Getenv("LM_BOT_LUA_PATH")
+	if p := os.Getenv("LM_BOT_LUA_PATH"); p != "" {
 		responsesChanged := make(chan struct{})
 		go func() {
 			for range responsesChanged {
 				var err error
-				matchersMu.Lock()
-				matchers, err = loadMatchers(dbCl, p)
+				luaMu.Lock()
+
+				luaC, err = loadLua(dbCl, p)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
-					matchersMu.Unlock()
+					luaMu.Unlock()
 					continue
 				}
-				fmt.Fprintf(os.Stderr, "updated matchers (%d)\n", len(matchers))
-
-				if lp != "" {
-					luaC, err = loadLua(dbCl, lp)
-					if err != nil {
-						fmt.Fprintln(os.Stderr, err)
-						matchersMu.Unlock()
-						continue
-					}
-					fmt.Fprintf(os.Stderr, "updated lua (%d bytes)\n", len(luaC))
-				}
-				matchersMu.Unlock()
+				fmt.Fprintf(os.Stderr, "updated lua (%d bytes)\n", len(luaC))
+				luaMu.Unlock()
 			}
 		}()
 		go dbCl.Longpoll(context.Background(), filepath.Dir(p), responsesChanged)
@@ -211,9 +193,8 @@ func init() {
 	mustRegister(messageCreateTotal)
 }
 
-var matchers []matcher
 var luaC string
-var matchersMu = &sync.Mutex{}
+var luaMu = &sync.Mutex{}
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Message.Content == "||hidden knowledge||" {
