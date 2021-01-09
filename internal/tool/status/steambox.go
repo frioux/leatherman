@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/user"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -72,9 +74,12 @@ LINE:
 }
 
 func (l *steambox) load() error {
-	const (
-		path = "/home/steam/.local/share/Steam/logs/content_log.txt"
-	)
+	u, err := user.Current()
+	if err != nil {
+		return err
+	}
+
+	path := filepath.Join(u.HomeDir, ".local", "share", "Steam", "logs", "content_log.txt")
 	f, err := os.Open(path)
 	if err != nil {
 		return err
