@@ -9,7 +9,6 @@ import (
 
 // Longpoll signals changes in dir by sending on ch.
 func (db Client) Longpoll(ctx context.Context, dir string, ch chan<- struct{}) {
-OUTER:
 	for {
 		res, err := db.ListFolder(ListFolderParams{
 			Path: dir,
@@ -56,6 +55,5 @@ OUTER:
 				break
 			}
 		}
-		continue OUTER
 	}
 }
