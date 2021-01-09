@@ -2,7 +2,6 @@ package notes
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	corehtml "html"
@@ -71,9 +70,6 @@ func server() (http.Handler, error) {
 		dir     = "/notes/content/posts/"
 		nowPath = dir + "now.md"
 	)
-
-	changed := make(chan struct{})
-	go db.Longpoll(context.Background(), dir, changed)
 
 	mux.Handle("/favicon", http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 		rw.Header().Add("Content-Type", "image/svg+xml")
