@@ -119,10 +119,44 @@ The following env vars should be set:
 
 Here's an example of lua code that works for this:
 
-	if es:messagematches("cronos") then
-		es:addrequired("👶")
-		es:addrequired("🥘")
-	end
+` + "`" + `` + "`" + `` + "`" + `lua
+function add(w)
+        es:addoptional(w:char())
+end
+
+function addtoken(tok)
+        if tok == "" then
+                return
+        end
+
+        bn = turtleemoji.findbyname(tok)
+        if not bn == nil then
+                add(bn)
+        end
+
+        for i, te in ipairs(turtleemoji.searchbycategory(tok)) do
+                add(te)
+        end
+
+        for i, te in ipairs(turtleemoji.searchbykeyword(tok)) do
+                add(te)
+        end
+
+        if not es:optionallen() == 0 then
+                return
+        end
+
+        -- this returns so many results for basic words that we only
+        -- use it if nothing else found anything for the whole message
+        for i, te in ipairs(turtleemoji.search(tok)) do
+                add(te)
+        end
+end
+
+for i, w in ipairs(es:words()) do
+        addtoken(w)
+end
+` + "`" + `` + "`" + `` + "`" + `
 
 The lua code has a global var called ` + "`" + `es` + "`" + ` (for emoji set) and an imported
 package called ` + "`" + `turtleemoji` + "`" + `.  ` + "`" + `es` + "`" + ` is how you access the current message,
@@ -588,70 +622,70 @@ func init() {
 
 		"alluni": readme[2642:3468],
 
-		"auto-emote": readme[3468:6217],
+		"auto-emote": readme[3468:6961],
 
-		"backlight": readme[6217:6419],
+		"backlight": readme[6961:7163],
 
-		"clocks": readme[6419:6635],
+		"clocks": readme[7163:7379],
 
-		"csv2json": readme[6635:6775],
+		"csv2json": readme[7379:7519],
 
-		"csv2md": readme[6775:6849],
+		"csv2md": readme[7519:7593],
 
-		"debounce": readme[6849:7193],
+		"debounce": readme[7593:7937],
 
-		"dump-mozlz4": readme[7193:7376],
+		"dump-mozlz4": readme[7937:8120],
 
-		"email2json": readme[7376:8091],
+		"email2json": readme[8120:8835],
 
-		"expand-url": readme[8091:8267],
+		"expand-url": readme[8835:9011],
 
-		"export-bamboohr": readme[8267:8351],
+		"export-bamboohr": readme[9011:9095],
 
-		"export-bamboohr-tree": readme[8351:8438],
+		"export-bamboohr-tree": readme[9095:9182],
 
-		"fn": readme[8438:8574],
+		"fn": readme[9182:9318],
 
-		"group-by-date": readme[8574:8792],
+		"group-by-date": readme[9318:9536],
 
-		"minotaur": readme[8792:10611],
+		"minotaur": readme[9536:11355],
 
-		"name2rune": readme[10611:10716],
+		"name2rune": readme[11355:11460],
 
-		"netrc-password": readme[10716:10881],
+		"netrc-password": readme[11460:11625],
 
-		"notes": readme[10881:11017],
+		"notes": readme[11625:11761],
 
-		"pomotimer": readme[11017:11509],
+		"pomotimer": readme[11761:12253],
 
-		"prepend-hist": readme[11509:11750],
+		"prepend-hist": readme[12253:12494],
 
-		"proj": readme[11750:13069],
+		"proj": readme[12494:13813],
 
-		"render-mail": readme[13069:13203],
+		"render-mail": readme[13813:13947],
 
-		"replace-unzip": readme[13203:13433],
+		"replace-unzip": readme[13947:14177],
 
-		"slack-deaddrop": readme[13433:13653],
+		"slack-deaddrop": readme[14177:14397],
 
-		"slack-open": readme[13653:13787],
+		"slack-open": readme[14397:14531],
 
-		"slack-status": readme[13787:13932],
+		"slack-status": readme[14531:14676],
 
-		"sm-list": readme[13932:14208],
+		"sm-list": readme[14676:14952],
 
-		"srv": readme[14208:14691],
+		"srv": readme[14952:15435],
 
-		"status": readme[14691:15148],
+		"status": readme[15435:15892],
 
-		"toml2json": readme[15148:15323],
+		"toml2json": readme[15892:16067],
 
-		"uni": readme[15323:15485],
+		"uni": readme[16067:16229],
 
-		"update": readme[15485:15708],
+		"update": readme[16229:16452],
 
-		"yaml2json": readme[15708:15785],
+		"yaml2json": readme[16452:16529],
 
-		"zine": readme[15785:15841],
+		"zine": readme[16529:16585],
 	}
 }
