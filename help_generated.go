@@ -128,11 +128,16 @@ The lua code has a global var called ` + "`" + `es` + "`" + ` (for emoji set) an
 package called ` + "`" + `turtleemoji` + "`" + `.  ` + "`" + `es` + "`" + ` is how you access the current message,
 currently added emoji, etc.  Here are the methods on ` + "`" + `es` + "`" + `:
 
+#### ` + "`" + `es:optional()` + "`" + ` // table of string to bool
+
+Returns a copy of the optional emoji.  Modifications of the table will not
+affect the final result; other methods should be used for modification.
+
 #### ` + "`" + `es:addoptional("💀")` + "`" + `
 
 Adds an emoji to randomly include in the reaction.
 
-#### ` + "`" + `es:hasoptional("💀") // bool` + "`" + `
+#### ` + "`" + `es:hasoptional("💀")` + "`" + ` // bool
 
 Returns true of the passed emoji is in the list of optional emoji to include
 (at random) on the reaction.
@@ -140,6 +145,11 @@ Returns true of the passed emoji is in the list of optional emoji to include
 #### ` + "`" + `es:removeoptional("💀")` + "`" + `
 
 Remove the passed emoji from the optionally included emoji.
+
+#### ` + "`" + `es:required()` + "`" + ` // table of required emoji
+
+Returns a copy of the required emoji.  Modifications of the table will not
+affect the final result; other methods should be used for modification.
 
 #### ` + "`" + `es:hasrequired("💀")` + "`" + ` // bool
 
@@ -162,16 +172,23 @@ Returns the message that triggered the reaction.
 True if the message matches the passed regex.
 [Docs for regex syntax are here](https://golang.org/pkg/regexp/syntax/).
 
+#### ` + "`" + `es:words()` + "`" + ` // table of tokenized words
+
+Returns a copy of the tokenized words.  Tokenization of words happens on all
+non-alpha characters and the message is lowerecased.
+
 #### ` + "`" + `es:hasword("word")` + "`" + ` // bool
 
-True if the word is included in the message.  Tokenization of words happens on
-all non-alpha characters and the message is lowerecased.
+True if the word is included in the message.
 
 All of the following are thin veneers atop
 [github.com/hackebrot/turtle](https://github.com/hackebrot/turtle):
 
  * ` + "`" + `turtle.findbyname("skull")` + "`" + ` // turtleemoji
  * ` + "`" + `turtle.findbychar("💀")` + "`" + ` // turtleemoji
+ * ` + "`" + `turtle.searchbycategory("people")` + "`" + ` // table of turtleemoji
+ * ` + "`" + `turtle.searchbykeyword("animal")` + "`" + ` // table of turtleemoji
+ * ` + "`" + `turtle.search("foo")` + "`" + ` // table of turtleemoji
  * ` + "`" + `turtleemoji#name()` + "`" + ` // string
  * ` + "`" + `turtleemoji#category()` + "`" + ` // string
  * ` + "`" + `turtleemoji#char()` + "`" + ` // string
@@ -571,70 +588,70 @@ func init() {
 
 		"alluni": readme[2642:3468],
 
-		"auto-emote": readme[3468:5561],
+		"auto-emote": readme[3468:6217],
 
-		"backlight": readme[5561:5763],
+		"backlight": readme[6217:6419],
 
-		"clocks": readme[5763:5979],
+		"clocks": readme[6419:6635],
 
-		"csv2json": readme[5979:6119],
+		"csv2json": readme[6635:6775],
 
-		"csv2md": readme[6119:6193],
+		"csv2md": readme[6775:6849],
 
-		"debounce": readme[6193:6537],
+		"debounce": readme[6849:7193],
 
-		"dump-mozlz4": readme[6537:6720],
+		"dump-mozlz4": readme[7193:7376],
 
-		"email2json": readme[6720:7435],
+		"email2json": readme[7376:8091],
 
-		"expand-url": readme[7435:7611],
+		"expand-url": readme[8091:8267],
 
-		"export-bamboohr": readme[7611:7695],
+		"export-bamboohr": readme[8267:8351],
 
-		"export-bamboohr-tree": readme[7695:7782],
+		"export-bamboohr-tree": readme[8351:8438],
 
-		"fn": readme[7782:7918],
+		"fn": readme[8438:8574],
 
-		"group-by-date": readme[7918:8136],
+		"group-by-date": readme[8574:8792],
 
-		"minotaur": readme[8136:9955],
+		"minotaur": readme[8792:10611],
 
-		"name2rune": readme[9955:10060],
+		"name2rune": readme[10611:10716],
 
-		"netrc-password": readme[10060:10225],
+		"netrc-password": readme[10716:10881],
 
-		"notes": readme[10225:10361],
+		"notes": readme[10881:11017],
 
-		"pomotimer": readme[10361:10853],
+		"pomotimer": readme[11017:11509],
 
-		"prepend-hist": readme[10853:11094],
+		"prepend-hist": readme[11509:11750],
 
-		"proj": readme[11094:12413],
+		"proj": readme[11750:13069],
 
-		"render-mail": readme[12413:12547],
+		"render-mail": readme[13069:13203],
 
-		"replace-unzip": readme[12547:12777],
+		"replace-unzip": readme[13203:13433],
 
-		"slack-deaddrop": readme[12777:12997],
+		"slack-deaddrop": readme[13433:13653],
 
-		"slack-open": readme[12997:13131],
+		"slack-open": readme[13653:13787],
 
-		"slack-status": readme[13131:13276],
+		"slack-status": readme[13787:13932],
 
-		"sm-list": readme[13276:13552],
+		"sm-list": readme[13932:14208],
 
-		"srv": readme[13552:14035],
+		"srv": readme[14208:14691],
 
-		"status": readme[14035:14492],
+		"status": readme[14691:15148],
 
-		"toml2json": readme[14492:14667],
+		"toml2json": readme[15148:15323],
 
-		"uni": readme[14667:14829],
+		"uni": readme[15323:15485],
 
-		"update": readme[14829:15052],
+		"update": readme[15485:15708],
 
-		"yaml2json": readme[15052:15129],
+		"yaml2json": readme[15708:15785],
 
-		"zine": readme[15129:15185],
+		"zine": readme[15785:15841],
 	}
 }

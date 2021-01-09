@@ -110,6 +110,9 @@ All of the following are thin veneers atop
 
  * `turtle.findbyname("skull")` // turtleemoji
  * `turtle.findbychar("💀")` // turtleemoji
+ * `turtle.searchbycategory("people")` // table of turtleemoji
+ * `turtle.searchbykeyword("animal")` // table of turtleemoji
+ * `turtle.search("foo")` // table of turtleemoji
  * `turtleemoji#name()` // string
  * `turtleemoji#category()` // string
  * `turtleemoji#char()` // string
@@ -146,10 +149,12 @@ func Run(args []string, _ io.Reader) error {
 		for _, arg := range args[1:] {
 			es := newEmojiSet(arg)
 
+			t0 := time.Now()
 			if err := luaEval(es, luaC); err != nil {
 				return err
 			}
 
+			fmt.Println("lua time", time.Now().Sub(t0))
 			fmt.Println(es.all(0))
 		}
 		return nil

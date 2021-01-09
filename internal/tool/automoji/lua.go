@@ -73,6 +73,12 @@ var emojiSetMethods = map[string]lua.LGFunction{
 		delete(es.optional, e)
 		return 0
 	},
+	"optionallen": func(L *lua.LState) int {
+		es := checkEmojiSet(L)
+
+		L.Push(lua.LNumber(float64(len(es.optional))))
+		return 1
+	},
 
 	"required": func(L *lua.LState) int {
 		es := checkEmojiSet(L)
