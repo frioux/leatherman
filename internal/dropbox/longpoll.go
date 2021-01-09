@@ -44,14 +44,17 @@ OUTER:
 		}
 
 		res = ListFolderResult{HasMore: true, Cursor: cu}
-		res, err = db.ListFolderContinue(res.Cursor)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "ListFolderContinue:", err)
-			continue
-		}
+		for res.HasMore {
+			res, err = db.ListFolderContinue(res.Cursor)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "ListFolderContinue:", err)
+				continue
+			}
 
-		if len(res.Entries) > 0 {
-			ch <- struct{}{}
+			if len(res.Entries) > 0 {
+				ch <- struct{}{}
+				break
+			}
 		}
 		continue OUTER
 	}
