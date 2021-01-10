@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -188,8 +189,15 @@ func Run(args []string, _ io.Reader) error {
 				return err
 			}
 
+			optional := make([]string, 0, len(es.optional))
+			for o := range es.optional {
+				optional = append(optional, o)
+			}
+
 			fmt.Println("lua time", time.Now().Sub(t0))
-			fmt.Println(es.all(0))
+			fmt.Println("required", es.required)
+			sort.Strings(optional)
+			fmt.Println("optional", optional)
 		}
 		return nil
 	}
