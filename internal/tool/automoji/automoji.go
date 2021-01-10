@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -160,6 +161,13 @@ All of the following are thin veneers atop
 Command: auto-emote
 */
 func Run(args []string, _ io.Reader) error {
+	fs := flag.NewFlagSet("automoji", flag.ContinueOnError)
+	var bench bool
+	fs.BoolVar(&bench, "bench", false, "run standard benchmarks against the current lua code")
+	if err := fs.Parse(args[1:]); err != nil {
+		return err
+	}
+
 	var dbCl dropbox.Client
 	if p := os.Getenv("LM_BOT_LUA_PATH"); p != "" {
 		if strings.HasPrefix(p, "file://") {
@@ -184,8 +192,12 @@ func Run(args []string, _ io.Reader) error {
 			luaMu.Unlock()
 		}
 	}
-	if len(args) > 1 {
-		for _, arg := range args[1:] {
+	switch {
+	case bench:
+		benchmark()
+		return nil
+	case len(fs.Args()) > 0:
+		for _, arg := range fs.Args() {
 			es := newEmojiSet(arg)
 
 			t0 := time.Now()
