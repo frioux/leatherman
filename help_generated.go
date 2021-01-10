@@ -215,6 +215,10 @@ non-alpha characters and the message is lowerecased.
 
 True if the word is included in the message.
 
+#### ` + "`" + `es:len()` + "`" + ` // int
+
+Total count of items in optional and required.
+
 All of the following are thin veneers atop
 [github.com/hackebrot/turtle](https://github.com/hackebrot/turtle):
 
@@ -622,70 +626,70 @@ func init() {
 
 		"alluni": readme[2642:3468],
 
-		"auto-emote": readme[3468:6961],
+		"auto-emote": readme[3468:7033],
 
-		"backlight": readme[6961:7163],
+		"backlight": readme[7033:7235],
 
-		"clocks": readme[7163:7379],
+		"clocks": readme[7235:7451],
 
-		"csv2json": readme[7379:7519],
+		"csv2json": readme[7451:7591],
 
-		"csv2md": readme[7519:7593],
+		"csv2md": readme[7591:7665],
 
-		"debounce": readme[7593:7937],
+		"debounce": readme[7665:8009],
 
-		"dump-mozlz4": readme[7937:8120],
+		"dump-mozlz4": readme[8009:8192],
 
-		"email2json": readme[8120:8835],
+		"email2json": readme[8192:8907],
 
-		"expand-url": readme[8835:9011],
+		"expand-url": readme[8907:9083],
 
-		"export-bamboohr": readme[9011:9095],
+		"export-bamboohr": readme[9083:9167],
 
-		"export-bamboohr-tree": readme[9095:9182],
+		"export-bamboohr-tree": readme[9167:9254],
 
-		"fn": readme[9182:9318],
+		"fn": readme[9254:9390],
 
-		"group-by-date": readme[9318:9536],
+		"group-by-date": readme[9390:9608],
 
-		"minotaur": readme[9536:11355],
+		"minotaur": readme[9608:11427],
 
-		"name2rune": readme[11355:11460],
+		"name2rune": readme[11427:11532],
 
-		"netrc-password": readme[11460:11625],
+		"netrc-password": readme[11532:11697],
 
-		"notes": readme[11625:11761],
+		"notes": readme[11697:11833],
 
-		"pomotimer": readme[11761:12253],
+		"pomotimer": readme[11833:12325],
 
-		"prepend-hist": readme[12253:12494],
+		"prepend-hist": readme[12325:12566],
 
-		"proj": readme[12494:13813],
+		"proj": readme[12566:13885],
 
-		"render-mail": readme[13813:13947],
+		"render-mail": readme[13885:14019],
 
-		"replace-unzip": readme[13947:14177],
+		"replace-unzip": readme[14019:14249],
 
-		"slack-deaddrop": readme[14177:14397],
+		"slack-deaddrop": readme[14249:14469],
 
-		"slack-open": readme[14397:14531],
+		"slack-open": readme[14469:14603],
 
-		"slack-status": readme[14531:14676],
+		"slack-status": readme[14603:14748],
 
-		"sm-list": readme[14676:14952],
+		"sm-list": readme[14748:15024],
 
-		"srv": readme[14952:15435],
+		"srv": readme[15024:15507],
 
-		"status": readme[15435:15892],
+		"status": readme[15507:15964],
 
-		"toml2json": readme[15892:16067],
+		"toml2json": readme[15964:16139],
 
-		"uni": readme[16067:16229],
+		"uni": readme[16139:16301],
 
-		"update": readme[16229:16452],
+		"update": readme[16301:16524],
 
-		"yaml2json": readme[16452:16529],
+		"yaml2json": readme[16524:16601],
 
-		"zine": readme[16529:16585],
+		"zine": readme[16601:16657],
 	}
 }

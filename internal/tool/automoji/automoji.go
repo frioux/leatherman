@@ -140,6 +140,10 @@ non-alpha characters and the message is lowerecased.
 
 True if the word is included in the message.
 
+#### `es:len()` // int
+
+Total count of items in optional and required.
+
 All of the following are thin veneers atop
 [github.com/hackebrot/turtle](https://github.com/hackebrot/turtle):
 

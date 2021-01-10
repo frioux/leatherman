@@ -134,6 +134,13 @@ var emojiSetMethods = map[string]lua.LGFunction{
 		return 1
 	},
 
+	"len": func(L *lua.LState) int {
+		es := checkEmojiSet(L)
+
+		L.Push(lua.LNumber(len(es.optional) + len(es.required)))
+		return 1
+	},
+
 	"hasword": func(L *lua.LState) int {
 		es := checkEmojiSet(L)
 		e := L.CheckString(2)
