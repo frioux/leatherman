@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -15,7 +14,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -25,6 +23,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/expfmt"
+	lua "github.com/yuin/gopher-lua"
 )
 
 var registry = prometheus.NewRegistry()
@@ -33,6 +32,8 @@ func mustRegister(cs ...prometheus.Collector) {
 	registry.MustRegister(cs...)
 	prometheus.MustRegister(cs...)
 }
+
+var luaC string
 
 /*
 Run comments to discord and reacts to all messages with vaguely related emoji.
@@ -170,26 +171,13 @@ func Run(args []string, _ io.Reader) error {
 
 	var dbCl dropbox.Client
 	if p := os.Getenv("LM_BOT_LUA_PATH"); p != "" {
-		if strings.HasPrefix(p, "file://") {
-			p = strings.TrimPrefix(p, "file://")
-			b, err := ioutil.ReadFile(p)
-			if err != nil {
-				return err
-			}
-			luaC = string(b)
-		} else {
-			var err error
-			dbCl, err = dropbox.NewClient(dropbox.Client{Token: os.Getenv("LM_DROPBOX_TOKEN")})
-			if err != nil {
-				return err
-			}
-			luaMu.Lock()
-			luaC, err = loadLua(dbCl, p)
-			if err != nil {
-				luaMu.Unlock()
-				return err
-			}
-			luaMu.Unlock()
+		var err error
+		dbCl, err = dropbox.NewClient(dropbox.Client{Token: os.Getenv("LM_DROPBOX_TOKEN")})
+		if err != nil {
+			return err
+		}
+		if err := loadLua(dbCl, p); err != nil {
+			return err
 		}
 	}
 	switch {
@@ -201,7 +189,7 @@ func Run(args []string, _ io.Reader) error {
 			es := newEmojiSet(arg)
 
 			t0 := time.Now()
-			if err := luaEval(es, luaC); err != nil {
+			if err := luaEval(es); err != nil {
 				return err
 			}
 
@@ -222,17 +210,11 @@ func Run(args []string, _ io.Reader) error {
 		responsesChanged := make(chan struct{})
 		go func() {
 			for range responsesChanged {
-				var err error
-				luaMu.Lock()
-
-				luaC, err = loadLua(dbCl, p)
-				if err != nil {
+				if err := loadLua(dbCl, p); err != nil {
 					fmt.Fprintln(os.Stderr, err)
-					luaMu.Unlock()
 					continue
 				}
 				fmt.Fprintf(os.Stderr, "updated lua (%d bytes)\n", len(luaC))
-				luaMu.Unlock()
 			}
 		}()
 		go dbCl.Longpoll(context.Background(), filepath.Dir(p), responsesChanged)
@@ -325,7 +307,7 @@ func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 	}
 
 	es := newEmojiSet(m.Content)
-	if err := luaEval(es, luaC); err != nil {
+	if err := luaEval(es); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
@@ -341,7 +323,7 @@ func init() {
 	mustRegister(messageCreateTotal)
 }
 
-var luaC string
+var luaFn *lua.FunctionProto
 var luaMu = &sync.Mutex{}
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -360,7 +342,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	es := newEmojiSet(m.Message.Content)
-	if err := luaEval(es, luaC); err != nil {
+	if err := luaEval(es); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}

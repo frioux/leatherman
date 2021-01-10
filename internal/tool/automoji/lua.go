@@ -1,25 +1,51 @@
 package automoji
 
 import (
-	"io/ioutil"
+	"bufio"
+	"io"
+	"os"
 	"regexp"
+	"strings"
 
 	"github.com/frioux/leatherman/internal/dropbox"
 	lua "github.com/yuin/gopher-lua"
+	"github.com/yuin/gopher-lua/parse"
 )
 
-func loadLua(dbCl dropbox.Client, path string) (string, error) {
-	r, err := dbCl.Download(path)
-	if err != nil {
-		return "", err
+func loadLua(dbCl dropbox.Client, path string) error {
+	luaMu.Lock()
+	defer luaMu.Unlock()
+
+	var (
+		r   io.Reader
+		err error
+	)
+	if strings.HasPrefix(path, "file://") {
+		path = strings.TrimPrefix(path, "file://")
+		r, err = os.Open(path)
+		if err != nil {
+			return err
+		}
+
+	} else {
+		r, err = dbCl.Download(path)
+		if err != nil {
+			return err
+		}
 	}
 
-	b, err := ioutil.ReadAll(r)
+	reader := bufio.NewReader(r)
+	chunk, err := parse.Parse(reader, ":memory:")
 	if err != nil {
-		return "", err
+		return err
+	}
+	proto, err := lua.Compile(chunk, ":memory:")
+	if err != nil {
+		return err
 	}
 
-	return string(b), err
+	luaFn = proto
+	return nil
 }
 
 func registerEmojiSetType(L *lua.LState) {
@@ -164,13 +190,14 @@ var emojiSetMethods = map[string]lua.LGFunction{
 	},
 }
 
-func luaEval(es *emojiSet, code string) error {
+func luaEval(es *emojiSet) error {
 	L := lua.NewState()
 	defer L.Close()
 
 	registerEmojiSetType(L)
 	registerTurtleType(L)
 	setGlobalEmojiSet(L, "es", es)
+	L.Push(L.NewFunctionFromProto(luaFn))
 
-	return L.DoString(code)
+	return L.PCall(0, lua.MultRet, nil)
 }

@@ -10,7 +10,7 @@ func benchmark() {
 	r := testing.Benchmark(func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			es := newEmojiSet("a b c d e f g h i j k l m n o p q r s t u v w x y z")
-			if err := luaEval(es, luaC); err != nil {
+			if err := luaEval(es); err != nil {
 				panic(err)
 			}
 		}
@@ -21,7 +21,7 @@ func benchmark() {
 	r = testing.Benchmark(func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			es := newEmojiSet("hello!")
-			if err := luaEval(es, luaC); err != nil {
+			if err := luaEval(es); err != nil {
 				panic(err)
 			}
 		}
@@ -32,7 +32,7 @@ func benchmark() {
 	r = testing.Benchmark(func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			es := newEmojiSet("gear grip strength hiccup bleed garbage tourist wriggle miscarriage crash trait feedback application relative prince hilarious matrix reserve velvet account good trick invite attractive disorder period drawer harm monk land cower governor knowledge pedestrian payment sniff beautiful nominate color possession width facility embryo thick refer wind moon mutter battle prove")
-			if err := luaEval(es, luaC); err != nil {
+			if err := luaEval(es); err != nil {
 				panic(err)
 			}
 		}
