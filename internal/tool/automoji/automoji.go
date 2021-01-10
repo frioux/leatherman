@@ -186,10 +186,9 @@ func Run(args []string, _ io.Reader) error {
 		return nil
 	case len(fs.Args()) > 0:
 		for _, arg := range fs.Args() {
-			es := newEmojiSet(arg)
-
 			t0 := time.Now()
-			if err := luaEval(es); err != nil {
+			es, err := newEmojiSet(arg)
+			if err != nil {
 				return err
 			}
 
@@ -306,8 +305,8 @@ func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 		return
 	}
 
-	es := newEmojiSet(m.Content)
-	if err := luaEval(es); err != nil {
+	es, err := newEmojiSet(m.Content)
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
@@ -341,8 +340,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	es := newEmojiSet(m.Message.Content)
-	if err := luaEval(es); err != nil {
+	es, err := newEmojiSet(m.Message.Content)
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}

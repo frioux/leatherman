@@ -10,7 +10,7 @@ var (
 	secretRE  = regexp.MustCompile(`\|\|.+\|\|`)
 )
 
-func newEmojiSet(m string) *emojiSet {
+func newEmojiSet(m string) (*emojiSet, error) {
 	s := &emojiSet{
 		message:  m,
 		optional: make(map[string]bool),
@@ -26,7 +26,11 @@ func newEmojiSet(m string) *emojiSet {
 	m = nonNameRE.ReplaceAllString(m, " ")
 	s.words = strings.Split(m, " ")
 
-	return s
+	if err := luaEval(s); err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }
 
 type emojiSet struct {
