@@ -23,7 +23,7 @@ require (
 	github.com/ulikunitz/xz v0.5.9
 	github.com/yuin/goldmark v1.3.1
 	github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da
-	golang.org/x/text v0.3.4
+	golang.org/x/text v0.3.5
 	modernc.org/sqlite v1.7.5
 )
 
