@@ -8,6 +8,9 @@ import (
 )
 
 func init() {
+	if os.Getenv("LM_BOT_LUA_PATH") == "" {
+		return
+	}
 	if err := loadLua(dropbox.Client{}, os.Getenv("LM_BOT_LUA_PATH")); err != nil {
 		panic(err)
 	}
