@@ -180,11 +180,7 @@ func Run(args []string, _ io.Reader) error {
 			return err
 		}
 	}
-	switch {
-	case bench:
-		benchmark()
-		return nil
-	case len(fs.Args()) > 0:
+	if len(fs.Args()) > 0 {
 		for _, arg := range fs.Args() {
 			t0 := time.Now()
 			es, err := newEmojiSet(arg)
