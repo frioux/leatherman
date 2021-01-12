@@ -5,6 +5,21 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+var (
+	fastCategory = make(map[string][]*turtle.Emoji, len(turtle.Emojis))
+	fastKeyword  = make(map[string][]*turtle.Emoji, len(turtle.Emojis))
+)
+
+func init() {
+	for _, e := range turtle.Emojis {
+		fastCategory[e.Category] = append(fastCategory[e.Category], e)
+
+		for _, k := range e.Keywords {
+			fastKeyword[k] = append(fastKeyword[k], e)
+		}
+	}
+}
+
 func registerTurtleType(L *lua.LState) {
 	mt := L.NewTypeMetatable("turtleemoji")
 	L.SetGlobal("turtleemoji", mt)
@@ -43,7 +58,7 @@ func registerTurtleType(L *lua.LState) {
 	L.SetField(mt, "searchbycategory", L.NewFunction(func(L *lua.LState) int {
 		category := L.CheckString(1)
 
-		found := turtle.Category(category)
+		found := fastCategory[category]
 		foundL := L.CreateTable(len(found), 0)
 
 		for i, f := range found {
@@ -60,7 +75,7 @@ func registerTurtleType(L *lua.LState) {
 	L.SetField(mt, "searchbykeyword", L.NewFunction(func(L *lua.LState) int {
 		keyword := L.CheckString(1)
 
-		found := turtle.Keyword(keyword)
+		found := fastKeyword[keyword]
 		foundL := L.CreateTable(len(found), 0)
 
 		for i, f := range found {
