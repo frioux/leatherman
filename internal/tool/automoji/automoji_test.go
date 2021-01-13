@@ -11,7 +11,15 @@ func init() {
 	if os.Getenv("LM_BOT_LUA_PATH") == "" {
 		return
 	}
-	if err := loadLua(dropbox.Client{}, os.Getenv("LM_BOT_LUA_PATH")); err != nil {
+	var dbCl dropbox.Client
+	if t := os.Getenv("LM_DROPBOX_TOKEN"); t != "" {
+		var err error
+		dbCl, err = dropbox.NewClient(dropbox.Client{Token: os.Getenv("LM_DROPBOX_TOKEN")})
+		if err != nil {
+			panic(err)
+		}
+	}
+	if err := loadLua(dbCl, os.Getenv("LM_BOT_LUA_PATH")); err != nil {
 		panic(err)
 	}
 }
