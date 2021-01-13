@@ -5,7 +5,7 @@ require (
 	github.com/BurntSushi/xgb v0.0.0-20200324125942-20f126ea2843 // indirect
 	github.com/BurntSushi/xgbutil v0.0.0-20190907113008-ad855c713046
 	github.com/PuerkitoBio/goquery v1.6.1
-	github.com/bwmarrin/discordgo v0.22.0
+	github.com/bwmarrin/discordgo v0.22.1
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/google/go-cmp v0.5.4
