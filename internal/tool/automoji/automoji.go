@@ -233,7 +233,7 @@ func Run(args []string, _ io.Reader) error {
 	dg.AddHandler(messageCreate)
 	dg.AddHandler(emojiAdd)
 
-	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuildMessageReactions)
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuildMessageReactions | discordgo.IntentsDirectMessages)
 
 	if err := dg.Open(); err != nil {
 		return err
