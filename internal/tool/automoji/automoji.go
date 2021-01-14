@@ -233,7 +233,7 @@ func Run(args []string, _ io.Reader) error {
 	dg.AddHandler(messageCreate)
 	dg.AddHandler(emojiAdd)
 
-	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuildMessageReactions | discordgo.IntentsDirectMessages)
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuildMessageReactions | discordgo.IntentsDirectMessages | discordgo.IntentsDirectMessageReactions)
 
 	if err := dg.Open(); err != nil {
 		return err
@@ -288,7 +288,7 @@ func init() {
 }
 
 func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
-	if a.Emoji.Name != "bot" {
+	if (a.GuildID != "" && a.Emoji.Name != "bot") || (a.GuildID == "" && a.Emoji.Name != "🤖") {
 		messageReactionAddTotal.WithLabelValues("no").Inc()
 		return
 	}
