@@ -48,11 +48,11 @@ Files are created in a directory in Dropbox and are the acted upon by
 
 All configuration is done via environment variables.
 
-### `DROPBOX_ACCESS_TOKEN`
+### `LM_DROPBOX_TOKEN`
 
 Used by `amygdala` to access Dropbox.
 
-### `MY_CELL`
+### `LM_MY_CELL`
 
 Used by `amygdala` to limit access to my own phone.
 
@@ -60,15 +60,15 @@ Used by `amygdala` to limit access to my own phone.
 
 All of these are used by `wuphf` to send notifications to my phone:
 
- * `PUSHOVER_TOKEN`
- * `PUSHOVER_USER`
- * `PUSHOVER_DEVICE`
+ * `LM_PUSHOVER_TOKEN`
+ * `LM_PUSHOVER_USER`
+ * `LM_PUSHOVER_DEVICE`
 
-### `TWILIO_AUTH_TOKEN`
+### `LM_TWILIO_TOKEN`
 
 Used by `amygdala` to validate that requests actually came from Twilio.
 
-### `TWILIO_URL`
+### `LM_TWILIO_URL`
 
 Also used by `amygdala` to validate that requests actually came from Twilio.  In
 theory this could be inferred from the request, but due to http proxies it must
@@ -112,9 +112,7 @@ Leatherman](https://github.com/frioux/leatherman#minotaur).
 
 ### `wuphf`
 
-Currently this tool sends alerts via both `wall` and
-[pushover](https://pushover.net).  All arguments are concatenated to produce the
-sent message.
+[Documentation moved](https://github.com/frioux/leatherman#wuphf).
 
 ## Development
 
@@ -126,7 +124,7 @@ Here's a list of places to look when you need to add functionality:
  * [Twilio package](https://godoc.org/github.com/frioux/amygdala/internal/twilio)
 
 It's always wise to run `go test ./...` before pushing any changes.  After
-that, using `cmd/brain-stem` to verify changes without needing the full stack
+that, using `brainstem` to verify changes without needing the full stack
 is useful.  If you want more, you can run the main app (`amygdala`) and poke at
 it with `cmd/twilio`.  There's no dropbox mock yet so you'll need to actually
 use the real dropbox token, but other than that you should be able to develop

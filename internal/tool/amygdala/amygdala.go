@@ -1,6 +1,7 @@
-package main
+package amygdala
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -16,50 +17,58 @@ import (
 	"github.com/frioux/leatherman/internal/twilio"
 )
 
-var (
-	dropboxAccessToken, myCell string
-)
+/*
+Amygdala is an automated assistant.  The main docs for it are in [amygdala.mdwn
+in the root of the leatherman
+repo](https://github.com/frioux/leatherman/blob/main/amygdala.mdwn).
 
-var twilioAuthToken, twilioURL []byte
+Configure it with the following environment variables:
 
-func init() {
+ * LM_DROPBOX_TOKEN
+ * LM_MY_CEL
+ * LM_TWILIO_URL
+
+Takes an optional `-port` argument to specify which port to listen on.
+
+Command: amygdala
+*/
+func Amygdala(args []string, _ io.Reader) error {
 	rand.Seed(time.Now().UnixNano())
+	var (
+		dropboxAccessToken, myCell, version string
+		twilioAuthToken, twilioURL          string
+		port                                int
+	)
 
-	dropboxAccessToken = os.Getenv("DROPBOX_ACCESS_TOKEN")
+	dropboxAccessToken = os.Getenv("LM_DROPBOX_TOKEN")
 	if dropboxAccessToken == "" {
-		panic("DROPBOX_ACCESS_TOKEN is missing")
+		return errors.New("LM_DROPBOX_TOKEN is missing")
 	}
 
-	myCell = os.Getenv("MY_CELL")
+	myCell = os.Getenv("LM_MY_CELL")
 	if myCell == "" {
 		myCell = "+15555555555"
 	}
 
-	twilioAuthToken = []byte(os.Getenv("TWILIO_AUTH_TOKEN"))
+	twilioAuthToken = os.Getenv("LM_TWILIO_TOKEN")
 	if len(twilioAuthToken) == 0 {
-		twilioAuthToken = []byte("xyzzy")
+		twilioAuthToken = "xyzzy"
 	}
 
-	twilioURL = []byte(os.Getenv("TWILIO_URL"))
+	twilioURL = os.Getenv("LM_TWILIO_URL")
 	if len(twilioURL) == 0 {
-		twilioURL = []byte("http://localhost:8080/twilio")
+		twilioURL = "http://localhost:8080/twilio"
 	}
-}
 
-var port int
-
-var version string
-
-func init() {
-	flag.IntVar(&port, "port", 8080, "port to listen on")
+	fs := flag.NewFlagSet("amgydala", flag.ContinueOnError)
+	fs.IntVar(&port, "port", 8080, "port to listen on")
 
 	if version == "" {
 		version = "unknown"
 	}
-}
-
-func main() {
-	flag.Parse()
+	if err := fs.Parse(args[1:]); err != nil {
+		return err
+	}
 	cl := &http.Client{}
 
 	mux := http.NewServeMux()
@@ -83,15 +92,14 @@ func main() {
 		}
 	}))
 
-	mux.Handle("/twilio", receiveSMS(cl, dropboxAccessToken))
+	mux.Handle("/twilio", receiveSMS(cl, dropboxAccessToken, twilioAuthToken, twilioURL, myCell))
 
 	h := middleware.Adapt(mux, middleware.Log(os.Stdout))
-	log.Err(http.ListenAndServe(fmt.Sprintf(":%d", port), h))
-	os.Exit(1)
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), h)
 }
 
 // receiveSMS handles https://www.twilio.com/docs/sms/twiml
-func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
+func receiveSMS(cl *http.Client, tok, twilioAuthToken, twilioURL, myCell string) http.HandlerFunc {
 	rules, err := notes.NewRules(tok)
 	if err != nil {
 		panic(err)
@@ -105,7 +113,7 @@ func receiveSMS(cl *http.Client, tok string) http.HandlerFunc {
 			return
 		}
 
-		if ok, err := twilio.CheckMAC(twilioAuthToken, twilioURL, r); err != nil || !ok {
+		if ok, err := twilio.CheckMAC([]byte(twilioAuthToken), []byte(twilioURL), r); err != nil || !ok {
 			rw.WriteHeader(403)
 			if err != nil {
 				log.Err(fmt.Errorf("twilio.CheckMAC: %w", err))

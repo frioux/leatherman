@@ -1,1 +1,1 @@
-web: amygdala -port $PORT
+web: leatherman amygdala -port $PORT

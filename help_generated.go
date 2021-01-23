@@ -107,6 +107,20 @@ DENTISTRY SYMBOL LIGHT VERTICAL AND TOP LEFT
 DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM LEFT
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `amygdala` + "`" + `
+
+` + "`" + `amygdala` + "`" + ` is an automated assistant.  The main docs for it are in [amygdala.mdwn
+in the root of the leatherman
+repo](https://github.com/frioux/leatherman/blob/main/amygdala.mdwn).
+
+Configure it with the following environment variables:
+
+ * LM_DROPBOX_TOKEN
+ * LM_MY_CEL
+ * LM_TWILIO_URL
+
+Takes an optional ` + "`" + `-port` + "`" + ` argument to specify which port to listen on.
+
 ### ` + "`" + `auto-emote` + "`" + `
 
 ` + "`" + `auto-emote` + "`" + ` comments to discord and reacts to all messages with vaguely related emoji.
@@ -247,6 +261,12 @@ Decrease by 10%:
 ` + "`" + `` + "`" + `` + "`" + ` bash
 $ backlight -10
 ` + "`" + `` + "`" + `` + "`" + `
+
+### ` + "`" + `brainstem` + "`" + `
+
+` + "`" + `brainstem` + "`" + ` allows interacting with amygdala without using any of the server
+components, typically for testing the personality etc, but can also be used as
+a lightweight amygdala instance.
 
 ### ` + "`" + `clocks` + "`" + `
 
@@ -564,6 +584,24 @@ $ echo 'foo = "bar"` + "`" + ` | toml2json
 {"foo":"bar"}
 ` + "`" + `` + "`" + `` + "`" + `
 
+### ` + "`" + `twilio` + "`" + `
+
+` + "`" + `twilio` + "`" + ` allows interacting with a service that recieves callbacks from twilio
+for testing.
+
+It takes four arguments:
+
+ * ` + "`" + `-endpoint` + "`" + `: the url to hit (` + "`" + `http://localhost:8080/twilio` + "`" + `, for example)
+ * ` + "`" + `-auth` + "`" + `: the auth token to use
+ * ` + "`" + `-message` + "`" + `: the message to send
+ * ` + "`" + `-from` + "`" + `: the phone number the message is from (` + "`" + `+15555555555` + "`" + `, for example)
+
+Run ` + "`" + `twilio -help` + "`" + ` to see the defaults.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ twilio -message "the building is on fire!"
+` + "`" + `` + "`" + `` + "`" + `
+
 ### ` + "`" + `uni` + "`" + `
 
 ` + "`" + `uni` + "`" + ` will describe the characters in the args.
@@ -578,6 +616,21 @@ $ uni ⢾
 ` + "`" + `update` + "`" + ` checks to see if there's an update from github and installs it if there
 is.  If LM_GH_TOKEN is set to a personal access token this can be called more
 frequently without exhausting github api limits.
+
+### ` + "`" + `wuphf` + "`" + `
+
+` + "`" + `wuphf` + "`" + ` sends alerts via both ` + "`" + `wall` + "`" + ` and [pushover](https://pushover.net).  All
+arguments are concatenated to produce the sent message.
+
+The following environment variables should be set:
+
+ * LM_PUSHOVER_TOKEN
+ * LM_PUSHOVER_USER
+ * LM_PUSHOVER_DEVICE
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ wuphf 'the shoes are on sale'
+` + "`" + `` + "`" + `` + "`" + `
 
 ### ` + "`" + `yaml2json` + "`" + `
 
@@ -626,70 +679,78 @@ func init() {
 
 		"alluni": readme[2642:3468],
 
-		"auto-emote": readme[3468:7033],
+		"amygdala": readme[3468:3845],
 
-		"backlight": readme[7033:7235],
+		"auto-emote": readme[3845:7410],
 
-		"clocks": readme[7235:7451],
+		"backlight": readme[7410:7612],
 
-		"csv2json": readme[7451:7591],
+		"brainstem": readme[7612:7819],
 
-		"csv2md": readme[7591:7665],
+		"clocks": readme[7819:8035],
 
-		"debounce": readme[7665:8009],
+		"csv2json": readme[8035:8175],
 
-		"dump-mozlz4": readme[8009:8192],
+		"csv2md": readme[8175:8249],
 
-		"email2json": readme[8192:8907],
+		"debounce": readme[8249:8593],
 
-		"expand-url": readme[8907:9083],
+		"dump-mozlz4": readme[8593:8776],
 
-		"export-bamboohr": readme[9083:9167],
+		"email2json": readme[8776:9491],
 
-		"export-bamboohr-tree": readme[9167:9254],
+		"expand-url": readme[9491:9667],
 
-		"fn": readme[9254:9390],
+		"export-bamboohr": readme[9667:9751],
 
-		"group-by-date": readme[9390:9608],
+		"export-bamboohr-tree": readme[9751:9838],
 
-		"minotaur": readme[9608:11427],
+		"fn": readme[9838:9974],
 
-		"name2rune": readme[11427:11532],
+		"group-by-date": readme[9974:10192],
 
-		"netrc-password": readme[11532:11697],
+		"minotaur": readme[10192:12011],
 
-		"notes": readme[11697:11833],
+		"name2rune": readme[12011:12116],
 
-		"pomotimer": readme[11833:12325],
+		"netrc-password": readme[12116:12281],
 
-		"prepend-hist": readme[12325:12566],
+		"notes": readme[12281:12417],
 
-		"proj": readme[12566:13885],
+		"pomotimer": readme[12417:12909],
 
-		"render-mail": readme[13885:14019],
+		"prepend-hist": readme[12909:13150],
 
-		"replace-unzip": readme[14019:14249],
+		"proj": readme[13150:14469],
 
-		"slack-deaddrop": readme[14249:14469],
+		"render-mail": readme[14469:14603],
 
-		"slack-open": readme[14469:14603],
+		"replace-unzip": readme[14603:14833],
 
-		"slack-status": readme[14603:14748],
+		"slack-deaddrop": readme[14833:15053],
 
-		"sm-list": readme[14748:15024],
+		"slack-open": readme[15053:15187],
 
-		"srv": readme[15024:15507],
+		"slack-status": readme[15187:15332],
 
-		"status": readme[15507:15964],
+		"sm-list": readme[15332:15608],
 
-		"toml2json": readme[15964:16139],
+		"srv": readme[15608:16091],
 
-		"uni": readme[16139:16301],
+		"status": readme[16091:16548],
 
-		"update": readme[16301:16524],
+		"toml2json": readme[16548:16723],
 
-		"yaml2json": readme[16524:16601],
+		"twilio": readme[16723:17181],
 
-		"zine": readme[16601:16657],
+		"uni": readme[17181:17343],
+
+		"update": readme[17343:17566],
+
+		"wuphf": readme[17566:17877],
+
+		"yaml2json": readme[17877:17954],
+
+		"zine": readme[17954:18010],
 	}
 }

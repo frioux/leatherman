@@ -1,8 +1,9 @@
-package main
+package wuphf
 
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -16,42 +17,56 @@ var drivers = map[string]driver{
 	"notify":   notify,
 }
 
-func main() {
-	if len(os.Args) == 1 {
-		fmt.Fprintf(os.Stderr, "usage: %s <message>\n", os.Args[0])
-		os.Exit(1)
+/*
+Wuphf sends alerts via both `wall` and [pushover](https://pushover.net).  All
+arguments are concatenated to produce the sent message.
+
+The following environment variables should be set:
+
+ * LM_PUSHOVER_TOKEN
+ * LM_PUSHOVER_USER
+ * LM_PUSHOVER_DEVICE
+
+```bash
+$ wuphf 'the shoes are on sale'
+```
+
+Command: wuphf
+*/
+func Wuphf(args []string, _ io.Reader) error {
+	if len(args) == 1 {
+		return fmt.Errorf("usage: %s <message>\n", args[0])
 	}
 
-	message := strings.Join(os.Args[1:], " ")
-	var failures int
+	message := strings.Join(args[1:], " ")
 	for n, d := range drivers {
 		err := d(message)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s failed: %s\n", n, err)
-			failures++
+			return fmt.Errorf("%s failed: %s\n", n, err)
 		}
 	}
-	os.Exit(failures)
+
+	return nil
 }
 
 type driver func(string) error
 
 var (
-	errNoPushoverToken  = errors.New("PUSHOVER_TOKEN not set")
-	errNoPushoverUser   = errors.New("PUSHOVER_USER not set")
-	errNoPushoverDevice = errors.New("PUSHOVER_DEVICE not set")
+	errNoPushoverToken  = errors.New("LM_PUSHOVER_TOKEN not set")
+	errNoPushoverUser   = errors.New("LM_PUSHOVER_USER not set")
+	errNoPushoverDevice = errors.New("LM_PUSHOVER_DEVICE not set")
 )
 
 func pushover(message string) error {
-	token := os.Getenv("PUSHOVER_TOKEN")
+	token := os.Getenv("LM_PUSHOVER_TOKEN")
 	if token == "" {
 		return errNoPushoverToken
 	}
-	user := os.Getenv("PUSHOVER_USER")
+	user := os.Getenv("LM_PUSHOVER_USER")
 	if user == "" {
 		return errNoPushoverUser
 	}
-	device := os.Getenv("PUSHOVER_DEVICE")
+	device := os.Getenv("LM_PUSHOVER_DEVICE")
 	if device == "" {
 		return errNoPushoverDevice
 	}

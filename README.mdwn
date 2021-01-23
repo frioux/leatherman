@@ -106,6 +106,20 @@ DENTISTRY SYMBOL LIGHT VERTICAL AND TOP LEFT
 DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM LEFT
 ```
 
+### `amygdala`
+
+`amygdala` is an automated assistant.  The main docs for it are in [amygdala.mdwn
+in the root of the leatherman
+repo](https://github.com/frioux/leatherman/blob/main/amygdala.mdwn).
+
+Configure it with the following environment variables:
+
+ * LM_DROPBOX_TOKEN
+ * LM_MY_CEL
+ * LM_TWILIO_URL
+
+Takes an optional `-port` argument to specify which port to listen on.
+
 ### `auto-emote`
 
 `auto-emote` comments to discord and reacts to all messages with vaguely related emoji.
@@ -246,6 +260,12 @@ Decrease by 10%:
 ``` bash
 $ backlight -10
 ```
+
+### `brainstem`
+
+`brainstem` allows interacting with amygdala without using any of the server
+components, typically for testing the personality etc, but can also be used as
+a lightweight amygdala instance.
 
 ### `clocks`
 
@@ -563,6 +583,24 @@ $ echo 'foo = "bar"` | toml2json
 {"foo":"bar"}
 ```
 
+### `twilio`
+
+`twilio` allows interacting with a service that recieves callbacks from twilio
+for testing.
+
+It takes four arguments:
+
+ * `-endpoint`: the url to hit (`http://localhost:8080/twilio`, for example)
+ * `-auth`: the auth token to use
+ * `-message`: the message to send
+ * `-from`: the phone number the message is from (`+15555555555`, for example)
+
+Run `twilio -help` to see the defaults.
+
+```bash
+$ twilio -message "the building is on fire!"
+```
+
 ### `uni`
 
 `uni` will describe the characters in the args.
@@ -577,6 +615,21 @@ $ uni ⢾
 `update` checks to see if there's an update from github and installs it if there
 is.  If LM_GH_TOKEN is set to a personal access token this can be called more
 frequently without exhausting github api limits.
+
+### `wuphf`
+
+`wuphf` sends alerts via both `wall` and [pushover](https://pushover.net).  All
+arguments are concatenated to produce the sent message.
+
+The following environment variables should be set:
+
+ * LM_PUSHOVER_TOKEN
+ * LM_PUSHOVER_USER
+ * LM_PUSHOVER_DEVICE
+
+```bash
+$ wuphf 'the shoes are on sale'
+```
 
 ### `yaml2json`
 

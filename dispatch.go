@@ -5,9 +5,11 @@ package main
 import (
 	"io"
 
+	"github.com/frioux/leatherman/internal/tool/amygdala"
 	"github.com/frioux/leatherman/internal/tool/automoji"
 	"github.com/frioux/leatherman/internal/tool/backlight"
 	"github.com/frioux/leatherman/internal/tool/bamboo"
+	"github.com/frioux/leatherman/internal/tool/brainstem"
 	"github.com/frioux/leatherman/internal/tool/clocks"
 	"github.com/frioux/leatherman/internal/tool/csv"
 	"github.com/frioux/leatherman/internal/tool/debounce"
@@ -28,8 +30,10 @@ import (
 	"github.com/frioux/leatherman/internal/tool/srv"
 	"github.com/frioux/leatherman/internal/tool/status"
 	"github.com/frioux/leatherman/internal/tool/toml"
+	"github.com/frioux/leatherman/internal/tool/twilio"
 	"github.com/frioux/leatherman/internal/tool/uni"
 	"github.com/frioux/leatherman/internal/tool/update"
+	"github.com/frioux/leatherman/internal/tool/wuphf"
 	"github.com/frioux/leatherman/internal/tool/yaml"
 	"github.com/frioux/leatherman/internal/tool/zine"
 )
@@ -39,8 +43,10 @@ func init() {
 		"addrs":                email.Addrs,
 		"addrspec-to-tabs":     email.ToTabs,
 		"alluni":               uni.All,
+		"amygdala":             amygdala.Amygdala,
 		"auto-emote":           automoji.Run,
 		"backlight":            backlight.Run,
+		"brainstem":            brainstem.Brainstem,
 		"clocks":               clocks.Run,
 		"csv2json":             csv.ToJSON,
 		"csv2md":               csv.ToMarkdown,
@@ -68,8 +74,10 @@ func init() {
 		"srv":                  srv.Serve,
 		"status":               status.Status,
 		"toml2json":            toml.ToJSON,
+		"twilio":               twilio.Twilio,
 		"uni":                  uni.Describe,
 		"update":               update.Update,
+		"wuphf":                wuphf.Wuphf,
 		"yaml2json":            yaml.ToJSON,
 		"zine":                 zine.Run,
 
