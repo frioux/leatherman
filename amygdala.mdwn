@@ -1,0 +1,143 @@
+# Amygdala
+
+Computer asisted brain stem.
+
+This project is comprised of a handful of tools that allow me to automate common
+tasks.  The main tool (`amygdala`) is currently deployed to Heroku, but it could
+be deployed anywhere.  This isn't written to run for more than one user or to
+meet any needs but my own.  It receives input from Twilio so I can just text the
+thing and get either a response or have it do what I asked.
+
+## Commands
+
+### cmd
+
+Explains all the commands online.
+
+### todo
+
+This is the most generically useful of the tools.  Any string that doesn't match
+anything else is assumed to be a todo.  Simply creates a document tagged `inbox`
+in my Dropbox.  Any attachment included in the message is linked to; if the
+attachment is an image it is linked to with an `img` tag.
+
+### `defer til`
+
+A command matching the following general pattern "defer til 2019-01-01" or
+"defer some message til 2019-01-01" will enqueue messages to be
+[undefered](https://github.com/frioux/leatherman#undefer) later.
+
+### `inspire me`
+
+The string `inspire me` will repy with [a random inspirational
+link](https://frioux.github.io/notes/posts/inspiration/).
+
+### `remind me`
+
+Remind me commands are created with an sms to amygdala of the form:
+
+ * remind me to power name at 3pm
+ * remind me to wake up at 3:05pm
+ * remind me to make dinner in 1h
+ * remind me to get dessert in 1h30m
+
+Files are created in a directory in Dropbox and are the acted upon by
+`enqueue-at`
+
+## Configuration
+
+All configuration is done via environment variables.
+
+### `DROPBOX_ACCESS_TOKEN`
+
+Used by `amygdala` to access Dropbox.
+
+### `MY_CELL`
+
+Used by `amygdala` to limit access to my own phone.
+
+### Pushover
+
+All of these are used by `wuphf` to send notifications to my phone:
+
+ * `PUSHOVER_TOKEN`
+ * `PUSHOVER_USER`
+ * `PUSHOVER_DEVICE`
+
+### `TWILIO_AUTH_TOKEN`
+
+Used by `amygdala` to validate that requests actually came from Twilio.
+
+### `TWILIO_URL`
+
+Also used by `amygdala` to validate that requests actually came from Twilio.  In
+theory this could be inferred from the request, but due to http proxies it must
+be configured instead.
+
+## Design
+
+As mentioned before, this project is a few distinct tools.  Simplicity is a
+priority for all of them, but I've tried to keep things relatively neat.
+
+### `amygdala`
+
+The top level tool, which initiates all the other stuff, is currently organized
+around my personal notes system, which is not yet documented other than [this
+blog
+post](https://blog.afoolishmanifesto.com/posts/a-love-letter-to-plain-text/).
+With that in mind it uses an ordered, regexp based dispatcher in the
+`internal/notes` package.
+
+My notes are structured text in Dropbox, so the `internal/notes` package talks
+directly to Dropbox to download and upload files.
+
+### `enqueue-at`
+
+This runs on my laptop.  If I find that I use it often I want to figure out how
+to run this in the cloud (without a VM.)
+
+I run it like this:
+
+```bash
+$ minotaur ~/Dropbox/notes/.alerts -- bin/enqueue-at
+```
+
+[`minotaur` comes with my
+Leatherman](https://github.com/frioux/leatherman#minotaur).
+
+`enqueue-at` simply enqueues notifications via `atd`, using a tool called
+`wuphf`, which is included with this project.
+
+[See docs for `remind me`](#remind-me) for more details.
+
+### `wuphf`
+
+Currently this tool sends alerts via both `wall` and
+[pushover](https://pushover.net).  All arguments are concatenated to produce the
+sent message.
+
+## Development
+
+Here's a list of places to look when you need to add functionality:
+
+ * [NewRules](https://godoc.org/github.com/frioux/amygdala/internal/notes#NewRules)
+   is where you can create a new command.
+ * [Dropbox package](https://godoc.org/github.com/frioux/amygdala/internal/dropbox)
+ * [Twilio package](https://godoc.org/github.com/frioux/amygdala/internal/twilio)
+
+It's always wise to run `go test ./...` before pushing any changes.  After
+that, using `cmd/brain-stem` to verify changes without needing the full stack
+is useful.  If you want more, you can run the main app (`amygdala`) and poke at
+it with `cmd/twilio`.  There's no dropbox mock yet so you'll need to actually
+use the real dropbox token, but other than that you should be able to develop
+almost 100% locally.
+
+## History
+
+This is meant to be a simpler replacement to [my lizard
+brain](https://github.com/frioux/Lizard-Brain), both because the world has
+improved and so have I.
+
+The old system's design was around allowing arbitrary inputs and outputs; the
+new system is only decoupled as I see fit, instead of enforcing that arbitrarily
+from the start.

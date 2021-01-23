@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# exit early if there are no CREATEd files
+perl -e 'exit 1 unless scalar grep m/^CREATE/, @ARGV' "$@" || exit
+
+cd ~/Dropbox/notes/.alerts
+
+for file in *; do
+   ts="$(echo "$file" | cut -f1 -d_)"
+   contents=$(cat "$file")
+
+   # if the ts is before now
+   if perl -e'exit 1 if shift gt shift' "$ts" "$(date -Iseconds)"; then
+      wuphf "$contents"
+   else
+      echo "wuphf $contents" | at "$(date -d "$ts" '+%H:%M %Y-%m-%d')"
+   fi
+   rm "$file"
+done
