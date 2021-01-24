@@ -220,7 +220,6 @@ func Run(args []string, _ io.Reader) error {
 		log.Fatal(http.ListenAndServe(":8080", nil))
 	}()
 
-	rand.Seed(time.Now().UnixNano())
 	token := os.Getenv("LM_DISCORD_TOKEN")
 	if token == "" {
 		return errors.New("set LM_DISCORD_TOKEN to use auto-emote")

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"hash/maphash"
 	"io"
 	"math/rand"
 	"net/http"
@@ -54,14 +53,6 @@ func AutoUpdate() {
 	}
 
 	go func() {
-		h := &maphash.Hash{}
-		h.WriteByte(byte(os.Getpid()))
-		h.WriteByte(byte(os.Getppid()))
-		if n, err := os.Hostname(); err == nil {
-			h.WriteString(n)
-		}
-
-		rand.Seed(int64(h.Sum64()))
 		for {
 			if token == "" {
 				time.Sleep(time.Duration(rand.Int63n(int64(time.Minute*60))) + time.Minute*30)

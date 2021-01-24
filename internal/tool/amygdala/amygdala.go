@@ -5,11 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
 	"os"
 	"runtime/debug"
-	"time"
 
 	"github.com/frioux/leatherman/internal/log"
 	"github.com/frioux/leatherman/internal/middleware"
@@ -33,7 +31,6 @@ Takes an optional `-port` argument to specify which port to listen on.
 Command: amygdala
 */
 func Amygdala(args []string, _ io.Reader) error {
-	rand.Seed(time.Now().UnixNano())
 	var (
 		dropboxAccessToken, myCell, version string
 		twilioAuthToken, twilioURL          string

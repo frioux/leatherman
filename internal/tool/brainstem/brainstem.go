@@ -4,9 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
-	"time"
 
 	"github.com/frioux/leatherman/internal/notes"
 )
@@ -25,8 +23,6 @@ func Brainstem(args []string, _ io.Reader) error {
 	if tok == "" {
 		return errors.New("DROPBOX_ACCESS_TOKEN is unset")
 	}
-
-	rand.Seed(time.Now().UnixNano())
 
 	rules, err := notes.NewRules(tok)
 	if err != nil {

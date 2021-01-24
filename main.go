@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"hash/maphash"
 	"io"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"runtime/trace"
@@ -21,6 +23,14 @@ var Dispatch map[string]func([]string, io.Reader) error
 func run() bool {
 	startDebug()
 	defer stopDebug()
+	h := &maphash.Hash{}
+	h.WriteByte(byte(os.Getpid()))
+	h.WriteByte(byte(os.Getppid()))
+	if n, err := os.Hostname(); err == nil {
+		h.WriteString(n)
+	}
+
+	rand.Seed(int64(h.Sum64()))
 
 	selfupdate.AutoUpdate()
 
