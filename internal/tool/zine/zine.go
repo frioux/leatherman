@@ -3,14 +3,12 @@ package zine
 import (
 	"bytes"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 
-	"github.com/tailscale/hujson"
+	"github.com/frioux/leatherman/internal/notes"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
@@ -33,29 +31,6 @@ func run() error {
 	}
 
 	return nil
-}
-
-type article struct {
-	Title string
-
-	// Filename will be set after parsing.
-	Filename string `json:"-"`
-
-	// URL will be set after parsing.
-	URL string `json:"-"`
-
-	// Raw tells the parser not to include the standard header and footer.
-	Raw bool
-
-	Tags []string
-
-	ReviewedOn *string `json:"reviewed_on"`
-
-	ReviewBy *string `json:"review_by"`
-
-	Extra map[string]string
-
-	Body []byte
 }
 
 type zine struct {
@@ -138,7 +113,7 @@ end
 	return z, nil
 }
 
-func (z *zine) load(as *[]article) error {
+func (z *zine) load(as *[]notes.Article) error {
 	var files []string
 
 	// parse index first so it can override header and footer
@@ -167,7 +142,7 @@ func (z *zine) load(as *[]article) error {
 		return err
 	}
 
-	var a article
+	var a notes.Article
 	for _, f := range files {
 		var err error
 
@@ -199,7 +174,7 @@ func (z *zine) load(as *[]article) error {
 	return nil
 }
 
-func (z *zine) renderToMarkdown(a article) ([]byte, error) {
+func (z *zine) renderToMarkdown(a notes.Article) ([]byte, error) {
 	// XXX this may be expensive, but fixes the new error introduced here:
 	// https://github.com/golang/go/commit/604146ce8961d32f410949015fc8ee31f9052209
 	t, err := z.tpl.Clone()
@@ -225,7 +200,7 @@ func (z *zine) renderToMarkdown(a article) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (z *zine) render(a article) ([]byte, error) {
+func (z *zine) render(a notes.Article) ([]byte, error) {
 	mdwn, err := z.renderToMarkdown(a)
 	if err != nil {
 		return nil, err
@@ -238,34 +213,12 @@ func (z *zine) render(a article) ([]byte, error) {
 	return out.Bytes(), nil
 }
 
-func readArticleFromFile(f string) (article, error) {
+func readArticleFromFile(f string) (notes.Article, error) {
 	r, err := os.Open(f)
 	if err != nil {
-		return article{}, err
+		return notes.Article{}, err
 	}
 	defer r.Close()
 
-	return readArticle(r)
-}
-
-func readArticle(r io.Reader) (article, error) {
-	var a article
-	d := hujson.NewDecoder(r)
-	err := d.Decode(&a)
-	if err != nil {
-		return a, fmt.Errorf("hujson.Decoder.Decode: %w", err)
-	}
-	a.Body, err = ioutil.ReadAll(d.Buffered())
-	if err != nil {
-		return a, fmt.Errorf("hujson.Decoder.Buffered+ioutil.ReadAll: %w", err)
-	}
-
-	c, err := ioutil.ReadAll(r)
-	if err != nil {
-		return a, err
-	}
-
-	a.Body = append(a.Body, c...)
-
-	return a, err
+	return notes.ReadArticle(r)
 }

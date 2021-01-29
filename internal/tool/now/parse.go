@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/frioux/leatherman/internal/notes"
 )
 
 var dateHeader = regexp.MustCompile(`## \d{4}-\d\d-\d\d ##`)
@@ -23,7 +25,7 @@ func parseNow(r io.Reader, when time.Time) ([]byte, error) {
 	desiredHeader := "## " + when.Format("2006-01-02") + " ##"
 	ret := &strings.Builder{}
 
-	a, err := readArticle(r)
+	a, err := notes.ReadArticle(r)
 	if err != nil {
 		return nil, fmt.Errorf("readArticle: %w", err)
 	}

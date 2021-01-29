@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 
+	"github.com/frioux/leatherman/internal/notes"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -97,7 +98,7 @@ func (d *db) prepareCached(sql string) (*sqlx.Stmt, error) {
 	return stmt, nil
 }
 
-func (d *db) insertArticle(a article) error {
+func (d *db) insertArticle(a notes.Article) error {
 	stmt, err := d.prepareCached(`INSERT INTO articles (
 		title, url, filename, reviewed_on, review_by, body
 	) VALUES (?, ?, ?, ?, ?, ?)`)

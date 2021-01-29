@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/frioux/leatherman/internal/dropbox"
+	"github.com/frioux/leatherman/internal/notes"
 	"github.com/frioux/leatherman/internal/selfupdate"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -137,9 +138,9 @@ func server() (http.Handler, error) {
 			return err
 		}
 
-		a, err := readArticle(r)
+		a, err := notes.ReadArticle(r)
 		if err != nil {
-			return fmt.Errorf("readArticle: %w", err)
+			return fmt.Errorf("ReadArticle: %w", err)
 		}
 
 		fmt.Fprintf(rw, prelude, "now: "+a.Title)

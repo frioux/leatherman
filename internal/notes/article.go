@@ -1,4 +1,4 @@
-package now
+package notes
 
 import (
 	"fmt"
@@ -8,9 +8,7 @@ import (
 	"github.com/tailscale/hujson"
 )
 
-// article was copy/pasted from zine, which should probably just merge into
-// leatherman.
-type article struct {
+type Article struct {
 	Title string
 
 	// Filename will be set after parsing.
@@ -33,8 +31,8 @@ type article struct {
 	Body []byte
 }
 
-func readArticle(r io.Reader) (article, error) {
-	var a article
+func ReadArticle(r io.Reader) (Article, error) {
+	var a Article
 	d := hujson.NewDecoder(r)
 	err := d.Decode(&a)
 	if err != nil {
@@ -54,3 +52,4 @@ func readArticle(r io.Reader) (article, error) {
 
 	return a, err
 }
+

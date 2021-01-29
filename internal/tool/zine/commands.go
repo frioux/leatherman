@@ -11,6 +11,8 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/frioux/leatherman/internal/notes"
 )
 
 var commands = map[string]func([]string) error{
@@ -88,7 +90,7 @@ func render(args []string) error {
 	}
 	z.root = root
 
-	metas := []article{}
+	metas := []notes.Article{}
 	if err := z.load(&metas); err != nil {
 		return err
 	}
@@ -185,7 +187,7 @@ func debug(args []string) error {
 	}
 	z.root = root
 
-	metas := []article{}
+	metas := []notes.Article{}
 	if err := z.load(&metas); err != nil {
 		return err
 	}
