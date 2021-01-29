@@ -5,8 +5,6 @@ package zine
 import (
 	"fmt"
 	"io"
-
-	_ "modernc.org/sqlite"
 )
 
 /*

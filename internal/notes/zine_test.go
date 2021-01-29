@@ -1,9 +1,6 @@
 package notes
 
 import (
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/frioux/leatherman/internal/testutil"
@@ -12,20 +9,20 @@ import (
 func BenchmarkInsertMetadata(b *testing.B) {
 	b.StopTimer()
 
-	db, err := newDB()
+	db, err := NewDB()
 	if err != nil {
 		b.Fatalf("couldn't create db: %s", err)
 	}
 	defer db.Close()
 
-	a := notes.Article{
+	a := Article{
 		Title: "frew",
 		Tags:  []string{"foo", "bar"},
 		Extra: map[string]string{"foo": "bar"},
 	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		if err := db.insertArticle(a); err != nil {
+		if err := db.InsertArticle(a); err != nil {
 			b.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -36,20 +33,20 @@ func TestQuery(t *testing.T) {
 	if err != nil {
 		t.Fatalf("couldn't create zine: %s", err)
 	}
-	defer z.DB.Close()
+	defer z.db.Close()
 
-	a := notes.Article{
+	a := Article{
 		Title: "frew",
 		Tags:  []string{"foo", "bar"},
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.insertArticle(a); err != nil {
+		if err := z.db.InsertArticle(a); err != nil {
 			t.Fatalf("couldn't insert article: %s", err)
 		}
 	}
 
-	_, err = z.q("SELECT * FROM _ LIMIT 5")
+	_, err = z.Q("SELECT * FROM _ LIMIT 5")
 	if err != nil {
 		t.Fatalf("Invalid query: %s", err)
 	}
@@ -64,13 +61,13 @@ func BenchmarkQuery(b *testing.B) {
 		b.Fatalf("couldn't create zine: %s", err)
 	}
 
-	a := notes.Article{
+	a := Article{
 		Title: "frew",
 		Tags:  []string{"foo", "bar"},
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.insertArticle(a); err != nil {
+		if err := z.db.InsertArticle(a); err != nil {
 			b.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -78,7 +75,7 @@ func BenchmarkQuery(b *testing.B) {
 	b.StartTimer()
 	var c int
 	for i := 0; i < b.N; i++ {
-		r, err := z.q("SELECT * FROM _ LIMIT 5")
+		r, err := z.Q("SELECT * FROM _ LIMIT 5")
 		if err != nil {
 			b.Fatalf("Invalid query: %s", err)
 		}
@@ -94,17 +91,17 @@ func TestRender(t *testing.T) {
 		t.Fatalf("couldn't create db: %s", err)
 	}
 
-	a := notes.Article{
+	a := Article{
 		Title: "frew",
 		Tags:  []string{"foo", "bar"},
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.insertArticle(a); err != nil {
+		if err := z.db.InsertArticle(a); err != nil {
 			t.Fatalf("couldn't insert article: %s", err)
 		}
 	}
-	got, err := z.render(notes.Article{Title: "x", Body: []byte(`hello! *{{ with $r := (q "SELECT COUNT(*) AS c FROM _")}}{{ index $r 0 "c" }}{{end}}*`)})
+	got, err := z.Render(Article{Title: "x", Body: []byte(`hello! *{{ with $r := (q "SELECT COUNT(*) AS c FROM _")}}{{ index $r 0 "c" }}{{end}}*`)})
 	if err != nil {
 		t.Errorf("should not have gotten an error: %s", err)
 		return
@@ -122,13 +119,13 @@ func BenchmarkRender(b *testing.B) {
 		b.Fatalf("couldn't create db: %s", err)
 	}
 
-	a := notes.Article{
+	a := Article{
 		Title: "frew",
 		Tags:  []string{"foo", "bar"},
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.insertArticle(a); err != nil {
+		if err := z.db.InsertArticle(a); err != nil {
 			b.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -137,7 +134,7 @@ func BenchmarkRender(b *testing.B) {
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		var err error
-		out, err = z.render(notes.Article{Title: "X", Body: []byte(`hello! *{{ with $r := (q "SELECT COUNT(*) AS c FROM _")}}{{ index $r 0 "c" }}{{end}}*`)})
+		out, err = z.Render(Article{Title: "X", Body: []byte(`hello! *{{ with $r := (q "SELECT COUNT(*) AS c FROM _")}}{{ index $r 0 "c" }}{{end}}*`)})
 		if err != nil {
 			b.Errorf("should not have gotten an error: %s", err)
 			return
@@ -149,7 +146,7 @@ func BenchmarkRender(b *testing.B) {
 
 func BenchmarkLoadNilNil(b *testing.B) {
 	var (
-		z   *zine
+		z   *Zine
 		err error
 	)
 	for i := 0; i < b.N; i++ {
@@ -159,21 +156,21 @@ func BenchmarkLoadNilNil(b *testing.B) {
 		if err != nil {
 			b.Fatalf("couldn't create zine: %s", err)
 		}
-		z.root = "testdata"
+		z.Root = "testdata"
 
 		b.StartTimer()
-		if err := z.load(nil); err != nil {
+		if err := z.Load(nil); err != nil {
 			b.Fatalf("couldn't load: %s", err)
 		}
 	}
 	b.StopTimer()
 
-	S = z.root
+	S = z.Root
 }
 
 func BenchmarkLoadXY(b *testing.B) {
 	var (
-		z   *zine
+		z   *Zine
 		err error
 		c   int
 	)
@@ -184,42 +181,17 @@ func BenchmarkLoadXY(b *testing.B) {
 		if err != nil {
 			b.Fatalf("couldn't create zine: %s", err)
 		}
-		z.root = "testdata"
+		z.Root = "testdata"
 
 		b.StartTimer()
-		var as []notes.Article
-		if err := z.load(&as); err != nil {
+		var as []Article
+		if err := z.Load(&as); err != nil {
 			b.Fatalf("couldn't load: %s", err)
 		}
 		c += len(as)
 	}
 	b.StopTimer()
 
-	S = z.root
+	S = z.Root
 	C = c
-}
-
-func TestFullRender(t *testing.T) {
-	d, err := ioutil.TempDir("", "")
-	if err != nil {
-		t.Fatalf("couldn't create test: %s", err)
-	}
-	defer os.RemoveAll(d)
-
-	if err := render([]string{"render", "-static", "./testdata", "-root", "./testdata", "-out", d}); err != nil {
-		t.Errorf("Rendered produced unexpected error: %s", err)
-	}
-
-	b, err := ioutil.ReadFile(filepath.Join(d, "cats", "index.html"))
-	if err != nil {
-		t.Errorf("Couldn't read output: %s", err)
-	}
-
-	testutil.Equal(t, `<p>This is the header!</p>
-<h1 id="cats">cats</h1>
-<p>cats are the best.</p>
-<p>this is the footer!</p>
-`, string(b), "cats generated correctly")
-
-	// XXX add test for index
 }
