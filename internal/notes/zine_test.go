@@ -1,4 +1,4 @@
-package zine
+package notes
 
 import (
 	"io/ioutil"
@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/frioux/leatherman/internal/notes"
 	"github.com/frioux/leatherman/internal/testutil"
 )
 
@@ -33,7 +32,7 @@ func BenchmarkInsertMetadata(b *testing.B) {
 }
 
 func TestQuery(t *testing.T) {
-	z, err := newZine()
+	z, err := NewZine()
 	if err != nil {
 		t.Fatalf("couldn't create zine: %s", err)
 	}
@@ -60,7 +59,7 @@ var C int
 
 func BenchmarkQuery(b *testing.B) {
 	b.StopTimer()
-	z, err := newZine()
+	z, err := NewZine()
 	if err != nil {
 		b.Fatalf("couldn't create zine: %s", err)
 	}
@@ -90,7 +89,7 @@ func BenchmarkQuery(b *testing.B) {
 }
 
 func TestRender(t *testing.T) {
-	z, err := newZine()
+	z, err := NewZine()
 	if err != nil {
 		t.Fatalf("couldn't create db: %s", err)
 	}
@@ -118,7 +117,7 @@ var S string
 
 func BenchmarkRender(b *testing.B) {
 	b.StopTimer()
-	z, err := newZine()
+	z, err := NewZine()
 	if err != nil {
 		b.Fatalf("couldn't create db: %s", err)
 	}
@@ -156,7 +155,7 @@ func BenchmarkLoadNilNil(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 
-		z, err = newZine()
+		z, err = NewZine()
 		if err != nil {
 			b.Fatalf("couldn't create zine: %s", err)
 		}
@@ -181,7 +180,7 @@ func BenchmarkLoadXY(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 
-		z, err = newZine()
+		z, err = NewZine()
 		if err != nil {
 			b.Fatalf("couldn't create zine: %s", err)
 		}

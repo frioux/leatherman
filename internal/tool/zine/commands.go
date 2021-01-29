@@ -49,16 +49,16 @@ func q(args []string) error {
 		return err
 	}
 
-	z, err := newZine()
+	z, err := notes.NewZine()
 	if err != nil {
 		return err
 	}
-	z.root = root
-	if err := z.load(nil); err != nil {
+	z.Root = root
+	if err := z.Load(nil); err != nil {
 		return err
 	}
 
-	ret, err := z.q(sql, flags.Args()...)
+	ret, err := z.Q(sql, flags.Args()...)
 	if err != nil {
 		return err
 	}
@@ -84,14 +84,14 @@ func render(args []string) error {
 		return err
 	}
 
-	z, err := newZine()
+	z, err := notes.NewZine()
 	if err != nil {
 		return err
 	}
-	z.root = root
+	z.Root = root
 
 	metas := []notes.Article{}
-	if err := z.load(&metas); err != nil {
+	if err := z.Load(&metas); err != nil {
 		return err
 	}
 
@@ -144,7 +144,7 @@ func render(args []string) error {
 			return fmt.Errorf("couldn't create dir for %s: %w", metas[i].Filename, err)
 		}
 
-		b, err := z.render(metas[i])
+		b, err := z.Render(metas[i])
 		if err != nil {
 			return fmt.Errorf("couldn't render %s: %w", metas[i].Filename, err)
 		}
@@ -181,14 +181,14 @@ func debug(args []string) error {
 		return err
 	}
 
-	z, err := newZine()
+	z, err := notes.NewZine()
 	if err != nil {
 		return err
 	}
-	z.root = root
+	z.Root = root
 
 	metas := []notes.Article{}
-	if err := z.load(&metas); err != nil {
+	if err := z.Load(&metas); err != nil {
 		return err
 	}
 
@@ -197,7 +197,7 @@ func debug(args []string) error {
 			continue
 		}
 
-		b, err := z.renderToMarkdown(metas[i])
+		b, err := z.RenderToMarkdown(metas[i])
 		if err != nil {
 			return fmt.Errorf("couldn't render %s: %w", metas[i].Filename, err)
 		}
