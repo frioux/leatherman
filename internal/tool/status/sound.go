@@ -3,6 +3,7 @@ package status
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -25,7 +26,13 @@ func (v *sound) load() error {
 	}
 
 	for _, i := range is {
+		// these are always connected
+		if strings.HasPrefix(i["application.name"], "speech-dispatcher") {
+			continue
+		}
+
 		if i["state"] == "RUNNING" {
+			json.NewEncoder(os.Stderr).Encode(i)
 			v.value = true
 			return nil
 		}
