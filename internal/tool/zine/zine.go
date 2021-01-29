@@ -36,7 +36,7 @@ func run() error {
 type zine struct {
 	root string
 
-	db
+	db   notes.DB
 	tpl  template.Template
 	mdwn goldmark.Markdown
 
@@ -44,7 +44,7 @@ type zine struct {
 }
 
 func newZine() (*zine, error) {
-	d, err := newDB()
+	d, err := notes.NewDB()
 	if err != nil {
 		return nil, fmt.Errorf("newDB: %s", err)
 	}
@@ -64,7 +64,7 @@ func newZine() (*zine, error) {
 			),
 		),
 		q: func(q string, more ...string) ([]map[string]interface{}, error) {
-			stmt, err := d.prepareCached(q)
+			stmt, err := d.PrepareCached(q)
 			if err != nil {
 				return nil, err
 			}
@@ -162,7 +162,7 @@ func (z *zine) load(as *[]notes.Article) error {
 			a.URL = strings.TrimSuffix(a.URL, ".md")
 		}
 
-		if err := z.insertArticle(a); err != nil {
+		if err := z.db.InsertArticle(a); err != nil {
 			return fmt.Errorf("error inserting data from %s: %w", f, err)
 		}
 

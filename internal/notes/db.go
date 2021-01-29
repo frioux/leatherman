@@ -1,14 +1,13 @@
-package zine
+package notes
 
 import (
 	"database/sql"
 	"os"
 
-	"github.com/frioux/leatherman/internal/notes"
 	"github.com/jmoiron/sqlx"
 )
 
-type db struct {
+type DB struct {
 	*sqlx.DB
 	insertTags *sql.Stmt
 
@@ -16,7 +15,7 @@ type db struct {
 	stmtCache map[string]*sqlx.Stmt
 }
 
-func newDB() (*db, error) {
+func NewDB() (*DB, error) {
 	var (
 		dbh *sqlx.DB
 		err error
@@ -74,7 +73,7 @@ func newDB() (*db, error) {
 		}
 	}()
 
-	d := &db{DB: dbh, stmtCache: map[string]*sqlx.Stmt{}}
+	d := &DB{DB: dbh, stmtCache: map[string]*sqlx.Stmt{}}
 	d.insertTags, err = d.Prepare(`INSERT INTO article_tag (id, tag) VALUES (?, ?)`)
 	if err != nil {
 		return nil, err
@@ -84,7 +83,7 @@ func newDB() (*db, error) {
 	return d, nil
 }
 
-func (d *db) prepareCached(sql string) (*sqlx.Stmt, error) {
+func (d *DB) PrepareCached(sql string) (*sqlx.Stmt, error) {
 	if stmt, ok := d.stmtCache[sql]; ok {
 		return stmt, nil
 	}
@@ -98,8 +97,8 @@ func (d *db) prepareCached(sql string) (*sqlx.Stmt, error) {
 	return stmt, nil
 }
 
-func (d *db) insertArticle(a notes.Article) error {
-	stmt, err := d.prepareCached(`INSERT INTO articles (
+func (d *DB) InsertArticle(a Article) error {
+	stmt, err := d.PrepareCached(`INSERT INTO articles (
 		title, url, filename, reviewed_on, review_by, body
 	) VALUES (?, ?, ?, ?, ?, ?)`)
 	if err != nil {
