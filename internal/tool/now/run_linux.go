@@ -1,6 +1,6 @@
 // +build linux
 
-package notes
+package now
 
 import (
 	"flag"
@@ -8,7 +8,9 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"os"
 
+	"github.com/frioux/leatherman/internal/dropbox"
 	_ "modernc.org/sqlite"
 )
 
@@ -21,10 +23,25 @@ Command: notes
 func Serve(args []string, _ io.Reader) error {
 	var (
 		listen string
+		load   bool
 	)
 	fs := flag.NewFlagSet("notes", flag.ContinueOnError)
 	fs.StringVar(&listen, "listen", ":0", "location to listen on; default is random")
+	fs.BoolVar(&load, "load", false, "load the db, for testing reasons?")
 	if err := fs.Parse(args[1:]); err != nil {
+		return err
+	}
+
+	if load {
+		db, err := dropbox.NewClient(dropbox.Client{
+			Token: os.Getenv("LM_DROPBOX_TOKEN"),
+		})
+		if err != nil {
+			return err
+		}
+		_, cleanup, err := loadDB(db, "/notes/content/posts/")
+		defer cleanup()
+		fmt.Println(err)
 		return err
 	}
 

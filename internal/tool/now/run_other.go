@@ -1,6 +1,6 @@
 // +build !linux
 
-package notes
+package now
 
 import (
 	"fmt"
