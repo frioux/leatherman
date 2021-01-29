@@ -14,12 +14,13 @@ import (
 type ListFolderParams struct {
 	Path string `json:"path"`
 
-	Recursive                       bool `json:"recursive"`
-	IncludeMediaInfo                bool `json:"include_media_info"`
-	IncludeDeleted                  bool `json:"include_deleted"`
-	IncludeHasExplicitSharedMembers bool `json:"include_has_explicit_shared_members"`
-	IncludeMountedFolders           bool `json:"include_mounted_folders"`
-	IncludeNonDownloadableFiles     bool `json:"include_non_downloadable_files"`
+	Recursive                       bool   `json:"recursive"`
+	IncludeMediaInfo                bool   `json:"include_media_info"`
+	IncludeDeleted                  bool   `json:"include_deleted"`
+	IncludeHasExplicitSharedMembers bool   `json:"include_has_explicit_shared_members"`
+	IncludeMountedFolders           bool   `json:"include_mounted_folders"`
+	IncludeNonDownloadableFiles     bool   `json:"include_non_downloadable_files"`
+	Limit                           uint32 `json:"limit,omitempty"`
 }
 
 // Metadata is defined at
