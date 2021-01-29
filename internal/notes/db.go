@@ -7,6 +7,22 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+const Schema = `
+CREATE TABLE articles (
+	title,
+	url,
+	filename,
+	reviewed_on NULLABLE,
+	review_by NULLABLE,
+	body
+);
+CREATE TABLE article_tag ( id, tag );
+CREATE VIEW _ ( id, title, url, filename, body, reviewed_on, review_by, tag) AS
+	SELECT a.rowid, title, url, filename, body, reviewed_on, review_by, tag
+	FROM articles a
+	JOIN article_tag at ON a.rowid = at.id;
+`
+
 type DB struct {
 	*sqlx.DB
 	insertTags *sql.Stmt
@@ -48,21 +64,7 @@ func NewDB() (*DB, error) {
 		return nil, err
 	}
 
-	if _, err := dbh.Exec(`
-		CREATE TABLE articles (
-			title,
-			url,
-			filename,
-			reviewed_on NULLABLE,
-			review_by NULLABLE,
-			body
-		);
-		CREATE TABLE article_tag ( id, tag );
-		CREATE VIEW _ ( id, title, url, filename, body, reviewed_on, review_by, tag) AS
-			SELECT a.rowid, title, url, filename, body, reviewed_on, review_by, tag
-			FROM articles a
-			JOIN article_tag at ON a.rowid = at.id;
-	`); err != nil {
+	if _, err := dbh.Exec(Schema); err != nil {
 		return nil, err
 	}
 

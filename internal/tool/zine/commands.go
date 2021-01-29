@@ -23,14 +23,23 @@ var commands = map[string]func([]string) error{
 
 // q runs a query against the corpus.
 func q(args []string) error {
-	var root, sql, tpl string
+	var (
+		root, sql, tpl string
+		showschema     bool
+	)
 
 	flags := flag.NewFlagSet("q", flag.ContinueOnError)
 	flags.StringVar(&root, "root", "./content", "root input directory")
 	flags.StringVar(&sql, "sql", "SELECT * FROM _", "sql to run")
 	flags.StringVar(&tpl, "tpl", `{{join . "\t"}}`, "template to run")
+	flags.BoolVar(&showschema, "showschema", false, "show sql schema")
 	if err := flags.Parse(args[1:]); err != nil {
 		return err
+	}
+
+	if showschema {
+		fmt.Print(notes.Schema)
+		return nil
 	}
 
 	t := template.New("x")
