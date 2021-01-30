@@ -39,10 +39,11 @@ func Serve(args []string, _ io.Reader) error {
 		if err != nil {
 			return err
 		}
-		_, cleanup, err := loadDB(db, "/notes/content/posts/")
-		defer cleanup()
-		fmt.Println(err)
-		return err
+
+		_, err = loadDB(db, "/notes/content/posts/")
+		if err != nil {
+			return err
+		}
 	}
 
 	listener, err := net.Listen("tcp", listen)
