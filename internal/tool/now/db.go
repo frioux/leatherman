@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/frioux/leatherman/internal/dropbox"
 	"github.com/frioux/leatherman/internal/notes"
 )
 
 func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
+	t0 := time.Now()
+
 	r, err := db.ListFolder(dropbox.ListFolderParams{Path: dir})
 	if err != nil {
 		return nil, err
@@ -61,6 +64,7 @@ func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
 	}
 
 	wg.Wait()
+	fmt.Fprintf(os.Stderr, "db loaded in %s\n", time.Now().Sub(t0))
 
 	return z, nil
 }
