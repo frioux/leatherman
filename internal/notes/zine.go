@@ -17,6 +17,8 @@ import (
 type Zine struct {
 	Root string
 
+	PublicPrefix string
+
 	DB
 	tpl  template.Template
 	mdwn goldmark.Markdown
@@ -138,6 +140,7 @@ func (z *Zine) Load(as *[]Article) error {
 		if err != nil {
 			return fmt.Errorf("error getting relname for %s: %w", f, err)
 		}
+		a.URL = z.PublicPrefix + a.URL
 		if a.Filename == "index.tmpl" || strings.HasSuffix(a.Filename, "index.tmpl") {
 			a.URL = strings.TrimSuffix(a.URL, "index.tmpl")
 		} else {

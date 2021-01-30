@@ -83,12 +83,14 @@ func q(args []string) error {
 
 // render will convert the corpus to html.
 func render(args []string) error {
-	var root, out, static string
+	var root, out, static, publicPrefix string
 
 	flags := flag.NewFlagSet("render", flag.ContinueOnError)
 	flags.StringVar(&root, "root", "./content", "root input directory")
 	flags.StringVar(&out, "out", "./public", "directory to render output to")
 	flags.StringVar(&static, "static", "./static", "directory to prepopulate out with")
+	flags.StringVar(&publicPrefix, "public-prefix", "notes/", "public prefix to render urls with")
+
 	if err := flags.Parse(args[1:]); err != nil {
 		return err
 	}
@@ -98,6 +100,7 @@ func render(args []string) error {
 		return err
 	}
 	z.Root = root
+	z.PublicPrefix = publicPrefix
 
 	metas := []notes.Article{}
 	if err := z.Load(&metas); err != nil {
@@ -148,7 +151,7 @@ func render(args []string) error {
 
 	for i := range metas {
 		// don't be running on windows
-		dir := filepath.Join(out, metas[i].URL)
+		dir := filepath.Join(out, strings.TrimPrefix(metas[i].URL, z.PublicPrefix))
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return fmt.Errorf("couldn't create dir for %s: %w", metas[i].Filename, err)
 		}
