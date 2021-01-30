@@ -33,17 +33,15 @@ func Serve(args []string, _ io.Reader) error {
 	}
 
 	if load {
-		db, err := dropbox.NewClient(dropbox.Client{
+		cl, err := dropbox.NewClient(dropbox.Client{
 			Token: os.Getenv("LM_DROPBOX_TOKEN"),
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = loadDB(db, "/notes/content/posts/")
-		if err != nil {
-			return err
-		}
+		_, err = loadDB(cl, "/notes/content/posts/")
+		return err
 	}
 
 	listener, err := net.Listen("tcp", listen)

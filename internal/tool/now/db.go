@@ -9,7 +9,7 @@ import (
 	"github.com/frioux/leatherman/internal/notes"
 )
 
-func loadDB(db dropbox.Client, dir string) (*notes.DB, error) {
+func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
 	r, err := db.ListFolder(dropbox.ListFolderParams{Path: dir})
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func loadDB(db dropbox.Client, dir string) (*notes.DB, error) {
 		entries = append(entries, r.Entries...)
 	}
 
-	dbh, err := notes.NewDB()
+	z, err := notes.NewZine()
 	if err != nil {
 		return nil, err
 	}
@@ -55,12 +55,12 @@ func loadDB(db dropbox.Client, dir string) (*notes.DB, error) {
 	}
 
 	for _, a := range articles {
-		if err := dbh.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(a); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
 	}
 
 	wg.Wait()
 
-	return dbh, nil
+	return z, nil
 }
