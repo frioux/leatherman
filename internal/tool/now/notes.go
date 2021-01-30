@@ -133,6 +133,27 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 		return mdwn.Convert(buf.Bytes(), rw)
 	}))
 
+	mux.Handle("/q", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		q := req.URL.Query().Get("q")
+		if q == "" {
+			q = "SELECT * FROM articles"
+		}
+		ret, err := z.Q(q)
+		if err != nil {
+			return err
+		}
+
+		buf := &bytes.Buffer{}
+		fmt.Fprintf(buf, "```\n")
+		for _, e := range ret {
+			fmt.Fprintf(buf, "%v\n", e)
+		}
+		fmt.Fprintf(buf, "```\n")
+
+		fmt.Fprintf(rw, prelude, "now: q")
+		return mdwn.Convert(buf.Bytes(), rw)
+	}))
+
 	mux.Handle("/sup", handlerFunc(sup))
 
 	mux.Handle("/update", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
