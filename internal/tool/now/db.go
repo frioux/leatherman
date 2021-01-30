@@ -16,7 +16,10 @@ func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata)
 	wg := &sync.WaitGroup{}
 	wg.Add(len(events))
 
-	articles := make([]notes.Article, len(events))
+	articles := make([]struct {
+		notes.Article
+		deleted bool
+	}, len(events))
 
 	for i, e := range events {
 		i := i
@@ -25,28 +28,43 @@ func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata)
 		go func() {
 			defer wg.Done()
 
+			defer func() {
+				articles[i].Filename = e.Name
+				articles[i].URL = strings.TrimSuffix(e.Name, ".md")
+			}()
+
+			if e.Tag == "deleted" {
+				articles[i].deleted = true
+				return
+			}
+
 			r, err := cl.Download(e.PathLower)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
 			}
 
-			articles[i], err = notes.ReadArticle(r)
+			articles[i].Article, err = notes.ReadArticle(r)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
 			}
-			articles[i].Filename = e.Name
-			articles[i].URL = strings.TrimSuffix(e.Name, ".md")
 		}()
 	}
 
 	wg.Wait()
 
 	for _, a := range articles {
-		fmt.Fprintln(os.Stderr, "replacing", a.Filename, "...")
-		if err := z.ReplaceArticle(a); err != nil {
-			return err
+		if a.deleted {
+			fmt.Fprintln(os.Stderr, "deleting", a.Filename, "...")
+			if err := z.DeleteArticle(a.Article.Filename); err != nil {
+				return err
+			}
+		} else {
+			fmt.Fprintln(os.Stderr, "replacing", a.Filename, "...")
+			if err := z.ReplaceArticle(a.Article); err != nil {
+				return err
+			}
 		}
 	}
 
