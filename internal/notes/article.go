@@ -22,9 +22,9 @@ type Article struct {
 
 	Tags []string
 
-	ReviewedOn *string `json:"reviewed_on"`
+	ReviewedOn *string `json:"reviewed_on" db:"reviewed_on"`
 
-	ReviewBy *string `json:"review_by"`
+	ReviewBy *string `json:"review_by" db:"review_by"`
 
 	Extra map[string]string
 
