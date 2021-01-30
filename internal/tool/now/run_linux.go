@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/frioux/leatherman/internal/dropbox"
+	"github.com/frioux/leatherman/internal/notes"
 	_ "modernc.org/sqlite"
 )
 
@@ -32,6 +33,7 @@ func Serve(args []string, _ io.Reader) error {
 		return err
 	}
 
+	var z *notes.Zine
 	if load {
 		cl, err := dropbox.NewClient(dropbox.Client{
 			Token: os.Getenv("LM_DROPBOX_TOKEN"),
@@ -40,7 +42,7 @@ func Serve(args []string, _ io.Reader) error {
 			return err
 		}
 
-		_, err = loadDB(cl, "/notes/content/posts/")
+		z, err = loadDB(cl, "/notes/content/posts/")
 		if err != nil {
 			return err
 		}
@@ -52,7 +54,7 @@ func Serve(args []string, _ io.Reader) error {
 	}
 
 	fmt.Fprintf(os.Stderr, "listening on %s\n", listener.Addr())
-	h, err := server()
+	h, err := server(z)
 	if err != nil {
 		return fmt.Errorf("server: %w", err)
 	}

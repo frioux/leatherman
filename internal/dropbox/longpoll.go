@@ -8,7 +8,7 @@ import (
 )
 
 // Longpoll signals changes in dir by sending on ch.
-func (db Client) Longpoll(ctx context.Context, dir string, ch chan<- struct{}) {
+func (db Client) Longpoll(ctx context.Context, dir string, ch chan<- []Metadata) {
 	for {
 		res, err := db.ListFolder(ListFolderParams{
 			Path: dir,
@@ -51,7 +51,7 @@ func (db Client) Longpoll(ctx context.Context, dir string, ch chan<- struct{}) {
 			}
 
 			if len(res.Entries) > 0 {
-				ch <- struct{}{}
+				ch <- res.Entries
 				break
 			}
 		}

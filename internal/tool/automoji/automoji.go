@@ -202,7 +202,7 @@ func Run(args []string, _ io.Reader) error {
 	}
 
 	if p := os.Getenv("LM_BOT_LUA_PATH"); p != "" {
-		responsesChanged := make(chan struct{})
+		responsesChanged := make(chan []dropbox.Metadata)
 		go func() {
 			for range responsesChanged {
 				if err := loadLua(dbCl, p); err != nil {

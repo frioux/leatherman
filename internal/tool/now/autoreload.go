@@ -35,7 +35,7 @@ func doReload(ch <-chan struct{}, dir string, generation *chan bool) error {
 }
 
 func autoReload(db dropbox.Client, h http.Handler, dir string) (handler http.Handler, err error) {
-	watcher := make(chan struct{})
+	watcher := make(chan []dropbox.Metadata)
 	generation := make(chan bool)
 	go func() { db.Longpoll(context.Background(), dir, watcher) }()
 	go func() {

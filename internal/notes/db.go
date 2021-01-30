@@ -122,3 +122,67 @@ func (d *DB) InsertArticle(a Article) error {
 
 	return nil
 }
+
+func (d *DB) LoadArticle(name string) (Article, error) {
+	stmt, err := d.PrepareCached(`
+	SELECT rowid, title, url, filename, reviewed_on, review_by, body
+	FROM articles
+	WHERE filename = ?
+	`)
+	if err != nil {
+		return Article{}, err
+	}
+
+	var ret struct {
+		Article
+		RowID int
+	}
+
+	if err := stmt.Get(&ret, name); err != nil {
+		return Article{}, err
+	}
+
+	tagsStmt, err := d.PrepareCached(`SELECT tag FROM article_tag WHERE id = ?`)
+	if err != nil {
+		return Article{}, err
+	}
+
+	if err := tagsStmt.Select(&ret.Tags, ret.RowID); err != nil {
+		return Article{}, err
+	}
+
+	return ret.Article, nil
+}
+
+func (d *DB) DeleteArticle(name string) error {
+	tagStmt, err := d.PrepareCached(`DELETE FROM article_tag WHERE id IN (SELECT rowid FROM articles WHERE filename = ?)`)
+	if err != nil {
+		return err
+	}
+
+	if _, err := tagStmt.Exec(name); err != nil {
+		return err
+	}
+
+	stmt, err := d.PrepareCached(`DELETE FROM articles WHERE filename = ?`)
+	if err != nil {
+		return err
+	}
+
+	if _, err := stmt.Exec(name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d *DB) ReplaceArticle(a Article) (err error) {
+	if err := d.DeleteArticle(a.Filename); err != nil {
+		return err
+	}
+	if err := d.InsertArticle(a); err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -1,8 +1,10 @@
 package now
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -10,10 +12,69 @@ import (
 	"github.com/frioux/leatherman/internal/notes"
 )
 
-func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
+func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata) (err error) {
+	wg := &sync.WaitGroup{}
+	wg.Add(len(events))
+
+	articles := make([]notes.Article, len(events))
+
+	for i, e := range events {
+		i := i
+		e := e
+
+		go func() {
+			defer wg.Done()
+
+			r, err := cl.Download(e.PathLower)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return
+			}
+
+			articles[i], err = notes.ReadArticle(r)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return
+			}
+			articles[i].Filename = e.Name
+			articles[i].URL = strings.TrimSuffix(e.Name, ".md")
+		}()
+	}
+
+	wg.Wait()
+
+	for _, a := range articles {
+		fmt.Fprintln(os.Stderr, "replacing", a.Filename, "...")
+		if err := z.ReplaceArticle(a); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func maintainDB(cl dropbox.Client, dir string, z *notes.Zine) {
+	watcher := make(chan []dropbox.Metadata)
+	go func() { cl.Longpoll(context.Background(), dir, watcher) }()
+	go func() {
+		for events := range watcher {
+			if err := syncEventsToDB(cl, z, events); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+			}
+		}
+	}()
+}
+
+func loadDB(cl dropbox.Client, dir string) (z *notes.Zine, err error) {
+	z, err = notes.NewZine()
+	if err != nil {
+		return nil, err
+	}
+
 	t0 := time.Now()
 
-	r, err := db.ListFolder(dropbox.ListFolderParams{Path: dir})
+	var r dropbox.ListFolderResult
+	r, err = cl.ListFolder(dropbox.ListFolderParams{Path: dir})
 	if err != nil {
 		return nil, err
 	}
@@ -21,17 +82,12 @@ func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
 	entries := r.Entries
 
 	for r.HasMore {
-		r, err = db.ListFolderContinue(r.Cursor)
+		r, err = cl.ListFolderContinue(r.Cursor)
 		if err != nil {
 			return nil, err
 		}
 
 		entries = append(entries, r.Entries...)
-	}
-
-	z, err := notes.NewZine()
-	if err != nil {
-		return nil, err
 	}
 
 	articles := make([]notes.Article, len(entries))
@@ -45,7 +101,7 @@ func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
 			defer wg.Done()
 
 			// unclear what to do about errors here
-			r, err := db.Download(dir + name)
+			r, err := cl.Download(dir + name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
@@ -56,6 +112,8 @@ func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
 				fmt.Fprintln(os.Stderr, err)
 				return
 			}
+			articles[i].Filename = name
+			articles[i].URL = "/" + strings.TrimSuffix(name, ".md")
 		}()
 	}
 	wg.Wait()
@@ -68,5 +126,6 @@ func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
 
 	fmt.Fprintf(os.Stderr, "db loaded in %s\n", time.Now().Sub(t0))
 
+	maintainDB(cl, dir, z)
 	return z, nil
 }

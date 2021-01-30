@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 	corehtml "html"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"sort"
 	"strings"
 	"time"
 
@@ -45,7 +45,7 @@ func (f handlerFunc) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func server() (http.Handler, error) {
+func server(z *notes.Zine) (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	mdwn := goldmark.New(
@@ -96,43 +96,37 @@ func server() (http.Handler, error) {
 		}
 
 		f := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/") + ".md"
-		r, err := db.Download(dir + f)
+		a, err := z.LoadArticle(f)
 		if err != nil {
-			return err
-		}
-
-		a, err := notes.ReadArticle(r)
-		if err != nil {
-			return fmt.Errorf("ReadArticle: %w", err)
+			return fmt.Errorf("LoadArticle: %w", err)
 		}
 
 		fmt.Fprintf(rw, prelude, "now: "+a.Title)
 		fmt.Fprintf(rw, `<br><a href="/update?file=%s">Update %s</a><br>`, f, f)
-		return mdwn.Convert(a.Body, rw)
+
+		b, err := z.Render(a)
+		if err != nil {
+			return fmt.Errorf("Render: %w", err)
+		}
+		buf := bytes.NewBuffer(b)
+		_, err = io.Copy(rw, buf)
+		return err
 	}))
 
 	mux.Handle("/list", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		r, err := db.ListFolder(dropbox.ListFolderParams{Path: dir})
+		stmt, err := z.PrepareCached(`SELECT title, url FROM articles ORDER BY title`)
 		if err != nil {
 			return err
 		}
 
-		entries := r.Entries
-
-		for r.HasMore {
-			r, err = db.ListFolderContinue(r.Cursor)
-			if err != nil {
-				return err
-			}
-
-			entries = append(entries, r.Entries...)
+		articles := make([]struct{ Title, URL string }, 0, 1000)
+		if err := stmt.Select(&articles); err != nil {
+			return err
 		}
 
-		sort.Slice(entries, func(i, j int) bool { return entries[i].Name < entries[j].Name })
-
 		buf := &bytes.Buffer{}
-		for _, e := range entries {
-			fmt.Fprintln(buf, " * ["+e.Name+"](/"+strings.TrimSuffix(e.Name, ".md")+")")
+		for _, e := range articles {
+			fmt.Fprintln(buf, " * ["+e.Title+"]("+e.URL+")")
 		}
 
 		fmt.Fprintf(rw, prelude, "now: list")
@@ -192,10 +186,8 @@ func server() (http.Handler, error) {
 			rw.WriteHeader(303)
 			fmt.Fprint(rw, "Successfully updated")
 			return nil
-		default:
-			return errors.New("invalid method for /update")
 		}
-		return nil
+		return errors.New("invalid method for /update")
 	}))
 
 	mux.Handle("/toggle", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
