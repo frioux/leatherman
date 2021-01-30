@@ -52,4 +52,3 @@ func ReadArticle(r io.Reader) (Article, error) {
 
 	return a, err
 }
-
