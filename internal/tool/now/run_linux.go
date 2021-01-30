@@ -51,6 +51,7 @@ func Serve(args []string, _ io.Reader) error {
 		return fmt.Errorf("net.Listen: %w", err)
 	}
 
+	fmt.Fprintf(os.Stderr, "listening on %s\n", listener.Addr())
 	h, err := server()
 	if err != nil {
 		return fmt.Errorf("server: %w", err)
