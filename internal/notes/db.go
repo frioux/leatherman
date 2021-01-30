@@ -100,6 +100,13 @@ func (d *DB) PrepareCached(sql string) (*sqlx.Stmt, error) {
 }
 
 func (d *DB) InsertArticle(a Article) error {
+	if a.Filename == "" {
+		return errors.New("Filename is required")
+	}
+	if a.URL == "" {
+		return errors.New("URL is required")
+	}
+
 	stmt, err := d.PrepareCached(`INSERT INTO articles (
 		title, url, filename, reviewed_on, review_by, body
 	) VALUES (?, ?, ?, ?, ?, ?)`)
