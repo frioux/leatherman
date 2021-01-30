@@ -107,7 +107,7 @@ func TestRender(t *testing.T) {
 		return
 	}
 
-	testutil.Equal(t, string(got), "<p>start</p>\n<p>hello! <em>2000</em></p>\n<p>end</p>\n", "simple")
+	testutil.Equal(t, string(got), "<!-- header -->\n<p>hello! <em>2000</em></p>\n<!-- footer -->\n", "simple")
 }
 
 var S string
