@@ -11,7 +11,6 @@ import (
 	"os"
 
 	"github.com/frioux/leatherman/internal/dropbox"
-	"github.com/frioux/leatherman/internal/notes"
 	_ "modernc.org/sqlite"
 )
 
@@ -24,28 +23,23 @@ Command: notes
 func Serve(args []string, _ io.Reader) error {
 	var (
 		listen string
-		load   bool
 	)
 	fs := flag.NewFlagSet("notes", flag.ContinueOnError)
 	fs.StringVar(&listen, "listen", ":0", "location to listen on; default is random")
-	fs.BoolVar(&load, "load", false, "load the db, for testing reasons?")
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
 
-	var z *notes.Zine
-	if load {
-		cl, err := dropbox.NewClient(dropbox.Client{
-			Token: os.Getenv("LM_DROPBOX_TOKEN"),
-		})
-		if err != nil {
-			return err
-		}
+	cl, err := dropbox.NewClient(dropbox.Client{
+		Token: os.Getenv("LM_DROPBOX_TOKEN"),
+	})
+	if err != nil {
+		return err
+	}
 
-		z, err = loadDB(cl, "/notes/content/posts/")
-		if err != nil {
-			return err
-		}
+	z, err := loadDB(cl, "/notes/content/posts/")
+	if err != nil {
+		return err
 	}
 
 	listener, err := net.Listen("tcp", listen)
