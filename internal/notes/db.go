@@ -2,7 +2,6 @@ package notes
 
 import (
 	"database/sql"
-	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "modernc.org/sqlite"
@@ -38,11 +37,7 @@ func NewDB() (*DB, error) {
 		err error
 	)
 
-	if err := os.Remove(".posts.db"); err != nil && !os.IsNotExist(err) {
-		return nil, err
-	}
-
-	dbh, err = sqlx.Open("sqlite", "file:.posts.db?_sync=OFF&_journal=OFF&_vacuum=0")
+	dbh, err = sqlx.Open("sqlite", "file:.posts.db?mode=memory&_sync=OFF&_journal=OFF&_vacuum=0")
 	if err != nil {
 		return nil, err
 	}
