@@ -58,6 +58,7 @@ func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
 			}
 		}()
 	}
+	wg.Wait()
 
 	for _, a := range articles {
 		if err := z.InsertArticle(a); err != nil {
@@ -65,7 +66,6 @@ func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
 		}
 	}
 
-	wg.Wait()
 	fmt.Fprintf(os.Stderr, "db loaded in %s\n", time.Now().Sub(t0))
 
 	return z, nil
