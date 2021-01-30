@@ -48,11 +48,13 @@ func loadDB(db dropbox.Client, dir string) (*notes.Zine, error) {
 			r, err := db.Download(dir + name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
+				return
 			}
 
 			articles[i], err = notes.ReadArticle(r)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
+				return
 			}
 		}()
 	}
