@@ -80,18 +80,35 @@ func server() (http.Handler, error) {
 	mux.Handle("/version", selfupdate.Handler)
 
 	mux.Handle("/", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		r, err := db.Download(nowPath)
+		if req.URL.Path == "/" {
+			r, err := db.Download(nowPath)
+			if err != nil {
+				return err
+			}
+
+			b, err := parseNow(r, time.Now())
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(rw, prelude, "now")
+			return mdwn.Convert(b, rw)
+		}
+
+		f := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/") + ".md"
+		r, err := db.Download(dir + f)
 		if err != nil {
 			return err
 		}
 
-		b, err := parseNow(r, time.Now())
+		a, err := notes.ReadArticle(r)
 		if err != nil {
-			return err
+			return fmt.Errorf("ReadArticle: %w", err)
 		}
 
-		fmt.Fprintf(rw, prelude, "now")
-		return mdwn.Convert(b, rw)
+		fmt.Fprintf(rw, prelude, "now: "+a.Title)
+		fmt.Fprintf(rw, `<br><a href="/update?file=%s">Update %s</a><br>`, f, f)
+		return mdwn.Convert(a.Body, rw)
 	}))
 
 	mux.Handle("/list", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
@@ -115,7 +132,7 @@ func server() (http.Handler, error) {
 
 		buf := &bytes.Buffer{}
 		for _, e := range entries {
-			fmt.Fprintln(buf, " * ["+e.Name+"](/render?file="+e.Name+")")
+			fmt.Fprintln(buf, " * ["+e.Name+"](/"+strings.TrimSuffix(e.Name, ".md")+")")
 		}
 
 		fmt.Fprintf(rw, prelude, "now: list")
@@ -123,30 +140,6 @@ func server() (http.Handler, error) {
 	}))
 
 	mux.Handle("/sup", handlerFunc(sup))
-
-	mux.Handle("/render", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		f := req.URL.Query().Get("file")
-		if f == "" {
-			rw.Header().Add("Location", "/list")
-			rw.WriteHeader(303)
-			fmt.Fprint(rw, "No file param, going to /list")
-			return nil
-		}
-
-		r, err := db.Download(dir + f)
-		if err != nil {
-			return err
-		}
-
-		a, err := notes.ReadArticle(r)
-		if err != nil {
-			return fmt.Errorf("ReadArticle: %w", err)
-		}
-
-		fmt.Fprintf(rw, prelude, "now: "+a.Title)
-		fmt.Fprintf(rw, `<br><a href="/update?file=%s">Update %s</a><br>`, f, f)
-		return mdwn.Convert(a.Body, rw)
-	}))
 
 	mux.Handle("/update", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		switch req.Method {
@@ -195,7 +188,7 @@ func server() (http.Handler, error) {
 			if err != nil {
 				return err
 			}
-			rw.Header().Add("Location", "/render?file="+f)
+			rw.Header().Add("Location", "/"+strings.TrimSuffix(f, ".md"))
 			rw.WriteHeader(303)
 			fmt.Fprint(rw, "Successfully updated")
 			return nil
