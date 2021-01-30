@@ -53,7 +53,7 @@ func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata)
 	return nil
 }
 
-func maintainDB(cl dropbox.Client, dir string, z *notes.Zine) {
+func maintainDB(cl dropbox.Client, dir string, generation *chan bool, z *notes.Zine) {
 	watcher := make(chan []dropbox.Metadata)
 	go func() { cl.Longpoll(context.Background(), dir, watcher) }()
 	go func() {
@@ -61,11 +61,13 @@ func maintainDB(cl dropbox.Client, dir string, z *notes.Zine) {
 			if err := syncEventsToDB(cl, z, events); err != nil {
 				fmt.Fprintln(os.Stderr, err)
 			}
+			close(*generation)
+			*generation = make(chan bool)
 		}
 	}()
 }
 
-func loadDB(cl dropbox.Client, dir string) (z *notes.Zine, err error) {
+func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine, err error) {
 	z, err = notes.NewZine()
 	if err != nil {
 		return nil, err
@@ -126,6 +128,6 @@ func loadDB(cl dropbox.Client, dir string) (z *notes.Zine, err error) {
 
 	fmt.Fprintf(os.Stderr, "db loaded in %s\n", time.Now().Sub(t0))
 
-	maintainDB(cl, dir, z)
+	maintainDB(cl, dir, generation, z)
 	return z, nil
 }

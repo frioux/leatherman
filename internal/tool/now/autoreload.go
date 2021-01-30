@@ -1,7 +1,6 @@
 package now
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -34,17 +33,7 @@ func doReload(ch <-chan struct{}, dir string, generation *chan bool) error {
 	}
 }
 
-func autoReload(db dropbox.Client, h http.Handler, dir string) (handler http.Handler, err error) {
-	watcher := make(chan []dropbox.Metadata)
-	generation := make(chan bool)
-	go func() { db.Longpoll(context.Background(), dir, watcher) }()
-	go func() {
-		for range watcher {
-			close(generation)
-			generation = make(chan bool)
-		}
-	}()
-
+func autoReload(db dropbox.Client, h http.Handler, generation *chan bool, dir string) (handler http.Handler, err error) {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		f, ok := rw.(http.Flusher)
 		if !ok {
@@ -56,7 +45,7 @@ func autoReload(db dropbox.Client, h http.Handler, dir string) (handler http.Han
 			rw.Header().Set("Content-Type", "text/event-stream")
 
 			select {
-			case <-generation:
+			case <-*generation:
 				fmt.Fprintf(rw, "data: Message: reload!!!\n\n")
 				f.Flush()
 			case <-r.Context().Done():
@@ -66,8 +55,8 @@ func autoReload(db dropbox.Client, h http.Handler, dir string) (handler http.Han
 		} else if r.URL.Path == "/_force_reload" {
 			rw.Header().Set("Cache-Control", "no-cache")
 
-			close(generation)
-			generation = make(chan bool)
+			close(*generation)
+			*generation = make(chan bool)
 			return
 		} else {
 			// This is a pretty inefficient way to do this, but

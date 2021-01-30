@@ -37,7 +37,8 @@ func Serve(args []string, _ io.Reader) error {
 		return err
 	}
 
-	z, err := loadDB(cl, "/notes/content/posts/")
+	generation := make(chan bool)
+	z, err := loadDB(cl, "/notes/content/posts/", &generation)
 	if err != nil {
 		return err
 	}
@@ -48,7 +49,7 @@ func Serve(args []string, _ io.Reader) error {
 	}
 
 	fmt.Fprintf(os.Stderr, "listening on %s\n", listener.Addr())
-	h, err := server(z)
+	h, err := server(z, &generation)
 	if err != nil {
 		return fmt.Errorf("server: %w", err)
 	}

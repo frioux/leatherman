@@ -45,7 +45,7 @@ func (f handlerFunc) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func server(z *notes.Zine) (http.Handler, error) {
+func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	mdwn := goldmark.New(
@@ -272,7 +272,7 @@ func server(z *notes.Zine) (http.Handler, error) {
 		return mdwn.Convert(b, rw)
 	}))
 
-	arMux, err := autoReload(db, mux, dir)
+	arMux, err := autoReload(db, mux, generation, dir)
 	if err != nil {
 		return nil, err
 	}
