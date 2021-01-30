@@ -42,6 +42,7 @@ func NewZine() (*Zine, error) {
 			),
 			goldmark.WithExtensions(
 				extension.Strikethrough,
+				extension.Table,
 			),
 		),
 		Q: func(q string, more ...string) ([]map[string]interface{}, error) {
