@@ -17,7 +17,7 @@ import (
 type Zine struct {
 	Root string
 
-	db   DB
+	DB
 	tpl  template.Template
 	mdwn goldmark.Markdown
 
@@ -31,7 +31,7 @@ func NewZine() (*Zine, error) {
 	}
 
 	z := &Zine{
-		db:  *d,
+		DB:  *d,
 		tpl: *template.New(""),
 		mdwn: goldmark.New(
 			goldmark.WithParserOptions(
@@ -144,7 +144,7 @@ func (z *Zine) Load(as *[]Article) error {
 			a.URL = strings.TrimSuffix(a.URL, ".md")
 		}
 
-		if err := z.db.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(a); err != nil {
 			return fmt.Errorf("error inserting data from %s: %w", f, err)
 		}
 

@@ -33,7 +33,7 @@ func TestQuery(t *testing.T) {
 	if err != nil {
 		t.Fatalf("couldn't create zine: %s", err)
 	}
-	defer z.db.Close()
+	defer z.Close()
 
 	a := Article{
 		Title: "frew",
@@ -41,7 +41,7 @@ func TestQuery(t *testing.T) {
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.db.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(a); err != nil {
 			t.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -67,7 +67,7 @@ func BenchmarkQuery(b *testing.B) {
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.db.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(a); err != nil {
 			b.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -97,7 +97,7 @@ func TestRender(t *testing.T) {
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.db.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(a); err != nil {
 			t.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -125,7 +125,7 @@ func BenchmarkRender(b *testing.B) {
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.db.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(a); err != nil {
 			b.Fatalf("couldn't insert article: %s", err)
 		}
 	}
