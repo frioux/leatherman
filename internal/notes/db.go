@@ -2,6 +2,7 @@ package notes
 
 import (
 	"database/sql"
+	"sync"
 
 	"github.com/jmoiron/sqlx"
 	_ "modernc.org/sqlite"
@@ -27,8 +28,8 @@ type DB struct {
 	*sqlx.DB
 	insertTags *sql.Stmt
 
-	// stmtCache is not safe for concurrent access.
-	stmtCache map[string]*sqlx.Stmt
+	stmtCacheMu *sync.Mutex
+	stmtCache   map[string]*sqlx.Stmt
 }
 
 func NewDB() (*DB, error) {
@@ -71,7 +72,7 @@ func NewDB() (*DB, error) {
 		}
 	}()
 
-	d := &DB{DB: dbh, stmtCache: map[string]*sqlx.Stmt{}}
+	d := &DB{DB: dbh, stmtCache: map[string]*sqlx.Stmt{}, stmtCacheMu: &sync.Mutex{}}
 	d.insertTags, err = d.Prepare(`INSERT INTO article_tag (id, tag) VALUES (?, ?)`)
 	if err != nil {
 		return nil, err
@@ -82,6 +83,8 @@ func NewDB() (*DB, error) {
 }
 
 func (d *DB) PrepareCached(sql string) (*sqlx.Stmt, error) {
+	d.stmtCacheMu.Lock()
+	defer d.stmtCacheMu.Unlock()
 	if stmt, ok := d.stmtCache[sql]; ok {
 		return stmt, nil
 	}
