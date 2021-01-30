@@ -41,7 +41,9 @@ func Serve(args []string, _ io.Reader) error {
 		}
 
 		_, err = loadDB(cl, "/notes/content/posts/")
-		return err
+		if err != nil {
+			return err
+		}
 	}
 
 	listener, err := net.Listen("tcp", listen)
