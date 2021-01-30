@@ -2,6 +2,7 @@ package notes
 
 import (
 	"database/sql"
+	"errors"
 	"sync"
 
 	"github.com/jmoiron/sqlx"
@@ -160,7 +161,7 @@ func (d *DB) DeleteArticle(name string) error {
 		return err
 	}
 
-	if _, err := tagStmt.Exec(name); err != nil {
+	if _, err := tagStmt.Exec(name); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
 
@@ -169,7 +170,7 @@ func (d *DB) DeleteArticle(name string) error {
 		return err
 	}
 
-	if _, err := stmt.Exec(name); err != nil {
+	if _, err := stmt.Exec(name); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
 
