@@ -80,11 +80,11 @@ func NewZine() (*Zine, error) {
 	}
 	z.tpl.Parse(`
 {{ define "header" }}
-start
+<!-- header -->
 {{ end }}
 
 {{ define "footer" }}
-end
+<!-- footer -->
 {{ end }}
 `)
 	z.tpl.Funcs(template.FuncMap{
