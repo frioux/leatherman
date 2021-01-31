@@ -147,7 +147,7 @@ func (z *Zine) Load(as *[]Article) error {
 			a.URL = strings.TrimSuffix(a.URL, ".md")
 		}
 
-		if err := z.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(z.DB, a); err != nil {
 			return fmt.Errorf("error inserting data from %s: %w", f, err)
 		}
 

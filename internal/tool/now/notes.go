@@ -96,7 +96,7 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 		}
 
 		f := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/") + ".md"
-		a, err := z.LoadArticle(f)
+		a, err := z.LoadArticle(z.DB, f)
 		if err != nil {
 			return fmt.Errorf("LoadArticle: %w", err)
 		}

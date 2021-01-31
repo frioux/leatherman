@@ -13,6 +13,19 @@ import (
 )
 
 func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata) (err error) {
+	tx, err := z.Beginx()
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback() // how to handle error?
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
 	wg := &sync.WaitGroup{}
 	wg.Add(len(events))
 
@@ -57,12 +70,12 @@ func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata)
 	for _, a := range articles {
 		if a.deleted {
 			fmt.Fprintln(os.Stderr, "deleting", a.Filename, "...")
-			if err := z.DeleteArticle(a.Article.Filename); err != nil {
+			if err := z.DeleteArticle(tx, a.Article.Filename); err != nil {
 				return err
 			}
 		} else {
 			fmt.Fprintln(os.Stderr, "replacing", a.Filename, "...")
-			if err := z.ReplaceArticle(a.Article); err != nil {
+			if err := z.ReplaceArticle(tx, a.Article); err != nil {
 				return err
 			}
 		}
@@ -90,6 +103,19 @@ func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine
 	if err != nil {
 		return nil, err
 	}
+
+	tx, err := z.Beginx()
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback() // how to handle error?
+		} else {
+			err = tx.Commit()
+		}
+	}()
 
 	t0 := time.Now()
 
@@ -139,7 +165,7 @@ func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine
 	wg.Wait()
 
 	for _, a := range articles {
-		if err := z.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(tx, a); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
 	}

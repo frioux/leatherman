@@ -22,7 +22,7 @@ func BenchmarkInsertMetadata(b *testing.B) {
 	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		if err := db.InsertArticle(a); err != nil {
+		if err := db.InsertArticle(db, a); err != nil {
 			b.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -43,7 +43,7 @@ func TestQuery(t *testing.T) {
 		Extra:    map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(z.DB, a); err != nil {
 			t.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -69,7 +69,7 @@ func BenchmarkQuery(b *testing.B) {
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(z.DB, a); err != nil {
 			b.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -101,7 +101,7 @@ func TestRender(t *testing.T) {
 		Extra:    map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(z.DB, a); err != nil {
 			t.Fatalf("couldn't insert article: %s", err)
 		}
 	}
@@ -129,7 +129,7 @@ func BenchmarkRender(b *testing.B) {
 		Extra: map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
-		if err := z.InsertArticle(a); err != nil {
+		if err := z.InsertArticle(z.DB, a); err != nil {
 			b.Fatalf("couldn't insert article: %s", err)
 		}
 	}

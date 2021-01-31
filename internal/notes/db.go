@@ -72,7 +72,7 @@ func NewDB() (*DB, error) {
 	return d, nil
 }
 
-func (d *DB) InsertArticle(a Article) error {
+func (d *DB) InsertArticle(db sqlx.Preparer, a Article) error {
 	if a.Filename == "" {
 		return errors.New("Filename is required")
 	}
@@ -80,7 +80,7 @@ func (d *DB) InsertArticle(a Article) error {
 		return errors.New("URL is required")
 	}
 
-	stmt, err := d.Preparex(`INSERT INTO articles (
+	stmt, err := sqlx.Preparex(db, `INSERT INTO articles (
 		title, url, filename, reviewed_on, review_by, body
 	) VALUES (?, ?, ?, ?, ?, ?)`)
 	if err != nil {
@@ -95,7 +95,7 @@ func (d *DB) InsertArticle(a Article) error {
 	if err != nil {
 		return err
 	}
-	insertTags, err := d.Preparex(`INSERT INTO article_tag (id, tag) VALUES (?, ?)`)
+	insertTags, err := sqlx.Preparex(db, `INSERT INTO article_tag (id, tag) VALUES (?, ?)`)
 	if err != nil {
 		return err
 	}
@@ -108,8 +108,8 @@ func (d *DB) InsertArticle(a Article) error {
 	return nil
 }
 
-func (d *DB) LoadArticle(name string) (Article, error) {
-	stmt, err := d.Preparex(`
+func (d *DB) LoadArticle(db sqlx.Preparer, name string) (Article, error) {
+	stmt, err := sqlx.Preparex(db, `
 	SELECT rowid, title, url, filename, reviewed_on, review_by, body
 	FROM articles
 	WHERE filename = ?
@@ -127,7 +127,7 @@ func (d *DB) LoadArticle(name string) (Article, error) {
 		return Article{}, err
 	}
 
-	tagsStmt, err := d.Preparex(`SELECT tag FROM article_tag WHERE id = ?`)
+	tagsStmt, err := sqlx.Preparex(db, `SELECT tag FROM article_tag WHERE id = ?`)
 	if err != nil {
 		return Article{}, err
 	}
@@ -139,8 +139,8 @@ func (d *DB) LoadArticle(name string) (Article, error) {
 	return ret.Article, nil
 }
 
-func (d *DB) DeleteArticle(name string) error {
-	tagStmt, err := d.Preparex(`DELETE FROM article_tag WHERE id IN (SELECT rowid FROM articles WHERE filename = ?)`)
+func (d *DB) DeleteArticle(db sqlx.Preparer, name string) error {
+	tagStmt, err := sqlx.Preparex(db, `DELETE FROM article_tag WHERE id IN (SELECT rowid FROM articles WHERE filename = ?)`)
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func (d *DB) DeleteArticle(name string) error {
 		return err
 	}
 
-	stmt, err := d.Preparex(`DELETE FROM articles WHERE filename = ?`)
+	stmt, err := sqlx.Preparex(db, `DELETE FROM articles WHERE filename = ?`)
 	if err != nil {
 		return err
 	}
@@ -161,11 +161,11 @@ func (d *DB) DeleteArticle(name string) error {
 	return nil
 }
 
-func (d *DB) ReplaceArticle(a Article) (err error) {
-	if err := d.DeleteArticle(a.Filename); err != nil {
+func (d *DB) ReplaceArticle(db sqlx.Preparer, a Article) (err error) {
+	if err := d.DeleteArticle(db, a.Filename); err != nil {
 		return err
 	}
-	if err := d.InsertArticle(a); err != nil {
+	if err := d.InsertArticle(db, a); err != nil {
 		return err
 	}
 
