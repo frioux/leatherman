@@ -3,7 +3,6 @@ package notes
 import (
 	"database/sql"
 	"errors"
-	"sync"
 
 	"github.com/jmoiron/sqlx"
 	_ "modernc.org/sqlite"
@@ -25,13 +24,7 @@ CREATE VIEW _ ( id, title, url, filename, body, reviewed_on, review_by, tag) AS
 	JOIN article_tag at ON a.rowid = at.id;
 `
 
-type DB struct {
-	*sqlx.DB
-	insertTags *sql.Stmt
-
-	stmtCacheMu *sync.Mutex
-	stmtCache   map[string]*sqlx.Stmt
-}
+type DB struct{ *sqlx.DB }
 
 func NewDB() (*DB, error) {
 	var (
@@ -73,30 +66,10 @@ func NewDB() (*DB, error) {
 		}
 	}()
 
-	d := &DB{DB: dbh, stmtCache: map[string]*sqlx.Stmt{}, stmtCacheMu: &sync.Mutex{}}
-	d.insertTags, err = d.Prepare(`INSERT INTO article_tag (id, tag) VALUES (?, ?)`)
-	if err != nil {
-		return nil, err
-	}
+	d := &DB{DB: dbh}
 
 	success = true
 	return d, nil
-}
-
-func (d *DB) PrepareCached(sql string) (*sqlx.Stmt, error) {
-	d.stmtCacheMu.Lock()
-	defer d.stmtCacheMu.Unlock()
-	if stmt, ok := d.stmtCache[sql]; ok {
-		return stmt, nil
-	}
-
-	stmt, err := d.Preparex(sql)
-	if err != nil {
-		return nil, err
-	}
-
-	d.stmtCache[sql] = stmt
-	return stmt, nil
 }
 
 func (d *DB) InsertArticle(a Article) error {
@@ -107,7 +80,7 @@ func (d *DB) InsertArticle(a Article) error {
 		return errors.New("URL is required")
 	}
 
-	stmt, err := d.PrepareCached(`INSERT INTO articles (
+	stmt, err := d.Preparex(`INSERT INTO articles (
 		title, url, filename, reviewed_on, review_by, body
 	) VALUES (?, ?, ?, ?, ?, ?)`)
 	if err != nil {
@@ -122,8 +95,12 @@ func (d *DB) InsertArticle(a Article) error {
 	if err != nil {
 		return err
 	}
+	insertTags, err := d.Preparex(`INSERT INTO article_tag (id, tag) VALUES (?, ?)`)
+	if err != nil {
+		return err
+	}
 	for _, tag := range a.Tags {
-		if _, err := d.insertTags.Exec(id, tag); err != nil {
+		if _, err := insertTags.Exec(id, tag); err != nil {
 			return err
 		}
 	}
@@ -132,7 +109,7 @@ func (d *DB) InsertArticle(a Article) error {
 }
 
 func (d *DB) LoadArticle(name string) (Article, error) {
-	stmt, err := d.PrepareCached(`
+	stmt, err := d.Preparex(`
 	SELECT rowid, title, url, filename, reviewed_on, review_by, body
 	FROM articles
 	WHERE filename = ?
@@ -150,7 +127,7 @@ func (d *DB) LoadArticle(name string) (Article, error) {
 		return Article{}, err
 	}
 
-	tagsStmt, err := d.PrepareCached(`SELECT tag FROM article_tag WHERE id = ?`)
+	tagsStmt, err := d.Preparex(`SELECT tag FROM article_tag WHERE id = ?`)
 	if err != nil {
 		return Article{}, err
 	}
@@ -163,7 +140,7 @@ func (d *DB) LoadArticle(name string) (Article, error) {
 }
 
 func (d *DB) DeleteArticle(name string) error {
-	tagStmt, err := d.PrepareCached(`DELETE FROM article_tag WHERE id IN (SELECT rowid FROM articles WHERE filename = ?)`)
+	tagStmt, err := d.Preparex(`DELETE FROM article_tag WHERE id IN (SELECT rowid FROM articles WHERE filename = ?)`)
 	if err != nil {
 		return err
 	}
@@ -172,7 +149,7 @@ func (d *DB) DeleteArticle(name string) error {
 		return err
 	}
 
-	stmt, err := d.PrepareCached(`DELETE FROM articles WHERE filename = ?`)
+	stmt, err := d.Preparex(`DELETE FROM articles WHERE filename = ?`)
 	if err != nil {
 		return err
 	}

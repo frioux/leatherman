@@ -48,7 +48,7 @@ func NewZine() (*Zine, error) {
 			),
 		),
 		Q: func(q string, more ...string) ([]map[string]interface{}, error) {
-			stmt, err := d.PrepareCached(q)
+			stmt, err := d.Preparex(q)
 			if err != nil {
 				return nil, err
 			}

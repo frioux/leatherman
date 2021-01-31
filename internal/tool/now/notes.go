@@ -114,7 +114,7 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 	}))
 
 	mux.Handle("/list", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		stmt, err := z.PrepareCached(`SELECT title, url FROM articles ORDER BY title`)
+		stmt, err := z.Preparex(`SELECT title, url FROM articles ORDER BY title`)
 		if err != nil {
 			return err
 		}
