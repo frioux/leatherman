@@ -26,13 +26,17 @@ CREATE VIEW _ ( id, title, url, filename, body, reviewed_on, review_by, tag) AS
 
 type DB struct{ *sqlx.DB }
 
-func NewDB() (*DB, error) {
+func NewDB(name string) (*DB, error) {
 	var (
 		dbh *sqlx.DB
 		err error
 	)
 
-	dbh, err = sqlx.Open("sqlite", "file:.posts.db?mode=memory&_sync=OFF&_journal=OFF&_vacuum=0")
+	if name == "" {
+		name = "notes"
+	}
+
+	dbh, err = sqlx.Open("sqlite", "file:"+name+"?mode=memory&_sync=OFF&_journal=OFF&_vacuum=0&cache=shared")
 	if err != nil {
 		return nil, err
 	}

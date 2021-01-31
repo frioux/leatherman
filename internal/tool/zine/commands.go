@@ -58,7 +58,7 @@ func q(args []string) error {
 		return err
 	}
 
-	z, err := notes.NewZine()
+	z, err := notes.NewZine("")
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func render(args []string) error {
 		return err
 	}
 
-	z, err := notes.NewZine()
+	z, err := notes.NewZine("")
 	if err != nil {
 		return err
 	}
@@ -193,7 +193,7 @@ func debug(args []string) error {
 		return err
 	}
 
-	z, err := notes.NewZine()
+	z, err := notes.NewZine("")
 	if err != nil {
 		return err
 	}

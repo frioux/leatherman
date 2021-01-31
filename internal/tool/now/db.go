@@ -99,7 +99,7 @@ func maintainDB(cl dropbox.Client, dir string, generation *chan bool, z *notes.Z
 }
 
 func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine, err error) {
-	z, err = notes.NewZine()
+	z, err = notes.NewZine("")
 	if err != nil {
 		return nil, err
 	}

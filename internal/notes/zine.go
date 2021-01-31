@@ -26,8 +26,8 @@ type Zine struct {
 	Q func(string, ...string) ([]map[string]interface{}, error)
 }
 
-func NewZine() (*Zine, error) {
-	d, err := NewDB()
+func NewZine(dbName string) (*Zine, error) {
+	d, err := NewDB(dbName)
 	if err != nil {
 		return nil, fmt.Errorf("newDB: %s", err)
 	}
