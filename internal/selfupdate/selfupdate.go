@@ -7,6 +7,7 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"runtime"
 	"strings"
@@ -200,6 +201,8 @@ func checkUpdate() string {
 	if h := resp.Header.Get("X-RateLimit-Limit"); token != "" && h != "5000" {
 		invalidToken = true
 		fmt.Fprintf(os.Stderr, "X-RateLimit-Limit wasn't 5000, your auth token might be invalid (was %s); disabling token\n", h)
+		b, _ := httputil.DumpResponse(resp, true)
+		fmt.Fprintf(os.Stderr, "Full response follows:\n%s", b)
 		token = ""
 	}
 
