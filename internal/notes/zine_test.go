@@ -36,9 +36,11 @@ func TestQuery(t *testing.T) {
 	defer z.Close()
 
 	a := Article{
-		Title: "frew",
-		Tags:  []string{"foo", "bar"},
-		Extra: map[string]string{"foo": "bar"},
+		Title:    "frew",
+		Filename: "frew.md",
+		URL:      "/frew/",
+		Tags:     []string{"foo", "bar"},
+		Extra:    map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
 		if err := z.InsertArticle(a); err != nil {
@@ -92,9 +94,11 @@ func TestRender(t *testing.T) {
 	}
 
 	a := Article{
-		Title: "frew",
-		Tags:  []string{"foo", "bar"},
-		Extra: map[string]string{"foo": "bar"},
+		Title:    "frew",
+		Filename: "frew.md",
+		URL:      "/frew/",
+		Tags:     []string{"foo", "bar"},
+		Extra:    map[string]string{"foo": "bar"},
 	}
 	for i := 0; i < 1000; i++ {
 		if err := z.InsertArticle(a); err != nil {
