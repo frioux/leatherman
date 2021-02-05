@@ -10,6 +10,7 @@ import (
 
 	"github.com/frioux/leatherman/internal/dropbox"
 	"github.com/frioux/leatherman/internal/notes"
+	"github.com/jmoiron/sqlx"
 )
 
 func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata) (err error) {
@@ -96,33 +97,67 @@ func maintainDB(cl dropbox.Client, dir string, generation *chan bool, z *notes.Z
 			*generation = make(chan bool)
 		}
 	}()
+	go func() {
+		for {
+			time.Sleep(time.Hour)
+			rebuildDB(cl, dir, z)
+		}
+	}()
 }
 
-func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine, err error) {
-	z, err = notes.NewZine("")
-	if err != nil {
-		return nil, err
-	}
-
+func rebuildDB(cl dropbox.Client, dir string, z *notes.Zine) (err error) {
 	tx, err := z.Beginx()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer func() {
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to rebuild database, rolling back: %s\n", err)
 			tx.Rollback() // how to handle error?
 		} else {
 			err = tx.Commit()
 		}
 	}()
 
+	if err := clearDB(z, tx); err != nil {
+		return err
+	}
+
+	if err := populateDB(cl, dir, z, tx); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func clearDB(z *notes.Zine, tx sqlx.Preparer) error {
+	stmt, err := tx.Prepare("DELETE FROM articles")
+	if err != nil {
+		return err
+	}
+	if _, err := stmt.Exec(); err != nil {
+		return err
+	}
+
+	stmt, err = tx.Prepare("DELETE FROM article_tag")
+	if err != nil {
+		return err
+	}
+	if _, err := stmt.Exec(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func populateDB(cl dropbox.Client, dir string, z *notes.Zine, tx sqlx.Preparer) error {
 	t0 := time.Now()
 
 	var r dropbox.ListFolderResult
-	r, err = cl.ListFolder(dropbox.ListFolderParams{Path: dir})
+	r, err := cl.ListFolder(dropbox.ListFolderParams{Path: dir})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	entries := r.Entries
@@ -130,7 +165,7 @@ func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine
 	for r.HasMore {
 		r, err = cl.ListFolderContinue(r.Cursor)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		entries = append(entries, r.Entries...)
@@ -171,6 +206,32 @@ func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine
 	}
 
 	fmt.Fprintf(os.Stderr, "db loaded in %s\n", time.Now().Sub(t0))
+
+	return nil
+}
+
+func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine, err error) {
+	z, err = notes.NewZine("")
+	if err != nil {
+		return nil, err
+	}
+
+	tx, err := z.Beginx()
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback() // how to handle error?
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
+	if err := populateDB(cl, dir, z, tx); err != nil {
+		return nil, err
+	}
 
 	maintainDB(cl, dir, generation, z)
 	return z, nil
