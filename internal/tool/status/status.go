@@ -24,8 +24,6 @@ tool is that it caches the values returned.
 
 In the background, it interact swith the [blink(1)](http://blink1.thingm.com/).
 It turns the light green when I'm in a meeting and red when audio is playing.
-
-Command: status
 */
 func Status(args []string, _ io.Reader) error {
 	fs := flag.NewFlagSet(args[0], flag.ContinueOnError)

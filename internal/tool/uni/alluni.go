@@ -29,8 +29,6 @@ DENTISTRY SYMBOL LIGHT UP AND HORIZONTAL
 DENTISTRY SYMBOL LIGHT VERTICAL AND TOP LEFT
 DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM LEFT
 ```
-
-Command: alluni
 */
 func All(_ []string, _ io.Reader) error {
 	t := rangetable.Assigned("11.0.0")

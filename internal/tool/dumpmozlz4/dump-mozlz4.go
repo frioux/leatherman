@@ -11,8 +11,6 @@ import (
 /*
 Run dumps the contents of a `mozlz4` (aka `jsonlz4`) file commonly used by
 Firefox.  Just takes the name of the file to dump and writes to standard out.
-
-Command: dump-mozlz4
 */
 func Run(args []string, _ io.Reader) error {
 	if len(args) != 2 {

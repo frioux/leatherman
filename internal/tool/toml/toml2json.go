@@ -19,8 +19,6 @@ on stdout.
 $ echo 'foo = "bar"` | toml2json
 {"foo":"bar"}
 ```
-
-Command: toml2json
 */
 func ToJSON(_ []string, stdin io.Reader) error {
 	buf := new(bytes.Buffer)

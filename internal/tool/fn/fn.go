@@ -17,8 +17,6 @@ Run creates persistent functions by actually writing scripts.  Example usage:
 ```
 fn count-users 'wc -l < /etc/passwd'
 ```
-
-Command: fn
 */
 func Run(args []string, _ io.Reader) error {
 	if len(args) < 3 {

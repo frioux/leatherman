@@ -66,8 +66,6 @@ The flag `-no-run-at-start` will not the the script until there are any events.
 
 The flag `-report` will decorate output with a text wrapper to clarify when the
 script is run.
-
-Command: minotaur
 */
 func Run(args []string, _ io.Reader) error {
 	args = args[1:]

@@ -10,8 +10,6 @@ import (
 
 /*
 ToMarkdown reads CSV on stdin and writes Markdown on stdout.
-
-Command: csv2md
 */
 func ToMarkdown(_ []string, stdin io.Reader) error {
 	reader := csv.NewReader(stdin)

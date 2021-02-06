@@ -158,8 +158,6 @@ All of the following are thin veneers atop
  * `turtleemoji#category()` // string
  * `turtleemoji#char()` // string
  * `turtleemoji#haskeyword("keyword")` // bool
-
-Command: auto-emote
 */
 func Run(args []string, _ io.Reader) error {
 	fs := flag.NewFlagSet("automoji", flag.ContinueOnError)

@@ -21,7 +21,7 @@ rating:
 ```bash
 $ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
 ```
-Command: sm-list */
+*/
 func Run(_ []string, _ io.Reader) error {
 	wg := sync.WaitGroup{}
 

@@ -21,8 +21,6 @@ var tidyRE = regexp.MustCompile(`^\s*(.*?)\s*$`)
 /*
 Run reads text on STDIN and writes the same text back, converting any links to
 Markdown links, with the title of the page as the title of the link.
-
-Command: expand-url
 */
 func Run(args []string, stdin io.Reader) error {
 	return run(stdin, os.Stdout)

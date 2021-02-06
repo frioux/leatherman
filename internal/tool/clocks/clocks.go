@@ -66,8 +66,6 @@ to choose which timezones are shown.
 ```bash
 clocks Africa/Johannesburg America/Los_Angeles Europe/Copenhagen
 ```
-
-Command: clocks
 */
 func Run(args []string, _ io.Reader) error {
 	if len(args) > 1 && args[1] == "-h" {

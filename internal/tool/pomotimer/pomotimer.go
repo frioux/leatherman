@@ -31,8 +31,6 @@ progress.
 
 [1]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique/
 [2]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique-three-years-later/
-
-Command: pomotimer
 */
 func Run(args []string, stdin io.Reader) error {
 	duration := 25 * time.Minute

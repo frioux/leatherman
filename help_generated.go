@@ -541,6 +541,7 @@ rating:
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
 ` + "`" + `` + "`" + `` + "`" + `
+
 ### ` + "`" + `srv` + "`" + `
 
 ` + "`" + `srv` + "`" + ` will serve a directory over http, injecting javascript to have pages
@@ -733,24 +734,24 @@ func init() {
 
 		"slack-status": readme[15187:15332],
 
-		"sm-list": readme[15332:15608],
+		"sm-list": readme[15332:15609],
 
-		"srv": readme[15608:16091],
+		"srv": readme[15609:16092],
 
-		"status": readme[16091:16548],
+		"status": readme[16092:16549],
 
-		"toml2json": readme[16548:16723],
+		"toml2json": readme[16549:16724],
 
-		"twilio": readme[16723:17181],
+		"twilio": readme[16724:17182],
 
-		"uni": readme[17181:17343],
+		"uni": readme[17182:17344],
 
-		"update": readme[17343:17566],
+		"update": readme[17344:17567],
 
-		"wuphf": readme[17566:17877],
+		"wuphf": readme[17567:17878],
 
-		"yaml2json": readme[17877:17954],
+		"yaml2json": readme[17878:17955],
 
-		"zine": readme[17954:18010],
+		"zine": readme[17955:18011],
 	}
 }

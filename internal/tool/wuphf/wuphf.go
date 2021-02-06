@@ -30,8 +30,6 @@ The following environment variables should be set:
 ```bash
 $ wuphf 'the shoes are on sale'
 ```
-
-Command: wuphf
 */
 func Wuphf(args []string, _ io.Reader) error {
 	if len(args) == 1 {

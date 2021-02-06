@@ -29,8 +29,6 @@ Run `twilio -help` to see the defaults.
 ```bash
 $ twilio -message "the building is on fire!"
 ```
-
-Command: twilio
 */
 func Twilio(args []string, _ io.Reader) error {
 	var endpoint, auth, message, from string

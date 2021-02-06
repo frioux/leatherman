@@ -16,8 +16,6 @@ Describe will describe the characters in the args.
 $ uni ⢾
 '⢾' @ 10430 aka BRAILLE PATTERN DOTS-234568 ( graphic | printable | symbol )
 ```
-
-Command: uni
 */
 func Describe(args []string, _ io.Reader) error {
 	if len(args) < 2 {

@@ -19,8 +19,6 @@ Typical usage is probably something like:
 ```bash
 $ slack-deaddrop -channel general -text 'good morning!'
 ```
-
-Command: slack-deaddrop
 */
 func Deaddrop(args []string, _ io.Reader) error {
 	// https://api.slack.com/custom-integrations/legacy-tokens

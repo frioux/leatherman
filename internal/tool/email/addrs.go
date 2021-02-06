@@ -138,8 +138,6 @@ folder.
 ``` bash
 $ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
 ```
-
-Command: addrs
 */
 func Addrs(args []string, stdin io.Reader) error {
 	if len(args) != 2 {

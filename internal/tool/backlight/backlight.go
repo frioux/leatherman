@@ -24,8 +24,6 @@ Decrease by 10%:
 ``` bash
 $ backlight -10
 ```
-
-Command: backlight
 */
 func Run(args []string, _ io.Reader) error {
 	err := os.Chdir(path)

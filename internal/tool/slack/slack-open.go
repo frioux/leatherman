@@ -18,8 +18,6 @@ Open opens a channel, group message, or direct message by name:
 ```bash
 $ slack-open -channel general
 ```
-
-Command: slack-open
 */
 func Open(args []string, _ io.Reader) error {
 	// https://api.slack.com/custom-integrations/legacy-tokens

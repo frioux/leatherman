@@ -62,8 +62,6 @@ add functionality to projects within shell sessions.
 [vim]: https://blog.afoolishmanifesto.com/posts/vim-session-workflow/
 [notes]: https://blog.afoolishmanifesto.com/posts/a-love-letter-to-plain-text/#notes
 [smartcd]: https://github.com/cxreg/smartcd
-
-Command: proj
 */
 func Proj(args []string, _ io.Reader) error {
 	if len(args) < 2 {

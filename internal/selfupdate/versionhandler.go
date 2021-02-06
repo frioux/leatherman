@@ -9,7 +9,8 @@ import (
 	"github.com/frioux/leatherman/internal/version"
 )
 
-var Handler = http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
+var Handler = http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+	fmt.Println(req.URL.Path)
 	rw.Header().Set("content-type", "text/plain")
 
 	bi, ok := debug.ReadBuildInfo()

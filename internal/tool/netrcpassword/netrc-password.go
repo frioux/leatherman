@@ -18,8 +18,6 @@ Run prints password for the passed hostname and login.
 $ netrc-password google.com me@gmail.com
 supersecretpassword
 ```
-
-Command: netrc-password
 */
 func Run(args []string, _ io.Reader) error {
 	if len(args) != 3 {

@@ -27,8 +27,6 @@ Configure it with the following environment variables:
  * LM_TWILIO_URL
 
 Takes an optional `-port` argument to specify which port to listen on.
-
-Command: amygdala
 */
 func Amygdala(args []string, _ io.Reader) error {
 	var (

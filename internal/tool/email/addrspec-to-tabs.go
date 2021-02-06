@@ -22,8 +22,6 @@ most comments are incorrectly recognized by all tools. (for example:
 `<5555555555@vzw.com> (555) 555-5555` should not have a comment of `(555)`.)
 
 It exists to be combined with `addrs` and mutt.
-
-Command: addrspec-to-tabs
 */
 func ToTabs(args []string, stdin io.Reader) error {
 	if len(args) > 1 && args[1] == "-h" {

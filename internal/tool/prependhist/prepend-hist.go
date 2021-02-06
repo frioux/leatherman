@@ -16,8 +16,6 @@ then prints out the lines from STDIN, filtering out what's already been printed.
 ```bash
 $ alluni | prefix-hist ~/.uni_history
 ```
-
-Command: prepend-hist
 */
 func Run(args []string, stdin io.Reader) error {
 	if len(args) != 2 {

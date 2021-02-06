@@ -72,8 +72,6 @@ $ email2json '/home/frew/var/mail/mitsi/cur/*' | head -1 | jq .
   }
 }
 ```
-
-Command: email2json
 */
 func ToJSON(args []string, stdin io.Reader) error {
 	if len(args) < 2 {

@@ -8,6 +8,7 @@ use autodie;
 no warnings 'uninitialized';
 
 use JSON::PP;
+use File::Basename 'fileparse';
 
 my (%imports, %commands);
 
@@ -21,16 +22,15 @@ for my $line (`$cmd`) {
    $imports{$import} = 1;
 
    my $ast = decode_json(`goblin -file $file`);
+   my ($basename) = fileparse($file, ".go");
 
    %commands = (
       %commands,
-      map {
-         my (undef, $cmd) = ($_->{comments}[0] =~ m/^(?:\S+\s+)(.+)\s+Command:\s+(.+)\s/s);
-
-         $cmd => "$name.$_->{name}{value}";
+      map { $basename => "$name.$_->{name}{value}" }
+      grep {
+              $_->{type} eq 'function' &&
+              $_->{name}{value} =~ m/^[A-Z]/ # public functions
       }
-      grep { my @n = grep m/Command: /, @{$_->{comments}}; @n > 0 }
-      grep { $_->{type} eq 'function' }
       @{$ast->{declarations}}
    );
 }

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
+use File::Basename 'fileparse';
 use Encode;
 use JSON::PP;
 
@@ -14,16 +15,15 @@ my %doc;
 while (<STDIN>) {
    my $c = decode_json($_);
 
-   die "Command should have exactly one comment\n" if @$c != 1;
-
-   my $d = $c->[0];
+   my $d = $c->{comments};
 
    $d =~ s/^ \/\*\s+  //x;
    $d =~ s/  \s+\*\/ $//x;
 
-   my ($body, $cmd) = ($d =~ m/^(?:\S+\s+)(.+)\s+Command:\s+(.+)$/s);
+   ($d) = ($d =~ m/^(?:\S+\s+)(.+)$/s); # strip off function name
 
-   $doc{$cmd} = $body;
+   my $basename = fileparse($c->{path}, '.go');
+   $doc{$basename} = "$d";
 }
 
 open my $fh, '<:encoding(UTF-8)', 'maint/README_begin.md';
@@ -34,7 +34,7 @@ open $fh, '<:encoding(UTF-8)', 'maint/README_end.md';
 my $end = do { local $/; <$fh> };
 close $fh;
 
-$doc{$_} = "### `$_`\n\n`$_` $doc{$_}\n" for keys %doc;
+$doc{$_} = "### `$_`\n\n`$_` $doc{$_}\n\n" for keys %doc;
 
 my $body = $begin;
 $body .= $doc{$_} for sort keys %doc;

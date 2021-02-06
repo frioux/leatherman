@@ -34,8 +34,6 @@ functionality can be disabled with -no-autoreload.
 $ srv -port 8080 -no-autoreload ~
 Serving /home/frew on [::]:8080
 ```
-
-Command: srv
 */
 func Serve(args []string, _ io.Reader) error {
 	var (

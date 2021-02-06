@@ -14,8 +14,6 @@ var dateRe = regexp.MustCompile(`^Date:\s+(.*)\s*$`)
 /*
 Render is a scrappy tool to render email with a Local-Date included, if Date is
 not already in local time.
-
-Command: render-mail
 */
 func Render(args []string, stdin io.Reader) error {
 	scanner := bufio.NewScanner(stdin)
