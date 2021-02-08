@@ -55,36 +55,9 @@ echo "---\nfoo: 1" | leatherman yaml2json
 
 ## Tools
 
-### ` + "`" + `addrs` + "`" + `
+### allpurpose
 
-` + "`" + `addrs` + "`" + ` sorts the addresses passed on stdin (in the mutt addrbook format, see
-` + "`" + `addrspec-to-tabs` + "`" + `) and sorts them based on how recently they were used, from
-the glob passed on the arguments.  The tool exists so that you can create an
-address list either with an export tool (like ` + "`" + `goobook` + "`" + `), a subset of your sent
-addresses, or whatever else, and then you can sort it based on your sent mail
-folder.
-
-` + "`" + `` + "`" + `` + "`" + ` bash
-$ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `addrspec-to-tabs` + "`" + `
-
-` + "`" + `addrspec-to-tabs` + "`" + ` converts email addresses from the standard format (` + "`" + `"Hello Friend"
-<foo@bar>` + "`" + `) from stdin to the mutt address book format, ie tab separated fields,
-on stdout.
-
-` + "`" + `` + "`" + `` + "`" + ` bash
-$ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" | addrspec-to-tabs >addrbook.txt
-` + "`" + `` + "`" + `` + "`" + `
-
-This tool ignores the comment because, after actually auditing my addressbook,
-most comments are incorrectly recognized by all tools. (for example:
-` + "`" + `<5555555555@vzw.com> (555) 555-5555` + "`" + ` should not have a comment of ` + "`" + `(555)` + "`" + `.)
-
-It exists to be combined with ` + "`" + `addrs` + "`" + ` and mutt.
-
-### ` + "`" + `alluni` + "`" + `
+#### ` + "`" + `alluni` + "`" + `
 
 ` + "`" + `alluni` + "`" + ` prints all unicode character names.
 
@@ -107,21 +80,204 @@ DENTISTRY SYMBOL LIGHT VERTICAL AND TOP LEFT
 DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM LEFT
 ` + "`" + `` + "`" + `` + "`" + `
 
-### ` + "`" + `amygdala` + "`" + `
+#### ` + "`" + `clocks` + "`" + `
 
-` + "`" + `amygdala` + "`" + ` is an automated assistant.  The main docs for it are in [amygdala.mdwn
-in the root of the leatherman
-repo](https://github.com/frioux/leatherman/blob/main/amygdala.mdwn).
+` + "`" + `clocks` + "`" + ` shows my personal, digital, wall of clocks.  Pass one or more timezone names
+to choose which timezones are shown.
 
-Configure it with the following environment variables:
+` + "`" + `` + "`" + `` + "`" + `bash
+clocks Africa/Johannesburg America/Los_Angeles Europe/Copenhagen
+` + "`" + `` + "`" + `` + "`" + `
 
- * LM_DROPBOX_TOKEN
- * LM_MY_CEL
- * LM_TWILIO_URL
+#### ` + "`" + `csv2json` + "`" + `
 
-Takes an optional ` + "`" + `-port` + "`" + ` argument to specify which port to listen on.
+` + "`" + `csv2json` + "`" + ` reads CSV on stdin and writes JSON on stdout; first line of input is the
+header, and thus the keys of the JSON.
 
-### ` + "`" + `auto-emote` + "`" + `
+#### ` + "`" + `csv2md` + "`" + `
+
+` + "`" + `csv2md` + "`" + ` reads CSV on stdin and writes Markdown on stdout.
+
+#### ` + "`" + `debounce` + "`" + `
+
+` + "`" + `debounce` + "`" + ` debounces input from stdin to stdout
+
+The default lockout time is one second, you can override that with the
+` + "`" + `--lockoutTime` + "`" + ` argument.  By default the trailing edge triggers output, so
+output is emitted after there is no input for the lockout time.  You can change
+this behavior by passing the ` + "`" + `--leadingEdge` + "`" + ` flag.
+
+#### ` + "`" + `dump-mozlz4` + "`" + `
+
+` + "`" + `dump-mozlz4` + "`" + ` dumps the contents of a ` + "`" + `mozlz4` + "`" + ` (aka ` + "`" + `jsonlz4` + "`" + `) file commonly used by
+Firefox.  Just takes the name of the file to dump and writes to standard out.
+
+#### ` + "`" + `expand-url` + "`" + `
+
+` + "`" + `expand-url` + "`" + ` reads text on STDIN and writes the same text back, converting any links to
+Markdown links, with the title of the page as the title of the link.
+
+#### ` + "`" + `fn` + "`" + `
+
+` + "`" + `fn` + "`" + ` creates persistent functions by actually writing scripts.  Example usage:
+
+` + "`" + `` + "`" + `` + "`" + `
+fn count-users 'wc -l < /etc/passwd'
+` + "`" + `` + "`" + `` + "`" + `
+
+#### ` + "`" + `group-by-date` + "`" + `
+
+` + "`" + `group-by-date` + "`" + ` creates time series data by counting lines and grouping them by a given date
+format.  takes dates on stdin in format -i, will group them by format -g, and
+write them in format -o.
+
+#### ` + "`" + `minotaur` + "`" + `
+
+` + "`" + `minotaur` + "`" + ` watches one or more directories (before the ` + "`" + `--` + "`" + `) and runs a script when
+events in those directories occur.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+minotaur -include-args -include internal -ignore yaml \
+   ~/code/leatherman -- \
+   go test ~/code/leatherman/...
+` + "`" + `` + "`" + `` + "`" + `
+
+If the ` + "`" + `-include-args` + "`" + ` flag is set, the script receives the events as
+arguments, so you can exit early if only irrelevant files changed.
+
+The arguments are of the form ` + "`" + `$event\t$filename` + "`" + `; for example ` + "`" + `CREATE	x.pl` + "`" + `.
+As far as I know the valid events are;
+
+ * ` + "`" + `CHMOD` + "`" + `
+ * ` + "`" + `CREATE` + "`" + `
+ * ` + "`" + `REMOVE` + "`" + `
+ * ` + "`" + `RENAME` + "`" + `
+ * ` + "`" + `WRITE` + "`" + `
+
+The events are deduplicated and also debounced, so your script will never fire
+more often than once a second.  If events are happening every half second the
+debouncing will cause the script to never run.
+
+The underlying library supports emitting multiple events in a single line (ie
+` + "`" + `CREATE|CHMOD` + "`" + `) though I've not seen that in Linux.
+
+` + "`" + `minotaur` + "`" + ` reëmits all output (both stderr and stdout) of the passed script to
+standard out, so you could make a script like this to experiment with the
+events with timestamps:
+
+` + "`" + `` + "`" + `` + "`" + `bash
+#!/bin/sh
+
+for x in "$@"; do
+   echo "$x"
+done | ts
+` + "`" + `` + "`" + `` + "`" + `
+
+You can do all kinds of interesting things in the script, for example you could
+verify that the events deserve a restart, then restart a service, then block till
+the service can serve traffic, then restart some other related service.
+
+The ` + "`" + `-include` + "`" + ` and ` + "`" + `-ignore` + "`" + ` arguments are optional; by default ` + "`" + `-include` + "`" + ` is
+empty, so matches everything, and ` + "`" + `-ignore` + "`" + ` matches ` + "`" + `.git` + "`" + `.  You can also pass
+` + "`" + `-verbose` + "`" + ` to include output about minotaur itself, like which directories it's
+watching.
+
+The flag ` + "`" + `-no-run-at-start` + "`" + ` will not the the script until there are any events.
+
+The flag ` + "`" + `-report` + "`" + ` will decorate output with a text wrapper to clarify when the
+script is run.
+
+#### ` + "`" + `name2rune` + "`" + `
+
+` + "`" + `name2rune` + "`" + ` takes the name of a unicode character and prints out any found
+characters.
+
+#### ` + "`" + `netrc-password` + "`" + `
+
+` + "`" + `netrc-password` + "`" + ` prints password for the passed hostname and login.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ netrc-password google.com me@gmail.com
+supersecretpassword
+` + "`" + `` + "`" + `` + "`" + `
+
+#### ` + "`" + `pomotimer` + "`" + `
+
+` + "`" + `pomotimer` + "`" + ` starts a timer for 25m or the duration expressed in the first
+argument.
+
+` + "`" + `` + "`" + `` + "`" + `
+pomotimer 2.5m
+` + "`" + `` + "`" + `` + "`" + `
+
+or
+
+` + "`" + `` + "`" + `` + "`" + `
+pomotimer 3m12s
+` + "`" + `` + "`" + `` + "`" + `
+
+Originally a timer for use with [the pomodoro][1] [technique][2].  Handy timer in any case
+since you can pass it arbitrary durations, pause it, reset it, and see it's
+progress.
+
+[1]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique/
+[2]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique-three-years-later/
+
+#### ` + "`" + `replace-unzip` + "`" + `
+
+` + "`" + `replace-unzip` + "`" + ` extracts zipfiles, but does not extract ` + "`" + `.DS_Store` + "`" + ` or ` + "`" + `__MACOSX/` + "`" + `.
+Automatically extracts into a directory named after the zipfile if there is not
+a single root for all files in the zipfile.
+
+#### ` + "`" + `srv` + "`" + `
+
+` + "`" + `srv` + "`" + ` will serve a directory over http, injecting javascript to have pages
+reload when files change.
+
+It takes an optional dir to serve, the default is ` + "`" + `.` + "`" + `.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ srv ~
+Serving /home/frew on [::]:21873
+` + "`" + `` + "`" + `` + "`" + `
+
+You can pass -port if you care to choose the listen port.
+
+It will set up file watchers and trigger page reloads (via SSE,) this
+functionality can be disabled with -no-autoreload.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ srv -port 8080 -no-autoreload ~
+Serving /home/frew on [::]:8080
+` + "`" + `` + "`" + `` + "`" + `
+
+#### ` + "`" + `toml2json` + "`" + `
+
+` + "`" + `toml2json` + "`" + ` reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON
+on stdout.
+
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ echo 'foo = "bar"` + "`" + ` | toml2json
+{"foo":"bar"}
+` + "`" + `` + "`" + `` + "`" + `
+
+#### ` + "`" + `uni` + "`" + `
+
+` + "`" + `uni` + "`" + ` will describe the characters in the args.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ uni ⢾
+'⢾' @ 10430 aka BRAILLE PATTERN DOTS-234568 ( graphic | printable | symbol )
+` + "`" + `` + "`" + `` + "`" + `
+
+#### ` + "`" + `yaml2json` + "`" + `
+
+` + "`" + `yaml2json` + "`" + ` reads YAML on stdin and writes JSON on stdout.
+
+### chat
+
+#### ` + "`" + `auto-emote` + "`" + `
 
 ` + "`" + `auto-emote` + "`" + ` comments to discord and reacts to all messages with vaguely related emoji.
 
@@ -246,61 +402,71 @@ All of the following are thin veneers atop
  * ` + "`" + `turtleemoji#char()` + "`" + ` // string
  * ` + "`" + `turtleemoji#haskeyword("keyword")` + "`" + ` // bool
 
-### ` + "`" + `backlight` + "`" + `
+#### ` + "`" + `slack-deaddrop` + "`" + `
 
-` + "`" + `backlight` + "`" + ` is a faster version of ` + "`" + `xbacklight` + "`" + ` by directly writing to ` + "`" + `/sys` + "`" + `.  Example:
-
-Increase by 10%:
-
-` + "`" + `` + "`" + `` + "`" + ` bash
-$ backlight 10
-` + "`" + `` + "`" + `` + "`" + `
-
-Decrease by 10%:
-
-` + "`" + `` + "`" + `` + "`" + ` bash
-$ backlight -10
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `brainstem` + "`" + `
-
-` + "`" + `brainstem` + "`" + ` allows interacting with amygdala without using any of the server
-components, typically for testing the personality etc, but can also be used as
-a lightweight amygdala instance.
-
-### ` + "`" + `clocks` + "`" + `
-
-` + "`" + `clocks` + "`" + ` shows my personal, digital, wall of clocks.  Pass one or more timezone names
-to choose which timezones are shown.
+` + "`" + `slack-deaddrop` + "`" + ` allows sending messages to a slack channel without looking at slack.
+Typical usage is probably something like:
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-clocks Africa/Johannesburg America/Los_Angeles Europe/Copenhagen
+$ slack-deaddrop -channel general -text 'good morning!'
 ` + "`" + `` + "`" + `` + "`" + `
 
-### ` + "`" + `csv2json` + "`" + `
+#### ` + "`" + `slack-open` + "`" + `
 
-` + "`" + `csv2json` + "`" + ` reads CSV on stdin and writes JSON on stdout; first line of input is the
-header, and thus the keys of the JSON.
+` + "`" + `slack-open` + "`" + ` opens a channel, group message, or direct message by name:
 
-### ` + "`" + `csv2md` + "`" + `
+` + "`" + `` + "`" + `` + "`" + `bash
+$ slack-open -channel general
+` + "`" + `` + "`" + `` + "`" + `
 
-` + "`" + `csv2md` + "`" + ` reads CSV on stdin and writes Markdown on stdout.
+#### ` + "`" + `slack-status` + "`" + `
 
-### ` + "`" + `debounce` + "`" + `
+` + "`" + `slack-status` + "`" + ` sets the current users's status.
 
-` + "`" + `debounce` + "`" + ` debounces input from stdin to stdout
+` + "`" + `` + "`" + `` + "`" + `bash
+$ slack-status -text "working for the weekend" -emoji :guitar:
+` + "`" + `` + "`" + `` + "`" + `
 
-The default lockout time is one second, you can override that with the
-` + "`" + `--lockoutTime` + "`" + ` argument.  By default the trailing edge triggers output, so
-output is emitted after there is no input for the lockout time.  You can change
-this behavior by passing the ` + "`" + `--leadingEdge` + "`" + ` flag.
+### leatherman
 
-### ` + "`" + `dump-mozlz4` + "`" + `
+#### ` + "`" + `update` + "`" + `
 
-` + "`" + `dump-mozlz4` + "`" + ` dumps the contents of a ` + "`" + `mozlz4` + "`" + ` (aka ` + "`" + `jsonlz4` + "`" + `) file commonly used by
-Firefox.  Just takes the name of the file to dump and writes to standard out.
+` + "`" + `update` + "`" + ` checks to see if there's an update from github and installs it if there
+is.  If LM_GH_TOKEN is set to a personal access token this can be called more
+frequently without exhausting github api limits.
 
-### ` + "`" + `email2json` + "`" + `
+### mail
+
+#### ` + "`" + `addrs` + "`" + `
+
+` + "`" + `addrs` + "`" + ` sorts the addresses passed on stdin (in the mutt addrbook format, see
+` + "`" + `addrspec-to-tabs` + "`" + `) and sorts them based on how recently they were used, from
+the glob passed on the arguments.  The tool exists so that you can create an
+address list either with an export tool (like ` + "`" + `goobook` + "`" + `), a subset of your sent
+addresses, or whatever else, and then you can sort it based on your sent mail
+folder.
+
+` + "`" + `` + "`" + `` + "`" + ` bash
+$ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
+` + "`" + `` + "`" + `` + "`" + `
+
+#### ` + "`" + `addrspec-to-tabs` + "`" + `
+
+` + "`" + `addrspec-to-tabs` + "`" + ` converts email addresses from the standard format (` + "`" + `"Hello Friend"
+<foo@bar>` + "`" + `) from stdin to the mutt address book format, ie tab separated fields,
+on stdout.
+
+` + "`" + `` + "`" + `` + "`" + ` bash
+$ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" | addrspec-to-tabs >addrbook.txt
+` + "`" + `` + "`" + `` + "`" + `
+
+This tool ignores the comment because, after actually auditing my addressbook,
+most comments are incorrectly recognized by all tools. (for example:
+` + "`" + `<5555555555@vzw.com> (555) 555-5555` + "`" + ` should not have a comment of ` + "`" + `(555)` + "`" + `.)
+
+It exists to be combined with ` + "`" + `addrs` + "`" + ` and mutt.
+
+#### ` + "`" + `email2json` + "`" + `
 
 ` + "`" + `email2json` + "`" + ` produces a JSON representation of an email from a list of globs.  Only
 headers are currently supported, patches welcome to support bodies.
@@ -322,131 +488,38 @@ $ email2json '/home/frew/var/mail/mitsi/cur/*' | head -1 | jq .
 }
 ` + "`" + `` + "`" + `` + "`" + `
 
-### ` + "`" + `expand-url` + "`" + `
+#### ` + "`" + `render-mail` + "`" + `
 
-` + "`" + `expand-url` + "`" + ` reads text on STDIN and writes the same text back, converting any links to
-Markdown links, with the title of the page as the title of the link.
+` + "`" + `render-mail` + "`" + ` is a scrappy tool to render email with a Local-Date included, if Date is
+not already in local time.
 
-### ` + "`" + `export-bamboohr` + "`" + `
+### misc
+
+#### ` + "`" + `backlight` + "`" + `
+
+` + "`" + `backlight` + "`" + ` is a faster version of ` + "`" + `xbacklight` + "`" + ` by directly writing to ` + "`" + `/sys` + "`" + `.  Example:
+
+Increase by 10%:
+
+` + "`" + `` + "`" + `` + "`" + ` bash
+$ backlight 10
+` + "`" + `` + "`" + `` + "`" + `
+
+Decrease by 10%:
+
+` + "`" + `` + "`" + `` + "`" + ` bash
+$ backlight -10
+` + "`" + `` + "`" + `` + "`" + `
+
+#### ` + "`" + `export-bamboohr` + "`" + `
 
 ` + "`" + `export-bamboohr` + "`" + ` exports entire company directory as JSON.
 
-### ` + "`" + `export-bamboohr-tree` + "`" + `
+#### ` + "`" + `export-bamboohr-tree` + "`" + `
 
 ` + "`" + `export-bamboohr-tree` + "`" + ` exports company org chart as JSON.
 
-### ` + "`" + `fn` + "`" + `
-
-` + "`" + `fn` + "`" + ` creates persistent functions by actually writing scripts.  Example usage:
-
-` + "`" + `` + "`" + `` + "`" + `
-fn count-users 'wc -l < /etc/passwd'
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `group-by-date` + "`" + `
-
-` + "`" + `group-by-date` + "`" + ` creates time series data by counting lines and grouping them by a given date
-format.  takes dates on stdin in format -i, will group them by format -g, and
-write them in format -o.
-
-### ` + "`" + `minotaur` + "`" + `
-
-` + "`" + `minotaur` + "`" + ` watches one or more directories (before the ` + "`" + `--` + "`" + `) and runs a script when
-events in those directories occur.
-
-` + "`" + `` + "`" + `` + "`" + `bash
-minotaur -include-args -include internal -ignore yaml \
-   ~/code/leatherman -- \
-   go test ~/code/leatherman/...
-` + "`" + `` + "`" + `` + "`" + `
-
-If the ` + "`" + `-include-args` + "`" + ` flag is set, the script receives the events as
-arguments, so you can exit early if only irrelevant files changed.
-
-The arguments are of the form ` + "`" + `$event\t$filename` + "`" + `; for example ` + "`" + `CREATE	x.pl` + "`" + `.
-As far as I know the valid events are;
-
- * ` + "`" + `CHMOD` + "`" + `
- * ` + "`" + `CREATE` + "`" + `
- * ` + "`" + `REMOVE` + "`" + `
- * ` + "`" + `RENAME` + "`" + `
- * ` + "`" + `WRITE` + "`" + `
-
-The events are deduplicated and also debounced, so your script will never fire
-more often than once a second.  If events are happening every half second the
-debouncing will cause the script to never run.
-
-The underlying library supports emitting multiple events in a single line (ie
-` + "`" + `CREATE|CHMOD` + "`" + `) though I've not seen that in Linux.
-
-` + "`" + `minotaur` + "`" + ` reëmits all output (both stderr and stdout) of the passed script to
-standard out, so you could make a script like this to experiment with the
-events with timestamps:
-
-` + "`" + `` + "`" + `` + "`" + `bash
-#!/bin/sh
-
-for x in "$@"; do
-   echo "$x"
-done | ts
-` + "`" + `` + "`" + `` + "`" + `
-
-You can do all kinds of interesting things in the script, for example you could
-verify that the events deserve a restart, then restart a service, then block till
-the service can serve traffic, then restart some other related service.
-
-The ` + "`" + `-include` + "`" + ` and ` + "`" + `-ignore` + "`" + ` arguments are optional; by default ` + "`" + `-include` + "`" + ` is
-empty, so matches everything, and ` + "`" + `-ignore` + "`" + ` matches ` + "`" + `.git` + "`" + `.  You can also pass
-` + "`" + `-verbose` + "`" + ` to include output about minotaur itself, like which directories it's
-watching.
-
-The flag ` + "`" + `-no-run-at-start` + "`" + ` will not the the script until there are any events.
-
-The flag ` + "`" + `-report` + "`" + ` will decorate output with a text wrapper to clarify when the
-script is run.
-
-### ` + "`" + `name2rune` + "`" + `
-
-` + "`" + `name2rune` + "`" + ` takes the name of a unicode character and prints out any found
-characters.
-
-### ` + "`" + `netrc-password` + "`" + `
-
-` + "`" + `netrc-password` + "`" + ` prints password for the passed hostname and login.
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ netrc-password google.com me@gmail.com
-supersecretpassword
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `notes` + "`" + `
-
-` + "`" + `notes` + "`" + ` provides a web interface to parts of my notes stored in
-Dropbox.  This should eventually be merged into Amygdala.
-
-### ` + "`" + `pomotimer` + "`" + `
-
-` + "`" + `pomotimer` + "`" + ` starts a timer for 25m or the duration expressed in the first
-argument.
-
-` + "`" + `` + "`" + `` + "`" + `
-pomotimer 2.5m
-` + "`" + `` + "`" + `` + "`" + `
-
-or
-
-` + "`" + `` + "`" + `` + "`" + `
-pomotimer 3m12s
-` + "`" + `` + "`" + `` + "`" + `
-
-Originally a timer for use with [the pomodoro][1] [technique][2].  Handy timer in any case
-since you can pass it arbitrary durations, pause it, reset it, and see it's
-progress.
-
-[1]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique/
-[2]: https://blog.afoolishmanifesto.com/posts/the-pomodoro-technique-three-years-later/
-
-### ` + "`" + `prepend-hist` + "`" + `
+#### ` + "`" + `prepend-hist` + "`" + `
 
 ` + "`" + `prepend-hist` + "`" + ` prints out deduplicated lines from the history file in reverse order and
 then prints out the lines from STDIN, filtering out what's already been printed.
@@ -455,7 +528,87 @@ then prints out the lines from STDIN, filtering out what's already been printed.
 $ alluni | prefix-hist ~/.uni_history
 ` + "`" + `` + "`" + `` + "`" + `
 
-### ` + "`" + `proj` + "`" + `
+#### ` + "`" + `sm-list` + "`" + `
+
+` + "`" + `sm-list` + "`" + ` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
+as json documents per line.  Here's how you might see the top ten coffees by
+rating:
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
+` + "`" + `` + "`" + `` + "`" + `
+
+#### ` + "`" + `status` + "`" + `
+
+` + "`" + `status` + "`" + ` runs a little web server that surfaces status information related to how
+I'm using the machine.  For example, it can say which window is active, what
+firefox tabs are loaded, if the screen is locked, etc.  The main benefit of the
+tool is that it caches the values returned.
+
+In the background, it interact swith the [blink(1)](http://blink1.thingm.com/).
+It turns the light green when I'm in a meeting and red when audio is playing.
+
+#### ` + "`" + `twilio` + "`" + `
+
+` + "`" + `twilio` + "`" + ` allows interacting with a service that recieves callbacks from twilio
+for testing.
+
+It takes four arguments:
+
+ * ` + "`" + `-endpoint` + "`" + `: the url to hit (` + "`" + `http://localhost:8080/twilio` + "`" + `, for example)
+ * ` + "`" + `-auth` + "`" + `: the auth token to use
+ * ` + "`" + `-message` + "`" + `: the message to send
+ * ` + "`" + `-from` + "`" + `: the phone number the message is from (` + "`" + `+15555555555` + "`" + `, for example)
+
+Run ` + "`" + `twilio -help` + "`" + ` to see the defaults.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ twilio -message "the building is on fire!"
+` + "`" + `` + "`" + `` + "`" + `
+
+#### ` + "`" + `wuphf` + "`" + `
+
+` + "`" + `wuphf` + "`" + ` sends alerts via both ` + "`" + `wall` + "`" + ` and [pushover](https://pushover.net).  All
+arguments are concatenated to produce the sent message.
+
+The following environment variables should be set:
+
+ * LM_PUSHOVER_TOKEN
+ * LM_PUSHOVER_USER
+ * LM_PUSHOVER_DEVICE
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ wuphf 'the shoes are on sale'
+` + "`" + `` + "`" + `` + "`" + `
+
+### notes
+
+#### ` + "`" + `amygdala` + "`" + `
+
+` + "`" + `amygdala` + "`" + ` is an automated assistant.  The main docs for it are in [amygdala.mdwn
+in the root of the leatherman
+repo](https://github.com/frioux/leatherman/blob/main/amygdala.mdwn).
+
+Configure it with the following environment variables:
+
+ * LM_DROPBOX_TOKEN
+ * LM_MY_CEL
+ * LM_TWILIO_URL
+
+Takes an optional ` + "`" + `-port` + "`" + ` argument to specify which port to listen on.
+
+#### ` + "`" + `brainstem` + "`" + `
+
+` + "`" + `brainstem` + "`" + ` allows interacting with amygdala without using any of the server
+components, typically for testing the personality etc, but can also be used as
+a lightweight amygdala instance.
+
+#### ` + "`" + `notes` + "`" + `
+
+` + "`" + `notes` + "`" + ` provides a web interface to parts of my notes stored in
+Dropbox.  This should eventually be merged into Amygdala.
+
+#### ` + "`" + `proj` + "`" + `
 
 ` + "`" + `proj` + "`" + ` integrates my various project management tools.
 
@@ -496,148 +649,7 @@ add functionality to projects within shell sessions.
 [notes]: https://blog.afoolishmanifesto.com/posts/a-love-letter-to-plain-text/#notes
 [smartcd]: https://github.com/cxreg/smartcd
 
-### ` + "`" + `render-mail` + "`" + `
-
-` + "`" + `render-mail` + "`" + ` is a scrappy tool to render email with a Local-Date included, if Date is
-not already in local time.
-
-### ` + "`" + `replace-unzip` + "`" + `
-
-` + "`" + `replace-unzip` + "`" + ` extracts zipfiles, but does not extract ` + "`" + `.DS_Store` + "`" + ` or ` + "`" + `__MACOSX/` + "`" + `.
-Automatically extracts into a directory named after the zipfile if there is not
-a single root for all files in the zipfile.
-
-### ` + "`" + `slack-deaddrop` + "`" + `
-
-` + "`" + `slack-deaddrop` + "`" + ` allows sending messages to a slack channel without looking at slack.
-Typical usage is probably something like:
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ slack-deaddrop -channel general -text 'good morning!'
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `slack-open` + "`" + `
-
-` + "`" + `slack-open` + "`" + ` opens a channel, group message, or direct message by name:
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ slack-open -channel general
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `slack-status` + "`" + `
-
-` + "`" + `slack-status` + "`" + ` sets the current users's status.
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ slack-status -text "working for the weekend" -emoji :guitar:
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `sm-list` + "`" + `
-
-` + "`" + `sm-list` + "`" + ` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
-as json documents per line.  Here's how you might see the top ten coffees by
-rating:
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `srv` + "`" + `
-
-` + "`" + `srv` + "`" + ` will serve a directory over http, injecting javascript to have pages
-reload when files change.
-
-It takes an optional dir to serve, the default is ` + "`" + `.` + "`" + `.
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ srv ~
-Serving /home/frew on [::]:21873
-` + "`" + `` + "`" + `` + "`" + `
-
-You can pass -port if you care to choose the listen port.
-
-It will set up file watchers and trigger page reloads (via SSE,) this
-functionality can be disabled with -no-autoreload.
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ srv -port 8080 -no-autoreload ~
-Serving /home/frew on [::]:8080
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `status` + "`" + `
-
-` + "`" + `status` + "`" + ` runs a little web server that surfaces status information related to how
-I'm using the machine.  For example, it can say which window is active, what
-firefox tabs are loaded, if the screen is locked, etc.  The main benefit of the
-tool is that it caches the values returned.
-
-In the background, it interact swith the [blink(1)](http://blink1.thingm.com/).
-It turns the light green when I'm in a meeting and red when audio is playing.
-
-### ` + "`" + `toml2json` + "`" + `
-
-` + "`" + `toml2json` + "`" + ` reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON
-on stdout.
-
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ echo 'foo = "bar"` + "`" + ` | toml2json
-{"foo":"bar"}
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `twilio` + "`" + `
-
-` + "`" + `twilio` + "`" + ` allows interacting with a service that recieves callbacks from twilio
-for testing.
-
-It takes four arguments:
-
- * ` + "`" + `-endpoint` + "`" + `: the url to hit (` + "`" + `http://localhost:8080/twilio` + "`" + `, for example)
- * ` + "`" + `-auth` + "`" + `: the auth token to use
- * ` + "`" + `-message` + "`" + `: the message to send
- * ` + "`" + `-from` + "`" + `: the phone number the message is from (` + "`" + `+15555555555` + "`" + `, for example)
-
-Run ` + "`" + `twilio -help` + "`" + ` to see the defaults.
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ twilio -message "the building is on fire!"
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `uni` + "`" + `
-
-` + "`" + `uni` + "`" + ` will describe the characters in the args.
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ uni ⢾
-'⢾' @ 10430 aka BRAILLE PATTERN DOTS-234568 ( graphic | printable | symbol )
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `update` + "`" + `
-
-` + "`" + `update` + "`" + ` checks to see if there's an update from github and installs it if there
-is.  If LM_GH_TOKEN is set to a personal access token this can be called more
-frequently without exhausting github api limits.
-
-### ` + "`" + `wuphf` + "`" + `
-
-` + "`" + `wuphf` + "`" + ` sends alerts via both ` + "`" + `wall` + "`" + ` and [pushover](https://pushover.net).  All
-arguments are concatenated to produce the sent message.
-
-The following environment variables should be set:
-
- * LM_PUSHOVER_TOKEN
- * LM_PUSHOVER_USER
- * LM_PUSHOVER_DEVICE
-
-` + "`" + `` + "`" + `` + "`" + `bash
-$ wuphf 'the shoes are on sale'
-` + "`" + `` + "`" + `` + "`" + `
-
-### ` + "`" + `yaml2json` + "`" + `
-
-` + "`" + `yaml2json` + "`" + ` reads YAML on stdin and writes JSON on stdout.
-
-### ` + "`" + `zine` + "`" + `
+#### ` + "`" + `zine` + "`" + `
 
 ` + "`" + `zine` + "`" + ` does read only operations on notes.
 
@@ -674,84 +686,84 @@ var commandReadme map[string][]byte
 
 func init() {
 	commandReadme = map[string][]byte{
-		"addrs": readme[1567:2064],
+		"addrs": readme[11950:12448],
 
-		"addrspec-to-tabs": readme[2064:2642],
+		"addrspec-to-tabs": readme[12448:13027],
 
-		"alluni": readme[2642:3468],
+		"alluni": readme[1583:2410],
 
-		"amygdala": readme[3468:3845],
+		"amygdala": readme[16024:16402],
 
-		"auto-emote": readme[3845:7410],
+		"auto-emote": readme[7632:11198],
 
-		"backlight": readme[7410:7612],
+		"backlight": readme[13888:14091],
 
-		"brainstem": readme[7612:7819],
+		"brainstem": readme[16402:16610],
 
-		"clocks": readme[7819:8035],
+		"clocks": readme[2410:2627],
 
-		"csv2json": readme[8035:8175],
+		"csv2json": readme[2627:2768],
 
-		"csv2md": readme[8175:8249],
+		"csv2md": readme[2768:2843],
 
-		"debounce": readme[8249:8593],
+		"debounce": readme[2843:3188],
 
-		"dump-mozlz4": readme[8593:8776],
+		"dump-mozlz4": readme[3188:3372],
 
-		"email2json": readme[8776:9491],
+		"email2json": readme[13027:13743],
 
-		"expand-url": readme[9491:9667],
+		"expand-url": readme[3372:3549],
 
-		"export-bamboohr": readme[9667:9751],
+		"export-bamboohr": readme[14091:14176],
 
-		"export-bamboohr-tree": readme[9751:9838],
+		"export-bamboohr-tree": readme[14176:14264],
 
-		"fn": readme[9838:9974],
+		"fn": readme[3549:3686],
 
-		"group-by-date": readme[9974:10192],
+		"group-by-date": readme[3686:3905],
 
-		"minotaur": readme[10192:12011],
+		"minotaur": readme[3905:5725],
 
-		"name2rune": readme[12011:12116],
+		"name2rune": readme[5725:5831],
 
-		"netrc-password": readme[12116:12281],
+		"netrc-password": readme[5831:5997],
 
-		"notes": readme[12281:12417],
+		"notes": readme[16610:16747],
 
-		"pomotimer": readme[12417:12909],
+		"pomotimer": readme[5997:6490],
 
-		"prepend-hist": readme[12909:13150],
+		"prepend-hist": readme[14264:14506],
 
-		"proj": readme[13150:14469],
+		"proj": readme[16747:18067],
 
-		"render-mail": readme[14469:14603],
+		"render-mail": readme[13743:13878],
 
-		"replace-unzip": readme[14603:14833],
+		"replace-unzip": readme[6490:6721],
 
-		"slack-deaddrop": readme[14833:15053],
+		"slack-deaddrop": readme[11198:11419],
 
-		"slack-open": readme[15053:15187],
+		"slack-open": readme[11419:11554],
 
-		"slack-status": readme[15187:15332],
+		"slack-status": readme[11554:11700],
 
-		"sm-list": readme[15332:15609],
+		"sm-list": readme[14506:14784],
 
-		"srv": readme[15609:16092],
+		"srv": readme[6721:7205],
 
-		"status": readme[16092:16549],
+		"status": readme[14784:15242],
 
-		"toml2json": readme[16549:16724],
+		"toml2json": readme[7205:7381],
 
-		"twilio": readme[16724:17182],
+		"twilio": readme[15242:15701],
 
-		"uni": readme[17182:17344],
+		"uni": readme[7381:7544],
 
-		"update": readme[17344:17567],
+		"update": readme[11716:11940],
 
-		"wuphf": readme[17567:17878],
+		"wuphf": readme[15701:16013],
 
-		"yaml2json": readme[17878:17955],
+		"yaml2json": readme[7544:7622],
 
-		"zine": readme[17955:18011],
+		"zine": readme[18067:18124],
 	}
 }
