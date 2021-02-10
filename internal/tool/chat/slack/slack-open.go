@@ -12,13 +12,6 @@ import (
 	"strings"
 )
 
-/*
-Open opens a channel, group message, or direct message by name:
-
-```bash
-$ slack-open -channel general
-```
-*/
 func Open(args []string, _ io.Reader) error {
 	// https://api.slack.com/custom-integrations/legacy-tokens
 	token := os.Getenv("SLACK_TOKEN")

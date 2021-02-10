@@ -9,14 +9,6 @@ import (
 	"github.com/icza/backscanner"
 )
 
-/*
-Run prints out deduplicated lines from the history file in reverse order and
-then prints out the lines from STDIN, filtering out what's already been printed.
-
-```bash
-$ alluni | prefix-hist ~/.uni_history
-```
-*/
 func Run(args []string, stdin io.Reader) error {
 	if len(args) != 2 {
 		fmt.Fprintln(os.Stderr, "you must pass a history file!")

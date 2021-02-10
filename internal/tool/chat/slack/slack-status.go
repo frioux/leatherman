@@ -8,13 +8,6 @@ import (
 	"os"
 )
 
-/*
-Status sets the current users's status.
-
-```bash
-$ slack-status -text "working for the weekend" -emoji :guitar:
-```
-*/
 func Status(args []string, _ io.Reader) error {
 	// https://api.slack.com/custom-integrations/legacy-tokens
 	token := os.Getenv("SLACK_TOKEN")

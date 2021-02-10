@@ -59,14 +59,6 @@ func t(now time.Time, l string) string {
 	return l + "\t" + day + "\t" + relativeThere.Format("15:04\t3:04 PM") + "\t\t" + offsetStr
 }
 
-/*
-Run shows my personal, digital, wall of clocks.  Pass one or more timezone names
-to choose which timezones are shown.
-
-```bash
-clocks Africa/Johannesburg America/Los_Angeles Europe/Copenhagen
-```
-*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) > 1 && args[1] == "-h" {
 		fmt.Println("my personal, digital, wall of clocks")

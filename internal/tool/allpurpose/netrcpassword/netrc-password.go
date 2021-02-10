@@ -11,14 +11,6 @@ import (
 	"github.com/frioux/leatherman/pkg/netrc"
 )
 
-/*
-Run prints password for the passed hostname and login.
-
-```bash
-$ netrc-password google.com me@gmail.com
-supersecretpassword
-```
-*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) != 3 {
 		fmt.Println("Usage:\n\tnetrc-password $machine $login")

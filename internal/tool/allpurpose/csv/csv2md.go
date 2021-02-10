@@ -8,9 +8,6 @@ import (
 	"strings"
 )
 
-/*
-ToMarkdown reads CSV on stdin and writes Markdown on stdout.
-*/
 func ToMarkdown(_ []string, stdin io.Reader) error {
 	reader := csv.NewReader(stdin)
 

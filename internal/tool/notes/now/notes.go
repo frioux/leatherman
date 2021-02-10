@@ -14,10 +14,6 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-/*
-Serve provides a web interface to parts of my notes stored in
-Dropbox.  This should eventually be merged into Amygdala.
-*/
 func Serve(args []string, _ io.Reader) error {
 	var (
 		listen string

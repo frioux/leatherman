@@ -8,10 +8,6 @@ import (
 	"github.com/frioux/leatherman/pkg/mozlz4"
 )
 
-/*
-Run dumps the contents of a `mozlz4` (aka `jsonlz4`) file commonly used by
-Firefox.  Just takes the name of the file to dump and writes to standard out.
-*/
 func Run(args []string, _ io.Reader) error {
 	if len(args) != 2 {
 		return fmt.Errorf("Usage: %s session.jsonlz4", args[0])

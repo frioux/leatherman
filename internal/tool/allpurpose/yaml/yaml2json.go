@@ -9,9 +9,6 @@ import (
 	"github.com/frioux/yaml"
 )
 
-/*
-ToJSON reads YAML on stdin and writes JSON on stdout.
-*/
 func ToJSON(_ []string, stdin io.Reader) error {
 	d := yaml.NewDecoder(stdin)
 	e := json.NewEncoder(os.Stdout)

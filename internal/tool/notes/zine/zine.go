@@ -8,9 +8,6 @@ import (
 	"os"
 )
 
-/*
-Run does read only operations on notes.
-*/
 func Run(args []string, _ io.Reader) error {
 	command := "render"
 	if len(args) > 1 {

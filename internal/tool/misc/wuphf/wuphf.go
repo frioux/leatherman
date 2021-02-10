@@ -17,20 +17,6 @@ var drivers = map[string]driver{
 	"notify":   notify,
 }
 
-/*
-Wuphf sends alerts via both `wall` and [pushover](https://pushover.net).  All
-arguments are concatenated to produce the sent message.
-
-The following environment variables should be set:
-
- * LM_PUSHOVER_TOKEN
- * LM_PUSHOVER_USER
- * LM_PUSHOVER_DEVICE
-
-```bash
-$ wuphf 'the shoes are on sale'
-```
-*/
 func Wuphf(args []string, _ io.Reader) error {
 	if len(args) == 1 {
 		return fmt.Errorf("usage: %s <message>\n", args[0])

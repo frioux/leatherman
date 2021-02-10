@@ -9,10 +9,6 @@ import (
 	"golang.org/x/text/unicode/runenames"
 )
 
-/*
-ToRune takes the name of a unicode character and prints out any found
-characters.
-*/
 func ToRune(args []string, _ io.Reader) error {
 	t := rangetable.Assigned("11.0.0")
 

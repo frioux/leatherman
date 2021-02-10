@@ -10,16 +10,6 @@ import (
 	parser "github.com/BurntSushi/toml"
 )
 
-/*
-ToJSON reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON
-on stdout.
-
-
-```bash
-$ echo 'foo = "bar"` | toml2json
-{"foo":"bar"}
-```
-*/
 func ToJSON(_ []string, stdin io.Reader) error {
 	buf := new(bytes.Buffer)
 	if _, err := io.Copy(buf, stdin); err != nil {

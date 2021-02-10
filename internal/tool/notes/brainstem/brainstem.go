@@ -9,11 +9,6 @@ import (
 	"github.com/frioux/leatherman/internal/notes"
 )
 
-/*
-Brainstem allows interacting with amygdala without using any of the server
-components, typically for testing the personality etc, but can also be used as
-a lightweight amygdala instance.
-*/
 func Brainstem(args []string, _ io.Reader) error {
 	var tok string
 
