@@ -271,11 +271,7 @@ type usersProfileSetInput struct {
 }
 
 func (i usersProfileSetInput) MarshalJSON() ([]byte, error) {
-	type p struct {
-		StatusText       string `json:"status_text"`
-		StatusEmoji      string `json:"status_emoji"`
-		StatusExpiration int    `json:"status_expiration,omitempty"`
-	}
+	type p usersProfileSetInput
 	type a struct {
 		Profile p `json:"profile"`
 	}
