@@ -267,7 +267,7 @@ func (c client) chatPostMessage(i chatPostMessageInput) (*http.Response, error) 
 type usersProfileSetInput struct {
 	StatusText       string `json:"status_text"`
 	StatusEmoji      string `json:"status_emoji"`
-	StatusExpiration int    `json:"status_expiration,omitempty"`
+	StatusExpiration int64  `json:"status_expiration,omitempty"`
 }
 
 func (i usersProfileSetInput) MarshalJSON() ([]byte, error) {
