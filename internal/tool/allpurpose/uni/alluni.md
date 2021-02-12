@@ -1,4 +1,4 @@
-All prints all unicode character names.
+Prints all unicode character names
 
 ```bash
 $ alluni | grep DENTISTRY
