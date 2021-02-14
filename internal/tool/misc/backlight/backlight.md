@@ -1,4 +1,6 @@
-Run is a faster version of `xbacklight` by directly writing to `/sys`.  Example:
+Modifies screen brightness.
+
+Backlight is a faster version of `xbacklight` by directly writing to `/sys`.  Example:
 
 Increase by 10%:
 

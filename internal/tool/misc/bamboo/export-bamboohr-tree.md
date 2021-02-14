@@ -1,1 +1,1 @@
-ExportOrgChart exports company org chart as JSON.
+Exports company org chart as JSON.

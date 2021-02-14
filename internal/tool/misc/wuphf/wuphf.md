@@ -1,3 +1,5 @@
+Sends notifications on lots (2) of platforms.
+
 Wuphf sends alerts via both `wall` and [pushover](https://pushover.net).  All
 arguments are concatenated to produce the sent message.
 

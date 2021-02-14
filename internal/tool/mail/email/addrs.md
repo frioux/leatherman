@@ -1,4 +1,6 @@
-Addrs sorts the addresses passed on stdin (in the mutt addrbook format, see
+Sorts addresses on stdin based on recency.
+
+`addrs` sorts the addresses passed on stdin (in the mutt addrbook format, see
 `addrspec-to-tabs`) and sorts them based on how recently they were used, from
 the glob passed on the arguments.  The tool exists so that you can create an
 address list either with an export tool (like `goobook`), a subset of your sent

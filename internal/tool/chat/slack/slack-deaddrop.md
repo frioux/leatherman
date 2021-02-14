@@ -1,6 +1,7 @@
-Deaddrop allows sending messages to a slack channel without looking at slack.
-Typical usage is probably something like:
+Sends messages to a slack channel.
 
 ```bash
 $ slack-deaddrop -channel general -text 'good morning!'
 ```
+
+Useful to avoid loading up a full slack instance or looking at other messages.

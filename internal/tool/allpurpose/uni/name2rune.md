@@ -1,2 +1,6 @@
-ToRune takes the name of a unicode character and prints out any found
-characters.
+Prints characters based on name.
+
+```bash
+$ name2rune CAT
+🐈
+```

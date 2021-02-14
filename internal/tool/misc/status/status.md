@@ -1,3 +1,5 @@
+Serves information about host machine.
+
 Status runs a little web server that surfaces status information related to how
 I'm using the machine.  For example, it can say which window is active, what
 firefox tabs are loaded, if the screen is locked, etc.  The main benefit of the

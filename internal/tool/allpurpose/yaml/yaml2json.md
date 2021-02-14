@@ -1,1 +1,1 @@
-ToJSON reads YAML on stdin and writes JSON on stdout.
+Reads YAML on stdin and writes JSON on stdout.

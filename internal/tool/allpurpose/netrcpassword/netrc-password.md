@@ -1,4 +1,4 @@
-Run prints password for the passed hostname and login.
+Prints password for a hostname, login pair.
 
 ```bash
 $ netrc-password google.com me@gmail.com

@@ -1,4 +1,6 @@
-Run starts a timer for 25m or the duration expressed in the first
+Conveniently counts down a duration.
+
+Pomotimer starts a timer for 25m or the duration expressed in the first
 argument.
 
 ```

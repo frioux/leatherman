@@ -1,4 +1,4 @@
-Run comments to discord and reacts to all messages with vaguely related emoji.
+Reacts to discord messages with vaguely related emoji.
 
 The following env vars should be set:
 

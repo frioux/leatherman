@@ -1,4 +1,4 @@
-Describe will describe the characters in the args.
+Describes unicode characters.
 
 ```bash
 $ uni ⢾

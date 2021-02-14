@@ -1,1 +1,1 @@
-Run does read only operations on notes.
+Read only view of my notes via the filesystem.

@@ -1,4 +1,4 @@
-Proj integrates my various project management tools.
+Integrates my various project management tools.
 
 Usage is:
 

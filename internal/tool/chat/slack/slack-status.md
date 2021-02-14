@@ -1,4 +1,4 @@
-Status sets the current users's status.
+Sets slack status.
 
 ```bash
 $ slack-status -text "working for the weekend" -emoji :guitar:

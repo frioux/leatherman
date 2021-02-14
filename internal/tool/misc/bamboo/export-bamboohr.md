@@ -1,1 +1,1 @@
-ExportDirectory exports entire company directory as JSON.
+Exports company directory as JSON.

@@ -19,8 +19,6 @@ while (<STDIN>) {
    my $doc_path = ($c->{path} =~ s/\.go$/.md/r);
    my $d = do { open my $fh, '<:encoding(UTF-8)', $doc_path; local $/; <$fh> };
 
-   ($d) = ($d =~ m/^(?:\S+\s+)(.+)$/s); # strip off function name
-
    my ($tool, $dir) = fileparse($c->{path}, '.go');
    
    my ($cat) = ($dir =~ m{/internal/tool/([^/]+)/[^/]+});
@@ -43,7 +41,7 @@ close $fh;
 
 for my $category (keys %doc) {
    for my $tool (keys %{$doc{$category}}) {
-      $doc{$category}{$tool} = "#### `$tool`\n\n`$tool` $doc{$category}{$tool}\n"
+      $doc{$category}{$tool} = "#### `$tool`\n\n$doc{$category}{$tool}\n"
    }
 }
 

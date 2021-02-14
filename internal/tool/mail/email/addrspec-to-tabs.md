@@ -1,4 +1,6 @@
-ToTabs converts email addresses from the standard format (`"Hello Friend"
+Converts email addresses from the standard format on stdin to the mutt address book format on stdout.
+
+`addrspec-to-tabs` converts email addresses from the standard format (`"Hello Friend"
 <foo@bar>`) from stdin to the mutt address book format, ie tab separated fields,
 on stdout.
 

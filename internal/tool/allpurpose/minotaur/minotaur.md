@@ -1,5 +1,4 @@
-Run watches one or more directories (before the `--`) and runs a script when
-events in those directories occur.
+Watches directories and runs a command when files change.
 
 ```bash
 minotaur -include-args -include internal -ignore yaml \

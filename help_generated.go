@@ -59,7 +59,7 @@ echo "---\nfoo: 1" | leatherman yaml2json
 
 #### ` + "`" + `alluni` + "`" + `
 
-` + "`" + `alluni` + "`" + ` prints all unicode character names.
+Prints all unicode character names
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ alluni | grep DENTISTRY
@@ -82,25 +82,44 @@ DENTISTRY SYMBOL LIGHT VERTICAL AND BOTTOM LEFT
 
 #### ` + "`" + `clocks` + "`" + `
 
-` + "`" + `clocks` + "`" + ` shows my personal, digital, wall of clocks.  Pass one or more timezone names
-to choose which timezones are shown.
+Shows my personal, digital, wall of clocks
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-clocks Africa/Johannesburg America/Los_Angeles Europe/Copenhagen
+$ clocks Africa/Johannesburg America/Los_Angeles Europe/Copenhagen
+  Africa/Johannesburg  tomorrow  02:43  2:43 AM  +10
+  America/Los_Angeles     today  16:43  4:43 PM  +0
+    Europe/Copenhagen  tomorrow  01:43  1:43 AM  +9
 ` + "`" + `` + "`" + `` + "`" + `
+
+Pass one or more timezone names to choose which timezones are shown.
 
 #### ` + "`" + `csv2json` + "`" + `
 
-` + "`" + `csv2json` + "`" + ` reads CSV on stdin and writes JSON on stdout; first line of input is the
-header, and thus the keys of the JSON.
+Reads CSV on stdin and writes JSON on stdout
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ echo "foo,bar\n1,2\n3,4" | csv2json
+{"bar":"2","foo":"1"}
+{"bar":"4","foo":"3"}
+` + "`" + `` + "`" + `` + "`" + `
+
+First line of input is the header, and thus the keys of the JSON.
 
 #### ` + "`" + `csv2md` + "`" + `
 
-` + "`" + `csv2md` + "`" + ` reads CSV on stdin and writes Markdown on stdout.
+Reads CSV on stdin and writes Markdown on stdout
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ echo "foo,bar\n1,2\n3,4" | csv2md
+foo | bar
+ --- | ---
+ 1 | 2
+ 3 | 4
+` + "`" + `` + "`" + `` + "`" + `
 
 #### ` + "`" + `debounce` + "`" + `
 
-` + "`" + `debounce` + "`" + ` debounces input from stdin to stdout
+Run debounces input from stdin to stdout
 
 The default lockout time is one second, you can override that with the
 ` + "`" + `--lockoutTime` + "`" + ` argument.  By default the trailing edge triggers output, so
@@ -109,17 +128,21 @@ this behavior by passing the ` + "`" + `--leadingEdge` + "`" + ` flag.
 
 #### ` + "`" + `dump-mozlz4` + "`" + `
 
-` + "`" + `dump-mozlz4` + "`" + ` dumps the contents of a ` + "`" + `mozlz4` + "`" + ` (aka ` + "`" + `jsonlz4` + "`" + `) file commonly used by
-Firefox.  Just takes the name of the file to dump and writes to standard out.
+Dumps the contents of a ` + "`" + `mozlz4` + "`" + ` (aka ` + "`" + `jsonlz4` + "`" + `) file.
+
+The format is commonly used by Firefox.  Just takes the name of the file to
+dump and writes to standard out.
 
 #### ` + "`" + `expand-url` + "`" + `
 
-` + "`" + `expand-url` + "`" + ` reads text on STDIN and writes the same text back, converting any links to
+Converts links in text to markdown links.
+
+Reads text on STDIN and writes the same text back, converting any links to
 Markdown links, with the title of the page as the title of the link.
 
 #### ` + "`" + `fn` + "`" + `
 
-` + "`" + `fn` + "`" + ` creates persistent functions by actually writing scripts.  Example usage:
+Creates persistent functions by generating scripts.
 
 ` + "`" + `` + "`" + `` + "`" + `
 fn count-users 'wc -l < /etc/passwd'
@@ -127,14 +150,15 @@ fn count-users 'wc -l < /etc/passwd'
 
 #### ` + "`" + `group-by-date` + "`" + `
 
-` + "`" + `group-by-date` + "`" + ` creates time series data by counting lines and grouping them by a given date
-format.  takes dates on stdin in format -i, will group them by format -g, and
-write them in format -o.
+Creates time series data by counting lines and grouping them by a given date
+format.
+
+Takes dates on stdin in format -i, will group them by format -g, and write them
+in format -o.
 
 #### ` + "`" + `minotaur` + "`" + `
 
-` + "`" + `minotaur` + "`" + ` watches one or more directories (before the ` + "`" + `--` + "`" + `) and runs a script when
-events in those directories occur.
+Watches directories and runs a command when files change.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 minotaur -include-args -include internal -ignore yaml \
@@ -189,12 +213,16 @@ script is run.
 
 #### ` + "`" + `name2rune` + "`" + `
 
-` + "`" + `name2rune` + "`" + ` takes the name of a unicode character and prints out any found
-characters.
+Prints characters based on name.
+
+` + "`" + `` + "`" + `` + "`" + `bash
+$ name2rune CAT
+🐈
+` + "`" + `` + "`" + `` + "`" + `
 
 #### ` + "`" + `netrc-password` + "`" + `
 
-` + "`" + `netrc-password` + "`" + ` prints password for the passed hostname and login.
+Prints password for a hostname, login pair.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ netrc-password google.com me@gmail.com
@@ -203,7 +231,9 @@ supersecretpassword
 
 #### ` + "`" + `pomotimer` + "`" + `
 
-` + "`" + `pomotimer` + "`" + ` starts a timer for 25m or the duration expressed in the first
+Conveniently counts down a duration.
+
+Pomotimer starts a timer for 25m or the duration expressed in the first
 argument.
 
 ` + "`" + `` + "`" + `` + "`" + `
@@ -225,14 +255,15 @@ progress.
 
 #### ` + "`" + `replace-unzip` + "`" + `
 
-` + "`" + `replace-unzip` + "`" + ` extracts zipfiles, but does not extract ` + "`" + `.DS_Store` + "`" + ` or ` + "`" + `__MACOSX/` + "`" + `.
+Does what ` + "`" + `unzip` + "`" + ` does more safely.
+
+Run extracts zipfiles, but does not extract ` + "`" + `.DS_Store` + "`" + ` or ` + "`" + `__MACOSX/` + "`" + `.
 Automatically extracts into a directory named after the zipfile if there is not
 a single root for all files in the zipfile.
 
 #### ` + "`" + `srv` + "`" + `
 
-` + "`" + `srv` + "`" + ` will serve a directory over http, injecting javascript to have pages
-reload when files change.
+Serves a directory over http, automatically refreshing when files change.
 
 It takes an optional dir to serve, the default is ` + "`" + `.` + "`" + `.
 
@@ -253,9 +284,7 @@ Serving /home/frew on [::]:8080
 
 #### ` + "`" + `toml2json` + "`" + `
 
-` + "`" + `toml2json` + "`" + ` reads [TOML](https://github.com/toml-lang/toml) on stdin and writes JSON
-on stdout.
-
+Reads TOML on stdin and writes JSON on stdout.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ echo 'foo = "bar"` + "`" + ` | toml2json
@@ -264,7 +293,7 @@ $ echo 'foo = "bar"` + "`" + ` | toml2json
 
 #### ` + "`" + `uni` + "`" + `
 
-` + "`" + `uni` + "`" + ` will describe the characters in the args.
+Describes unicode characters.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ uni ⢾
@@ -273,13 +302,13 @@ $ uni ⢾
 
 #### ` + "`" + `yaml2json` + "`" + `
 
-` + "`" + `yaml2json` + "`" + ` reads YAML on stdin and writes JSON on stdout.
+Reads YAML on stdin and writes JSON on stdout.
 
 ### chat
 
 #### ` + "`" + `auto-emote` + "`" + `
 
-` + "`" + `auto-emote` + "`" + ` comments to discord and reacts to all messages with vaguely related emoji.
+Reacts to discord messages with vaguely related emoji.
 
 The following env vars should be set:
 
@@ -404,16 +433,17 @@ All of the following are thin veneers atop
 
 #### ` + "`" + `slack-deaddrop` + "`" + `
 
-` + "`" + `slack-deaddrop` + "`" + ` allows sending messages to a slack channel without looking at slack.
-Typical usage is probably something like:
+Sends messages to a slack channel.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ slack-deaddrop -channel general -text 'good morning!'
 ` + "`" + `` + "`" + `` + "`" + `
 
+Useful to avoid loading up a full slack instance or looking at other messages.
+
 #### ` + "`" + `slack-open` + "`" + `
 
-` + "`" + `slack-open` + "`" + ` opens a channel, group message, or direct message by name:
+Opens a channel, group message, or direct message by name.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ slack-open -channel general
@@ -421,7 +451,7 @@ $ slack-open -channel general
 
 #### ` + "`" + `slack-status` + "`" + `
 
-` + "`" + `slack-status` + "`" + ` sets the current users's status.
+Sets slack status.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ slack-status -text "working for the weekend" -emoji :guitar:
@@ -431,13 +461,16 @@ $ slack-status -text "working for the weekend" -emoji :guitar:
 
 #### ` + "`" + `update` + "`" + `
 
-` + "`" + `update` + "`" + ` checks to see if there's an update from github and installs it if there
-is.  If LM_GH_TOKEN is set to a personal access token this can be called more
+Installs new version of leatherman if one exists.
+
+If LM_GH_TOKEN is set to a personal access token this can be called more
 frequently without exhausting github api limits.
 
 ### mail
 
 #### ` + "`" + `addrs` + "`" + `
+
+Sorts addresses on stdin based on recency.
 
 ` + "`" + `addrs` + "`" + ` sorts the addresses passed on stdin (in the mutt addrbook format, see
 ` + "`" + `addrspec-to-tabs` + "`" + `) and sorts them based on how recently they were used, from
@@ -451,6 +484,8 @@ $ <someaddrs.txt addrs "$HOME/mail/gmail.sent/cur/*" >sortedaddrs.txt
 ` + "`" + `` + "`" + `` + "`" + `
 
 #### ` + "`" + `addrspec-to-tabs` + "`" + `
+
+Converts email addresses from the standard format on stdin to the mutt address book format on stdout.
 
 ` + "`" + `addrspec-to-tabs` + "`" + ` converts email addresses from the standard format (` + "`" + `"Hello Friend"
 <foo@bar>` + "`" + `) from stdin to the mutt address book format, ie tab separated fields,
@@ -468,7 +503,9 @@ It exists to be combined with ` + "`" + `addrs` + "`" + ` and mutt.
 
 #### ` + "`" + `email2json` + "`" + `
 
-` + "`" + `email2json` + "`" + ` produces a JSON representation of an email from a list of globs.  Only
+Converts email to JSON.
+
+Produces a JSON representation of an email from a list of globs.  Only
 headers are currently supported, patches welcome to support bodies.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
@@ -490,14 +527,15 @@ $ email2json '/home/frew/var/mail/mitsi/cur/*' | head -1 | jq .
 
 #### ` + "`" + `render-mail` + "`" + `
 
-` + "`" + `render-mail` + "`" + ` is a scrappy tool to render email with a Local-Date included, if Date is
-not already in local time.
+Render email with a Local-Date included, if Date is not already in local time.
 
 ### misc
 
 #### ` + "`" + `backlight` + "`" + `
 
-` + "`" + `backlight` + "`" + ` is a faster version of ` + "`" + `xbacklight` + "`" + ` by directly writing to ` + "`" + `/sys` + "`" + `.  Example:
+Modifies screen brightness.
+
+Backlight is a faster version of ` + "`" + `xbacklight` + "`" + ` by directly writing to ` + "`" + `/sys` + "`" + `.  Example:
 
 Increase by 10%:
 
@@ -513,34 +551,55 @@ $ backlight -10
 
 #### ` + "`" + `export-bamboohr` + "`" + `
 
-` + "`" + `export-bamboohr` + "`" + ` exports entire company directory as JSON.
+Exports company directory as JSON.
 
 #### ` + "`" + `export-bamboohr-tree` + "`" + `
 
-` + "`" + `export-bamboohr-tree` + "`" + ` exports company org chart as JSON.
+Exports company org chart as JSON.
 
 #### ` + "`" + `prepend-hist` + "`" + `
 
-` + "`" + `prepend-hist` + "`" + ` prints out deduplicated lines from the history file in reverse order and
+Combines a history file and stdin.
+
+Prints out deduplicated lines from the history file in reverse order and
 then prints out the lines from STDIN, filtering out what's already been printed.
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-$ alluni | prefix-hist ~/.uni_history
+$ echo "1\n2\n3" > eg_history
+$ echo "1\n5 | prepend-hist eg_history
+3
+2
+1
+5
 ` + "`" + `` + "`" + `` + "`" + `
 
 #### ` + "`" + `sm-list` + "`" + `
 
-` + "`" + `sm-list` + "`" + ` lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
+Lists coffee from sweetmarias as JSON.
+
+Run lists all of the available [Sweet Maria's](https://www.sweetmarias.com/) coffees
 as json documents per line.  Here's how you might see the top ten coffees by
 rating:
 
 ` + "`" + `` + "`" + `` + "`" + `bash
 $ sm-list | jq -r '[.Score, .Title, .URL ] | @tsv' | sort -n | tail -10
+87.7    Colombia EA Café Quindio Decaf  https://www.sweetmarias.com/colombia-ea-cafe-quindio-decaf-6728.html
+87.7    Guatemala Antigua Pulcal Inteligente    https://www.sweetmarias.com/guatemala-antigua-pulcal-inteligente-6604.html
+88.2    El Salvador Santa Ana Pacamara AAA Lot 2        https://www.sweetmarias.com/el-salvador-santa-ana-pacamara-aaa-lot-2-6653.html
+88.7    Burundi Monge Murambi Hill      https://www.sweetmarias.com/burundi-monge-murambi-hill-6643.html
+89      Ethiopia Uraga Tebe Haro Wato   https://www.sweetmarias.com/ethiopia-uraga-tebe-haro-wato-6725-.html
+89.4    Burundi Kazoza N'Ikawa Coop     https://www.sweetmarias.com/burundi-kazoza-nikawa-station-6639.html
+89.6    Ethiopia Nano Challa Cooperative        https://www.sweetmarias.com/ethiopa-nano-challa-cooperative-6726.html
+89.8    Ethiopia Dry Process Yirga Cheffe Aricha        https://www.sweetmarias.com/ethiopia-dry-process-yirga-cheffe-aricha-6680.html
+90.1    Ethiopia Dry Process Tarekech Werasa    https://www.sweetmarias.com/ethiopia-dry-process-tarekech-werasa-6701.html
+90.2    Ethiopia Organic Shakiso Kayon Mountain Farm    https://www.sweetmarias.com/ethiopia-organic-shakiso-kayon-mountain-farm-6681.html
 ` + "`" + `` + "`" + `` + "`" + `
 
 #### ` + "`" + `status` + "`" + `
 
-` + "`" + `status` + "`" + ` runs a little web server that surfaces status information related to how
+Serves information about host machine.
+
+Status runs a little web server that surfaces status information related to how
 I'm using the machine.  For example, it can say which window is active, what
 firefox tabs are loaded, if the screen is locked, etc.  The main benefit of the
 tool is that it caches the values returned.
@@ -550,8 +609,7 @@ It turns the light green when I'm in a meeting and red when audio is playing.
 
 #### ` + "`" + `twilio` + "`" + `
 
-` + "`" + `twilio` + "`" + ` allows interacting with a service that recieves callbacks from twilio
-for testing.
+Makes callbacks like twilio.
 
 It takes four arguments:
 
@@ -568,7 +626,9 @@ $ twilio -message "the building is on fire!"
 
 #### ` + "`" + `wuphf` + "`" + `
 
-` + "`" + `wuphf` + "`" + ` sends alerts via both ` + "`" + `wall` + "`" + ` and [pushover](https://pushover.net).  All
+Sends notifications on lots (2) of platforms.
+
+Wuphf sends alerts via both ` + "`" + `wall` + "`" + ` and [pushover](https://pushover.net).  All
 arguments are concatenated to produce the sent message.
 
 The following environment variables should be set:
@@ -585,8 +645,9 @@ $ wuphf 'the shoes are on sale'
 
 #### ` + "`" + `amygdala` + "`" + `
 
-` + "`" + `amygdala` + "`" + ` is an automated assistant.  The main docs for it are in [amygdala.mdwn
-in the root of the leatherman
+Automated assistant.
+
+The main docs for it are in [amygdala.mdwn in the root of the leatherman
 repo](https://github.com/frioux/leatherman/blob/main/amygdala.mdwn).
 
 Configure it with the following environment variables:
@@ -599,18 +660,20 @@ Takes an optional ` + "`" + `-port` + "`" + ` argument to specify which port to 
 
 #### ` + "`" + `brainstem` + "`" + `
 
-` + "`" + `brainstem` + "`" + ` allows interacting with amygdala without using any of the server
-components, typically for testing the personality etc, but can also be used as
-a lightweight amygdala instance.
+Interacts with amygdala without using any server components.
+
+Typically for testing the personality etc, but can also be used as a
+lightweight amygdala instance.
 
 #### ` + "`" + `notes` + "`" + `
 
-` + "`" + `notes` + "`" + ` provides a web interface to parts of my notes stored in
-Dropbox.  This should eventually be merged into Amygdala.
+Serves my notes via Dropbox.
+
+This should eventually be merged into ` + "`" + `amygdala` + "`" + `.
 
 #### ` + "`" + `proj` + "`" + `
 
-` + "`" + `proj` + "`" + ` integrates my various project management tools.
+Integrates my various project management tools.
 
 Usage is:
 
@@ -651,7 +714,7 @@ add functionality to projects within shell sessions.
 
 #### ` + "`" + `zine` + "`" + `
 
-` + "`" + `zine` + "`" + ` does read only operations on notes.
+Read only view of my notes via the filesystem.
 
 ## Debugging
 
@@ -686,84 +749,84 @@ var commandReadme map[string][]byte
 
 func init() {
 	commandReadme = map[string][]byte{
-		"addrs": readme[11950:12448],
+		"addrs": readme[11955:12497],
 
-		"addrspec-to-tabs": readme[12448:13027],
+		"addrspec-to-tabs": readme[12497:13179],
 
-		"alluni": readme[1583:2410],
+		"alluni": readme[1583:2400],
 
-		"amygdala": readme[16024:16402],
+		"amygdala": readme[17451:17812],
 
-		"auto-emote": readme[7632:11198],
+		"auto-emote": readme[7760:11293],
 
-		"backlight": readme[13888:14091],
+		"backlight": readme[14017:14247],
 
-		"brainstem": readme[16402:16610],
+		"brainstem": readme[17812:17993],
 
-		"clocks": readme[2410:2627],
+		"clocks": readme[2400:2766],
 
-		"csv2json": readme[2627:2768],
+		"csv2json": readme[2766:2991],
 
-		"csv2md": readme[2768:2843],
+		"csv2md": readme[2991:3140],
 
-		"debounce": readme[2843:3188],
+		"debounce": readme[3140:3478],
 
-		"dump-mozlz4": readme[3188:3372],
+		"dump-mozlz4": readme[3478:3664],
 
-		"email2json": readme[13027:13743],
+		"email2json": readme[13179:13907],
 
-		"expand-url": readme[3372:3549],
+		"expand-url": readme[3664:3871],
 
-		"export-bamboohr": readme[14091:14176],
+		"export-bamboohr": readme[14247:14307],
 
-		"export-bamboohr-tree": readme[14176:14264],
+		"export-bamboohr-tree": readme[14307:14372],
 
-		"fn": readme[3549:3686],
+		"fn": readme[3871:3981],
 
-		"group-by-date": readme[3686:3905],
+		"group-by-date": readme[3981:4184],
 
-		"minotaur": readme[3905:5725],
+		"minotaur": readme[4184:5943],
 
-		"name2rune": readme[5725:5831],
+		"name2rune": readme[5943:6029],
 
-		"netrc-password": readme[5831:5997],
+		"netrc-password": readme[6029:6171],
 
-		"notes": readme[16610:16747],
+		"notes": readme[17993:18088],
 
-		"pomotimer": readme[5997:6490],
+		"pomotimer": readme[6171:6700],
 
-		"prepend-hist": readme[14264:14506],
+		"prepend-hist": readme[14372:14674],
 
-		"proj": readme[16747:18067],
+		"proj": readme[18088:19401],
 
-		"render-mail": readme[13743:13878],
+		"render-mail": readme[13907:14007],
 
-		"replace-unzip": readme[6490:6721],
+		"replace-unzip": readme[6700:6956],
 
-		"slack-deaddrop": readme[11198:11419],
+		"slack-deaddrop": readme[11293:11501],
 
-		"slack-open": readme[11419:11554],
+		"slack-open": readme[11501:11623],
 
-		"slack-status": readme[11554:11700],
+		"slack-status": readme[11623:11740],
 
-		"sm-list": readme[14506:14784],
+		"sm-list": readme[14674:16191],
 
-		"srv": readme[6721:7205],
+		"srv": readme[6956:7413],
 
-		"status": readme[14784:15242],
+		"status": readme[16191:16687],
 
-		"toml2json": readme[7205:7381],
+		"toml2json": readme[7413:7539],
 
-		"twilio": readme[15242:15701],
+		"twilio": readme[16687:17083],
 
-		"uni": readme[7381:7544],
+		"uni": readme[7539:7684],
 
-		"update": readme[11716:11940],
+		"update": readme[11756:11945],
 
-		"wuphf": readme[15701:16013],
+		"wuphf": readme[17083:17440],
 
-		"yaml2json": readme[7544:7622],
+		"yaml2json": readme[7684:7750],
 
-		"zine": readme[18067:18124],
+		"zine": readme[19401:19462],
 	}
 }

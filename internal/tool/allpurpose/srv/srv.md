@@ -1,5 +1,4 @@
-Serve will serve a directory over http, injecting javascript to have pages
-reload when files change.
+Serves a directory over http, automatically refreshing when files change.
 
 It takes an optional dir to serve, the default is `.`.
 

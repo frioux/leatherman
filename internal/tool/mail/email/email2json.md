@@ -1,4 +1,6 @@
-ToJSON produces a JSON representation of an email from a list of globs.  Only
+Converts email to JSON.
+
+Produces a JSON representation of an email from a list of globs.  Only
 headers are currently supported, patches welcome to support bodies.
 
 ```bash

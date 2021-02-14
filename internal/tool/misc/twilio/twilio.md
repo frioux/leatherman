@@ -1,5 +1,4 @@
-Twilio allows interacting with a service that recieves callbacks from twilio
-for testing.
+Makes callbacks like twilio.
 
 It takes four arguments:
 
