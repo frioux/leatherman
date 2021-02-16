@@ -1,6 +1,6 @@
 module github.com/frioux/leatherman
 
-// +heroku goVersion go1.15
+// +heroku goVersion go1.16
 
 require (
 	github.com/BurntSushi/toml v0.3.1
@@ -29,4 +29,4 @@ require (
 	modernc.org/sqlite v1.8.7
 )
 
-go 1.15
+go 1.16
