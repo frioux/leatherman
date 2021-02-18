@@ -1,12 +1,17 @@
 package main
 
 import (
+	_ "embed"
 	"flag"
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"sort"
 )
+
+//go:embed README.mdwn
+var readme []byte
 
 // Help prints tool listing
 func Help(args []string, _ io.Reader) error {
@@ -24,7 +29,12 @@ func Help(args []string, _ io.Reader) error {
 	}
 
 	if full {
-		fmt.Print(string(readme))
+		comment, err := regexp.Compile(`<!--.*?-->\n?`)
+		if err != nil {
+			return err
+		}
+
+		fmt.Print(string(comment.ReplaceAll(readme, []byte{})))
 		return nil
 	}
 
