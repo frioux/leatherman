@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -109,7 +110,7 @@ LOOP:
 }
 
 func addDir(watcher *fsnotify.Watcher, c config, path string) error {
-	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+	return fs.WalkDir(os.DirFS(path), ".", func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

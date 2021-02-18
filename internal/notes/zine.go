@@ -3,6 +3,7 @@ package notes
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -105,7 +106,7 @@ func (z *Zine) Load(as *[]Article) error {
 		return err
 	}
 
-	if err := filepath.Walk(z.Root, func(path string, _ os.FileInfo, err error) error {
+	if err := fs.WalkDir(os.DirFS(z.Root), ".", func(path string, _ fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

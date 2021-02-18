@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -111,7 +112,7 @@ func render(args []string) error {
 		return err
 	}
 
-	if err := filepath.Walk(static, func(path string, info os.FileInfo, err error) error {
+	if err := fs.WalkDir(os.DirFS(static), ".", func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
