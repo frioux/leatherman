@@ -1,87 +1,127 @@
 package main
 
-var commandReadme map[string][]byte
+import "embed"
 
-func init() {
-	commandReadme = map[string][]byte{
-		"addrs": readme[12018:12560],
+//go:embed internal/tool/allpurpose/uni/alluni.md
+//go:embed internal/tool/allpurpose/clocks/clocks.md
+//go:embed internal/tool/allpurpose/csv/csv2json.md
+//go:embed internal/tool/allpurpose/csv/csv2md.md
+//go:embed internal/tool/allpurpose/debounce/debounce.md
+//go:embed internal/tool/allpurpose/dumpmozlz4/dump-mozlz4.md
+//go:embed internal/tool/allpurpose/expandurl/expand-url.md
+//go:embed internal/tool/allpurpose/fn/fn.md
+//go:embed internal/tool/allpurpose/groupbydate/group-by-date.md
+//go:embed internal/tool/allpurpose/minotaur/minotaur.md
+//go:embed internal/tool/allpurpose/uni/name2rune.md
+//go:embed internal/tool/allpurpose/netrcpassword/netrc-password.md
+//go:embed internal/tool/allpurpose/pomotimer/pomotimer.md
+//go:embed internal/tool/allpurpose/replaceunzip/replace-unzip.md
+//go:embed internal/tool/allpurpose/srv/srv.md
+//go:embed internal/tool/allpurpose/toml/toml2json.md
+//go:embed internal/tool/allpurpose/uni/uni.md
+//go:embed internal/tool/allpurpose/yaml/yaml2json.md
+//go:embed internal/tool/chat/automoji/auto-emote.md
+//go:embed internal/tool/chat/slack/slack-deaddrop.md
+//go:embed internal/tool/chat/slack/slack-open.md
+//go:embed internal/tool/chat/slack/slack-status.md
+//go:embed internal/tool/leatherman/update/update.md
+//go:embed internal/tool/mail/email/addrs.md
+//go:embed internal/tool/mail/email/addrspec-to-tabs.md
+//go:embed internal/tool/mail/email/email2json.md
+//go:embed internal/tool/mail/email/render-mail.md
+//go:embed internal/tool/misc/backlight/backlight.md
+//go:embed internal/tool/misc/bamboo/export-bamboohr.md
+//go:embed internal/tool/misc/bamboo/export-bamboohr-tree.md
+//go:embed internal/tool/misc/prependhist/prepend-hist.md
+//go:embed internal/tool/misc/smlist/sm-list.md
+//go:embed internal/tool/misc/status/status.md
+//go:embed internal/tool/misc/twilio/twilio.md
+//go:embed internal/tool/misc/wuphf/wuphf.md
+//go:embed internal/tool/notes/amygdala/amygdala.md
+//go:embed internal/tool/notes/brainstem/brainstem.md
+//go:embed internal/tool/notes/now/notes.md
+//go:embed internal/tool/notes/proj/proj.md
+//go:embed internal/tool/notes/zine/zine.md
+var helpFS embed.FS
 
-		"addrspec-to-tabs": readme[12560:13242],
+var helpPaths = map[string]string{
+	"alluni": "internal/tool/allpurpose/uni/alluni.md",
 
-		"alluni": readme[1646:2463],
+	"clocks": "internal/tool/allpurpose/clocks/clocks.md",
 
-		"amygdala": readme[17514:17875],
+	"csv2json": "internal/tool/allpurpose/csv/csv2json.md",
 
-		"auto-emote": readme[7823:11356],
+	"csv2md": "internal/tool/allpurpose/csv/csv2md.md",
 
-		"backlight": readme[14080:14310],
+	"debounce": "internal/tool/allpurpose/debounce/debounce.md",
 
-		"brainstem": readme[17875:18056],
+	"dump-mozlz4": "internal/tool/allpurpose/dumpmozlz4/dump-mozlz4.md",
 
-		"clocks": readme[2463:2829],
+	"expand-url": "internal/tool/allpurpose/expandurl/expand-url.md",
 
-		"csv2json": readme[2829:3054],
+	"fn": "internal/tool/allpurpose/fn/fn.md",
 
-		"csv2md": readme[3054:3203],
+	"group-by-date": "internal/tool/allpurpose/groupbydate/group-by-date.md",
 
-		"debounce": readme[3203:3541],
+	"minotaur": "internal/tool/allpurpose/minotaur/minotaur.md",
 
-		"dump-mozlz4": readme[3541:3727],
+	"name2rune": "internal/tool/allpurpose/uni/name2rune.md",
 
-		"email2json": readme[13242:13970],
+	"netrc-password": "internal/tool/allpurpose/netrcpassword/netrc-password.md",
 
-		"expand-url": readme[3727:3934],
+	"pomotimer": "internal/tool/allpurpose/pomotimer/pomotimer.md",
 
-		"export-bamboohr": readme[14310:14370],
+	"replace-unzip": "internal/tool/allpurpose/replaceunzip/replace-unzip.md",
 
-		"export-bamboohr-tree": readme[14370:14435],
+	"srv": "internal/tool/allpurpose/srv/srv.md",
 
-		"fn": readme[3934:4044],
+	"toml2json": "internal/tool/allpurpose/toml/toml2json.md",
 
-		"group-by-date": readme[4044:4247],
+	"uni": "internal/tool/allpurpose/uni/uni.md",
 
-		"minotaur": readme[4247:6006],
+	"yaml2json": "internal/tool/allpurpose/yaml/yaml2json.md",
 
-		"name2rune": readme[6006:6092],
+	"auto-emote": "internal/tool/chat/automoji/auto-emote.md",
 
-		"netrc-password": readme[6092:6234],
+	"slack-deaddrop": "internal/tool/chat/slack/slack-deaddrop.md",
 
-		"notes": readme[18056:18151],
+	"slack-open": "internal/tool/chat/slack/slack-open.md",
 
-		"pomotimer": readme[6234:6763],
+	"slack-status": "internal/tool/chat/slack/slack-status.md",
 
-		"prepend-hist": readme[14435:14737],
+	"update": "internal/tool/leatherman/update/update.md",
 
-		"proj": readme[18151:19464],
+	"addrs": "internal/tool/mail/email/addrs.md",
 
-		"render-mail": readme[13970:14070],
+	"addrspec-to-tabs": "internal/tool/mail/email/addrspec-to-tabs.md",
 
-		"replace-unzip": readme[6763:7019],
+	"email2json": "internal/tool/mail/email/email2json.md",
 
-		"slack-deaddrop": readme[11356:11564],
+	"render-mail": "internal/tool/mail/email/render-mail.md",
 
-		"slack-open": readme[11564:11686],
+	"backlight": "internal/tool/misc/backlight/backlight.md",
 
-		"slack-status": readme[11686:11803],
+	"export-bamboohr": "internal/tool/misc/bamboo/export-bamboohr.md",
 
-		"sm-list": readme[14737:16254],
+	"export-bamboohr-tree": "internal/tool/misc/bamboo/export-bamboohr-tree.md",
 
-		"srv": readme[7019:7476],
+	"prepend-hist": "internal/tool/misc/prependhist/prepend-hist.md",
 
-		"status": readme[16254:16750],
+	"sm-list": "internal/tool/misc/smlist/sm-list.md",
 
-		"toml2json": readme[7476:7602],
+	"status": "internal/tool/misc/status/status.md",
 
-		"twilio": readme[16750:17146],
+	"twilio": "internal/tool/misc/twilio/twilio.md",
 
-		"uni": readme[7602:7747],
+	"wuphf": "internal/tool/misc/wuphf/wuphf.md",
 
-		"update": readme[11819:12008],
+	"amygdala": "internal/tool/notes/amygdala/amygdala.md",
 
-		"wuphf": readme[17146:17503],
+	"brainstem": "internal/tool/notes/brainstem/brainstem.md",
 
-		"yaml2json": readme[7747:7813],
+	"notes": "internal/tool/notes/now/notes.md",
 
-		"zine": readme[19464:19525],
-	}
+	"proj": "internal/tool/notes/proj/proj.md",
+
+	"zine": "internal/tool/notes/zine/zine.md",
 }

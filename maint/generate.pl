@@ -5,7 +5,7 @@ use warnings;
 use autodie;
 
 use File::Basename 'fileparse';
-use File::Spec 'splitdir';
+use File::Spec ();
 use Encode;
 use JSON::PP;
 
@@ -28,7 +28,7 @@ while (<STDIN>) {
       next;
    }
 
-   $doc{$cat}{$tool} = "$d";
+   $doc{$cat}{$tool} = { path => File::Spec->abs2rel($doc_path), doc => $d };
 }
 
 open my $fh, '<:encoding(UTF-8)', 'maint/README_begin.md';
@@ -42,23 +42,17 @@ close $fh;
 
 for my $category (keys %doc) {
    for my $tool (keys %{$doc{$category}}) {
-      $doc{$category}{$tool} = "#### `$tool`\n\n$doc{$category}{$tool}\n"
+      $doc{$category}{$tool}{doc} = "#### `$tool`\n\n$doc{$category}{$tool}{doc}\n"
    }
 }
 
-my %offsets;
-my $offset = length $begin;
 my $body = $begin;
 
 for my $category (sort keys %doc) {
    $body .= "### $category\n\n";
-   $offset += length(encode('UTF-8', "### $category\n\n", Encode::FB_CROAK));;
 
    for my $tool (sort keys %{$doc{$category}}) {
-      $body .= $doc{$category}{$tool};
-      my $length = length(encode('UTF-8', $doc{$category}{$tool}, Encode::FB_CROAK));
-      $offsets{$tool} = "[$offset:" . ($offset + $length) . "]";
-      $offset += $length;
+      $body .= $doc{$category}{$tool}{doc};
    }
 }
 
@@ -70,15 +64,27 @@ print $readme $body;
 close $readme;
 
 open my $help, '>:encoding(UTF-8)', 'help_generated.go';
-$body =~ s/`/` + "`" + `/g;
-print $help "package main\n\n" .
-   "var commandReadme map[string][]byte\n" .
-   "func init() {\n" .
-   "\tcommandReadme = map[string][]byte{\n";
+print $help "package main\n\n";
+print $help qq(import "embed"\n\n);
 
-print $help qq(\t\t"$_": readme$offsets{$_},\n\n) for sort keys %offsets;
+for my $category (sort keys %doc) {
+   for my $tool (sort keys %{$doc{$category}}) {
+      print $help "//go:embed $doc{$category}{$tool}{path}\n";
+   }
+}
 
-print $help "\t}\n";
+print $help "var helpFS embed.FS\n\n";
+
+print $help "var helpPaths = map[string]string{\n";
+
+for my $category (sort keys %doc) {
+   for my $tool (sort keys %{$doc{$category}}) {
+      print $help qq(\t"$tool": "$doc{$category}{$tool}{path}",\n\n);
+   }
+}
+
 print $help "}\n";
+
+close $help;
 
 system 'go', 'fmt';

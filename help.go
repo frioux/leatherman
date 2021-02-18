@@ -2,9 +2,11 @@ package main
 
 import (
 	_ "embed"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"regexp"
 	"sort"
@@ -39,12 +41,15 @@ func Help(args []string, _ io.Reader) error {
 	}
 
 	if command != "" {
-		readme, ok := commandReadme[command]
-		if !ok {
+		doc, err := fs.ReadFile(helpFS, helpPaths[command])
+		if err != nil && errors.Is(err, fs.ErrNotExist) {
 			fmt.Fprintf(os.Stderr, "No such command: %s\n", command)
 			os.Exit(1)
 		}
-		fmt.Print(string(readme))
+		if err != nil {
+			return err
+		}
+		fmt.Print(string(doc))
 		return nil
 	}
 
