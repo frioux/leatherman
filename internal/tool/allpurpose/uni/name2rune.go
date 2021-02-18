@@ -10,7 +10,7 @@ import (
 )
 
 func ToRune(args []string, _ io.Reader) error {
-	t := rangetable.Assigned("11.0.0")
+	t := rangetable.Assigned(unicodeVersion)
 
 	if len(args) != 2 {
 		return errors.New("name2rune requires a name")
