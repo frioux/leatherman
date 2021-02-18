@@ -9,7 +9,7 @@ import (
 )
 
 func All(_ []string, _ io.Reader) error {
-	t := rangetable.Assigned("11.0.0")
+	t := rangetable.Assigned("13.0.0")
 
 	rangetable.Visit(t, func(r rune) {
 		name := runenames.Name(r)
