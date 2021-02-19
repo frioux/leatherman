@@ -1,0 +1,4 @@
+#!/bin/sh
+
+maint/find-tools | maint/generate.pl
+maint/find-tools | maint/generate-dispatch

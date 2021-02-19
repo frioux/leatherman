@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-
 use autodie;
 
 no warnings 'uninitialized';
@@ -12,26 +11,16 @@ use File::Basename 'fileparse';
 
 my (%imports, %commands);
 
-my $cmd = q(go list -f '{{$name := .Name}}{{ $import := .ImportPath}}{{$dir := .Dir}}{{range .GoFiles}}{{$name}} {{$import}} {{$dir}}/{{.}}{{"\n"}}{{end}}' ./internal/tool/...);
+while (<STDIN>) {
+   my $c = decode_json($_);
 
-for my $line (`$cmd`) {
-   chomp $line;
+   $imports{$c->{import}} = 1;
 
-   my ($name, $import, $file) = split /\s+/, $line;
-
-   $imports{$import} = 1;
-
-   my $ast = decode_json(`goblin -file $file`);
-   my ($basename) = fileparse($file, ".go");
+   my ($basename) = fileparse($c->{path}, ".go");
 
    %commands = (
       %commands,
-      map { $basename => "$name.$_->{name}{value}" }
-      grep {
-              $_->{type} eq 'function' &&
-              $_->{name}{value} =~ m/^[A-Z]/ # public functions
-      }
-      @{$ast->{declarations}}
+      $basename => "$c->{package}.$c->{func}"
    );
 }
 

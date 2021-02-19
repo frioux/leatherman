@@ -13,8 +13,7 @@ import (
 	"github.com/frioux/leatherman/internal/selfupdate"
 )
 
-//go:generate maint/generate-README
-//go:generate maint/generate-dispatch
+//go:generate maint/generate
 
 // Dispatch is the dispatch table that maps command names to functions.
 var Dispatch map[string]func([]string, io.Reader) error

@@ -6,7 +6,6 @@ use autodie;
 
 use File::Basename 'fileparse';
 use File::Spec ();
-use Encode;
 use JSON::PP;
 
 no warnings 'uninitialized';
