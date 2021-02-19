@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -193,7 +194,7 @@ func autoReload(h http.Handler, dir string) (handler http.Handler, sinking chan 
 }
 
 func addDir(watcher *fsnotify.Watcher, dir string) error {
-	return fs.WalkDir(os.DirFS(dir), ".", func(path string, info fs.DirEntry, err error) error {
+	return filepath.WalkDir(dir, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

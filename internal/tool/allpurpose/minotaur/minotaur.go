@@ -110,7 +110,7 @@ LOOP:
 }
 
 func addDir(watcher *fsnotify.Watcher, c config, path string) error {
-	return fs.WalkDir(os.DirFS(path), ".", func(path string, info fs.DirEntry, err error) error {
+	return filepath.WalkDir(path, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
