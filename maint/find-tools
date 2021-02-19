@@ -5,6 +5,8 @@
 #  * import
 #  * package
 #  * path
+#
+# set LM_TOOL to a regex to filter tools by path.
 
 use strict;
 use warnings;
@@ -14,11 +16,15 @@ no warnings 'uninitialized';
 
 use JSON::PP;
 
+my $re = qr/$ENV{LM_TOOL}/;
+
 for my $pkg (`go list -json ./internal/tool/... | jq -c .`) {
    my $c = decode_json($pkg);
    my $dir = $c->{Dir};
    
    for my $file (@{$c->{GoFiles}}) {
+      next if "$dir/$file" !~ $re;
+
       my $g = decode_json(`goblin -file $dir/$file`);
       my $path = $g->{path}; 
       my $pkg = $g->{"package-name"}{value};
