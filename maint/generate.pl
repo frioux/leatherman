@@ -16,14 +16,16 @@ while (<STDIN>) {
    my $c = decode_json($_);
 
    my $doc_path = ($c->{path} =~ s/\.go$/.md/r);
-   my $d = do { open my $fh, '<:encoding(UTF-8)', $doc_path; local $/; <$fh> };
+   my ($d) = split /\n\n/, do { open my $fh, '<:encoding(UTF-8)', $doc_path; local $/; <$fh> }, 2;
+   chomp $d;
+   $d =~ s/\n/ /g;
 
    my ($tool, $dir) = fileparse($c->{path}, '.go');
    
    my ($cat) = ($dir =~ m{/internal/tool/([^/]+)/[^/]+});
 
    if (!$cat) {
-      warn "no category for $tool, skipping...\n";
+      die "no category for $tool\n";
       next;
    }
 
@@ -41,21 +43,21 @@ close $fh;
 
 for my $category (keys %doc) {
    for my $tool (keys %{$doc{$category}}) {
-      $doc{$category}{$tool}{doc} = "#### `$tool`\n\n$doc{$category}{$tool}{doc}\n"
+      $doc{$category}{$tool}{doc} = " * `$tool`: $doc{$category}{$tool}{doc} ([$doc{$category}{$tool}{path}](https://github.com/frioux/leatherman/blob/main/$doc{$category}{$tool}{path}))\n"
    }
 }
 
 my $body = $begin;
 
 for my $category (sort keys %doc) {
-   $body .= "### $category\n\n";
+   $body .= "\n### $category\n\n";
 
    for my $tool (sort keys %{$doc{$category}}) {
       $body .= $doc{$category}{$tool}{doc};
    }
 }
 
-$body .= $end;
+$body .= "\n$end";
 
 open my $readme, '>:encoding(UTF-8)', 'README.mdwn';
 print $readme $body;
