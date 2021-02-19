@@ -112,7 +112,7 @@ func render(args []string) error {
 		return err
 	}
 
-	if err := fs.WalkDir(os.DirFS(static), ".", func(path string, info fs.DirEntry, err error) error {
+	if err := filepath.WalkDir(static, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

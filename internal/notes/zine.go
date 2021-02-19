@@ -106,7 +106,7 @@ func (z *Zine) Load(as *[]Article) error {
 		return err
 	}
 
-	if err := fs.WalkDir(os.DirFS(z.Root), ".", func(path string, _ fs.DirEntry, err error) error {
+	if err := filepath.WalkDir(z.Root, func(path string, _ fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
