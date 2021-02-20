@@ -33,6 +33,7 @@ for my $pkg (`go list -json ./internal/tool/... | jq -c .`) {
          next if $decl->{type} ne "function";
          next if $decl->{name}{value} !~ m/^[A-Z]/;
 
+         warn "# $path matched LM_TOOL\n" if $ENV{LM_TOOL};
          print encode_json({
             func => $decl->{name}{value},
             import => $c->{ImportPath},

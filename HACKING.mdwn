@@ -1,0 +1,69 @@
+## Creating a new tool
+
+To create a new tool create a file of the form
+`./internal/tool/$category/$package/$tool_name.go`.
+
+ * The category will be shown as the section in the readme
+ * the $package is internal and solely to allow sharing stuff across tools
+ * the tool_name is how you specify the subcommand used to run the tool
+
+The file should have a single public function (with a capital letter) with the
+signature `func Herp(args []string, r io.Reader) error`.
+
+Create a matching documentation file of the form
+`./internal/tool/$category/$package/$tool_name.go`.  Ensure that it has a brief
+description appropriate for use in a list (see `README.mdwn` for examples.)
+
+After that's done, run `go generate ./...` to have the tool added to
+`dispatch.go`, `help_generated.go`, and `README.mdwn`.
+
+## Making a mini-leatherman
+
+If you want to shrink the leatherman for some reason, you can set LM_TOOL to a
+regex to limit which tools get built.  It is checked against the full path
+of each tool source file, so to only build a single tool you might do:
+
+```bash
+$ LM_TOOL='alluni.go$' go generate ./...
+$ go build
+$ ./leatherman     
+Tools:
+ * alluni
+ * explode
+ * help
+ * version
+
+Get more help for each tool with `leatherman help -command <tool>`, or `leatherman help -v`
+```
+
+Or if you wanted to only build the general purpose tools you could match the category:
+
+```bash
+$ LM_TOOL='/allpurpose' go generate ./...
+$ go build
+$ ./leatherman
+Tools:
+ * alluni
+ * clocks
+ * csv2json
+ * csv2md
+ * debounce
+ * dump-mozlz4
+ * expand-url
+ * explode
+ * fn
+ * group-by-date
+ * help
+ * minotaur
+ * name2rune
+ * netrc-password
+ * pomotimer
+ * replace-unzip
+ * srv
+ * toml2json
+ * uni
+ * version
+ * yaml2json
+
+Get more help for each tool with `leatherman help -command <tool>`, or `leatherman help -v`
+```
