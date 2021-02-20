@@ -1,6 +1,6 @@
 #!/bin/sh
 
-tools=$(maint/find-tools)
+tools=$(go run -tags generate maint/find-tools.go)
 
 echo "$tools" | maint/generate-readme
 echo "$tools" | maint/generate-dispatch
