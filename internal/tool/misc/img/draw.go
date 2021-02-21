@@ -1,12 +1,16 @@
 package img
 
 import (
+	"fmt"
 	"image"
 	"image/color"
+	"image/draw"
+	"image/gif"
 	"image/png"
 	"io"
 	"math"
 	"os"
+	"regexp"
 
 	lua "github.com/yuin/gopher-lua"
 )
@@ -39,7 +43,7 @@ func luaEval(img ImageSetter, code []string) error {
 	L := lua.NewState()
 	defer L.Close()
 
-	registerImageFunctions(L, img)
+	cleanup := registerImageFunctions(L, img)
 
 	for _, c := range code {
 		if err := L.DoString(c); err != nil {
@@ -47,7 +51,7 @@ func luaEval(img ImageSetter, code []string) error {
 		}
 	}
 
-	return nil
+	return cleanup()
 }
 
 func checkColor(L *lua.LState, w int) color.Color {
@@ -59,7 +63,57 @@ func checkColor(L *lua.LState, w int) color.Color {
 	return nil
 }
 
-func registerImageFunctions(L *lua.LState, img ImageSetter) {
+func registerImageFunctions(L *lua.LState, img ImageSetter) (cleanup func() error) {
+	palette := color.Palette([]color.Color{
+		color.Black,
+		color.RGBA{0, 0, 0, 255},     // white
+		color.RGBA{255, 0, 0, 255},   // red
+		color.RGBA{0, 0, 255, 255},   // blue
+		color.RGBA{255, 255, 0, 255}, // yellow
+		color.RGBA{0, 255, 0, 255},   // green
+		color.RGBA{255, 165, 0, 255}, // orange
+		color.RGBA{128, 0, 128, 255}, // purple
+		color.RGBA{0, 255, 255, 255}, // cyan
+		color.RGBA{255, 0, 255, 255}, // magenta
+	})
+	var debugDraw func(string, image.Image) error
+
+	if d := os.Getenv("LM_DEBUG_DRAW"); d != "" {
+		dgif := &gif.GIF{}
+		shouldDebug := regexp.MustCompile(d)
+		e, err := os.Create("debug.log")
+		if err != nil {
+			panic(err)
+		}
+
+		debugDraw = func(name string, img image.Image) error {
+			if !shouldDebug.MatchString(name) {
+				return nil
+			}
+
+			fmt.Fprintln(e, name)
+			frame := image.NewPaletted(img.Bounds(), palette)
+			draw.Over.Draw(frame, img.Bounds(), img, image.Point{})
+			dgif.Image = append(dgif.Image, frame)
+			dgif.Delay = append(dgif.Delay, 1) // 10ms, minimum delay
+			return nil
+		}
+		cleanup = func() error {
+			defer e.Close()
+			f, err := os.Create("debug.gif")
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+
+			if err := gif.EncodeAll(f, dgif); err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+
 	L.SetGlobal("set", L.NewFunction(func(L *lua.LState) int {
 		x := L.CheckNumber(1)
 		y := L.CheckNumber(2)
@@ -89,43 +143,43 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) {
 
 	{
 		black := L.NewUserData()
-		black.Value = color.Black
+		black.Value = palette[0]
 		L.SetGlobal("black", black)
 
 		white := L.NewUserData()
-		white.Value = color.RGBA{0, 0, 0, 255}
+		white.Value = palette[1]
 		L.SetGlobal("white", white)
 
 		red := L.NewUserData()
-		red.Value = color.RGBA{255, 0, 0, 255}
+		red.Value = palette[2]
 		L.SetGlobal("red", red)
 
 		blue := L.NewUserData()
-		blue.Value = color.RGBA{0, 0, 255, 255}
+		blue.Value = palette[3]
 		L.SetGlobal("blue", blue)
 
 		yellow := L.NewUserData()
-		yellow.Value = color.RGBA{255, 255, 0, 255}
+		yellow.Value = palette[4]
 		L.SetGlobal("yellow", yellow)
 
 		green := L.NewUserData()
-		green.Value = color.RGBA{0, 255, 0, 255}
+		green.Value = palette[5]
 		L.SetGlobal("green", green)
 
 		orange := L.NewUserData()
-		orange.Value = color.RGBA{255, 165, 0, 255}
+		orange.Value = palette[6]
 		L.SetGlobal("orange", orange)
 
 		purple := L.NewUserData()
-		purple.Value = color.RGBA{128, 0, 128, 255}
+		purple.Value = palette[7]
 		L.SetGlobal("purple", purple)
 
 		cyan := L.NewUserData()
-		cyan.Value = color.RGBA{0, 255, 255, 255}
+		cyan.Value = palette[8]
 		L.SetGlobal("cyan", cyan)
 
 		magenta := L.NewUserData()
-		magenta.Value = color.RGBA{255, 0, 255, 255}
+		magenta.Value = palette[9]
 		L.SetGlobal("magenta", magenta)
 	}
 
@@ -181,6 +235,8 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) {
 	}))
 
 	line := func(x1, y1, x2, y2 float64, c color.Color) {
+		debugDraw(fmt.Sprintf("line(%f, %f, %f, %f, <c>)", x1, y1, x2, y2), img)
+
 		if math.Round(x1) == math.Round(x2) {
 			for y := y1; y < y2; y++ {
 				img.Set(int(math.Round(x1)), int(math.Round(y)), c)
@@ -216,7 +272,7 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) {
 		border := checkColor(L, 4)
 		fill := checkColor(L, 5)
 
-		for t := 0.0; t < 2*math.Pi*r; t += 0.001 /* uhh */ {
+		for t := 0.0; t < 2*math.Pi*r; t += 0.1 /* uhh */ {
 			xt := r*math.Cos(t) + float64(x)
 			yt := r*math.Sin(t) + float64(y)
 
@@ -238,4 +294,6 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) {
 
 		return 0
 	}))
+
+	return
 }

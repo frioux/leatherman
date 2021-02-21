@@ -70,3 +70,9 @@ Something is wrong with `line` in certain situations (I'm assuming infinity or
 NaN or something is causing the issue.)  `line` is used when drawing `circle`s,
 so you can see the bug by drawing a circle and there will be weird gaps in the
 top and bottom of them.
+
+## DEBUGGING
+
+If you set the `LM_DEBUG_DRAW` env var a debug.gif and debug.log will be
+created with a frame / logline per event.  The env var should be set to a regex
+that filters events, so `.` will show all events.
