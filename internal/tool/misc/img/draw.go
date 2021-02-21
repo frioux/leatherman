@@ -11,6 +11,11 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+type ImageSetter interface {
+	image.Image
+	Set(int, int, color.Color)
+}
+
 func Draw(args []string, _ io.Reader) error {
 	if len(args) == 1 {
 		args = append(args, "")
@@ -30,7 +35,7 @@ func Draw(args []string, _ io.Reader) error {
 	return png.Encode(os.Stdout, img)
 }
 
-func luaEval(img *image.NRGBA, code []string) error {
+func luaEval(img ImageSetter, code []string) error {
 	L := lua.NewState()
 	defer L.Close()
 
@@ -54,7 +59,7 @@ func checkColor(L *lua.LState, w int) color.Color {
 	return nil
 }
 
-func registerImageFunctions(L *lua.LState, img *image.NRGBA) {
+func registerImageFunctions(L *lua.LState, img ImageSetter) {
 	L.SetGlobal("set", L.NewFunction(func(L *lua.LState) int {
 		x := L.CheckNumber(1)
 		y := L.CheckNumber(2)
@@ -205,7 +210,7 @@ func registerImageFunctions(L *lua.LState, img *image.NRGBA) {
 		border := checkColor(L, 4)
 		fill := checkColor(L, 5)
 
-		for t := 0.0; t < 2*math.Pi; t += 0.001 /* uhh */ {
+		for t := 0.0; t < 2*math.Pi*r; t += 0.001 /* uhh */ {
 			xt := r*math.Cos(t) + float64(x)
 			yt := r*math.Sin(t) + float64(y)
 
