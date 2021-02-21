@@ -171,31 +171,30 @@ func registerImageFunctions(L *lua.LState, img *image.NRGBA) {
 	}))
 
 	line := func(x1, y1, x2, y2 float64, c color.Color) {
-		m := (y2 - y1) / (x2 - x1)
-		// y = m*x + b
-		// y - m*x = b
-		// b = y - m*x
-		b := y1 - m*x1
-		l := math.Sqrt(math.Pow(x2-x1, 2) + math.Pow(y2-y1, 2))
-
-		if m == math.Inf(1) || m == math.Inf(-1) {
-			start, end := y1, y2
-			if start > end {
-				start, end = end, start
-			}
-			for y := start; y <= end; y += l / 1000 {
+		if math.Round(x1) == math.Round(x2) {
+			for y := y1; y < y2; y++ {
 				img.Set(int(math.Round(x1)), int(math.Round(y)), c)
 			}
-		} else {
-			start, end := x1, x2
-			if start > end {
-				start, end = end, start
+			return
+		} else if math.Round(y1) == math.Round(y2) {
+			for x := x1; x < x2; x++ {
+				img.Set(int(math.Round(x)), int(math.Round(y1)), c)
 			}
+			return
+		}
 
-			for x := start; x <= end; x += l / 1000 {
-				y := m*x + b
-				img.Set(int(math.Round(x)), int(math.Round(y)), c)
-			}
+		m := (y2 - y1) / (x2 - x1)
+		y := y1
+
+		start, end := x1, x2
+		if start > end {
+			start, end = end, start
+			y = y2
+		}
+
+		for x := start; x <= end; x++ {
+			img.Set(int(math.Round(x)), int(math.Round(y)), c)
+			y += m
 		}
 	}
 
@@ -206,17 +205,11 @@ func registerImageFunctions(L *lua.LState, img *image.NRGBA) {
 		border := checkColor(L, 4)
 		fill := checkColor(L, 5)
 
-		// draw borders
 		for t := 0.0; t < 2*math.Pi; t += 0.001 /* uhh */ {
 			xt := r*math.Cos(t) + float64(x)
 			yt := r*math.Sin(t) + float64(y)
 
 			line(float64(x), float64(y), xt, yt, fill)
-		}
-		for t := 0.0; t < 2*math.Pi; t += 0.001 /* uhh */ {
-			xt := r*math.Cos(t) + float64(x)
-			yt := r*math.Sin(t) + float64(y)
-
 			img.Set(int(math.Round(xt)), int(math.Round(yt)), border)
 		}
 
