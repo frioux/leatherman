@@ -26,6 +26,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/mail/email"
 	"github.com/frioux/leatherman/internal/tool/misc/backlight"
 	"github.com/frioux/leatherman/internal/tool/misc/bamboo"
+	"github.com/frioux/leatherman/internal/tool/misc/img"
 	"github.com/frioux/leatherman/internal/tool/misc/prependhist"
 	"github.com/frioux/leatherman/internal/tool/misc/smlist"
 	"github.com/frioux/leatherman/internal/tool/misc/status"
@@ -51,6 +52,7 @@ func init() {
 		"csv2json":             csv.ToJSON,
 		"csv2md":               csv.ToMarkdown,
 		"debounce":             debounce.Run,
+		"draw":                 img.Draw,
 		"dump-mozlz4":          dumpmozlz4.Run,
 		"email2json":           email.ToJSON,
 		"expand-url":           expandurl.Run,

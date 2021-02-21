@@ -30,6 +30,7 @@ import "embed"
 //go:embed internal/tool/mail/email/email2json.md
 //go:embed internal/tool/mail/email/render-mail.md
 //go:embed internal/tool/misc/backlight/backlight.md
+//go:embed internal/tool/misc/img/draw.md
 //go:embed internal/tool/misc/bamboo/export-bamboohr.md
 //go:embed internal/tool/misc/bamboo/export-bamboohr-tree.md
 //go:embed internal/tool/misc/prependhist/prepend-hist.md
@@ -100,6 +101,8 @@ var helpPaths = map[string]string{
 	"render-mail": "internal/tool/mail/email/render-mail.md",
 
 	"backlight": "internal/tool/misc/backlight/backlight.md",
+
+	"draw": "internal/tool/misc/img/draw.md",
 
 	"export-bamboohr": "internal/tool/misc/bamboo/export-bamboohr.md",
 
