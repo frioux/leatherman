@@ -76,7 +76,12 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) {
 		b := L.CheckNumber(3)
 
 		ud := L.NewUserData()
-		ud.Value = color.RGBA{uint8(r), uint8(g), uint8(b), 255}
+
+		if r >= 0 && r <= 1 && g >= 0 && g <= 1 && b >= 0 && b <= 1 {
+			ud.Value = color.RGBA{uint8(r * 255), uint8(g * 255), uint8(b * 255), 255}
+		} else {
+			ud.Value = color.RGBA{uint8(r), uint8(g), uint8(b), 255}
+		}
 
 		L.Push(ud)
 		return 1
@@ -207,6 +212,7 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) {
 		x := int(L.CheckNumber(1))
 		y := int(L.CheckNumber(2))
 		r := float64(L.CheckNumber(3))
+
 		border := checkColor(L, 4)
 		fill := checkColor(L, 5)
 

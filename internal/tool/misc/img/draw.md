@@ -18,7 +18,8 @@ Takes an x, y coordinate and sets it to a color.
 
 ### `rgb(r, g, b)`
 
-Takes a red, green, and blue value (from 0 to 255), returns a color value.
+Takes a red, green, and blue value (from 0 to 255 or as floating points from 0
+to 1), returns a color value.
 
 The following colors are defined as globals for you:
 
