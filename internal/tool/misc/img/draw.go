@@ -284,6 +284,33 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) (cleanup func() erro
 		return 0
 	}))
 
+	L.SetGlobal("circ", L.NewFunction(func(L *lua.LState) int {
+		xc := int(L.CheckNumber(1))
+		yc := int(L.CheckNumber(2))
+		r := float64(L.CheckNumber(3))
+
+		border := checkColor(L, 4)
+		fill := checkColor(L, 5)
+
+		for x := int(-r); x <= int(r); x++ {
+			for y := int(-r); y <= int(r); y++ {
+				if x*x+y*y <= int(r*r) {
+					img.Set(x+xc, y+yc, fill)
+				}
+			}
+		}
+
+		// improve with http://weber.itn.liu.se/~stegu/circle/circlealgorithm.pdf
+		for t := 0.0; t < 2*math.Pi; t += 1 / r {
+			xt := r*math.Cos(t) + float64(xc)
+			yt := r*math.Sin(t) + float64(yc)
+
+			img.Set(int(math.Round(xt)), int(math.Round(yt)), border)
+		}
+
+		return 0
+	}))
+
 	L.SetGlobal("line", L.NewFunction(func(L *lua.LState) int {
 		x1 := float64(L.CheckNumber(1))
 		y1 := float64(L.CheckNumber(2))

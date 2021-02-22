@@ -66,10 +66,8 @@ Draws a line from (x1, y1) to (x2, y2) in color.
 
 ## BUGS
 
-Something is wrong with `line` in certain situations (I'm assuming infinity or
-NaN or something is causing the issue.)  `line` is used when drawing `circle`s,
-so you can see the bug by drawing a circle and there will be weird gaps in the
-top and bottom of them.
+Line currently has gaps when the absolute value of the slope is high. I intend
+to fix that soon.
 
 ## DEBUGGING
 
