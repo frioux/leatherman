@@ -273,7 +273,7 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) (cleanup func() erro
 		border := checkColor(L, 4)
 		fill := checkColor(L, 5)
 
-		for t := 0.0; t < 2*math.Pi*r; t += 0.1 /* uhh */ {
+		for t := 0.0; t < 2*math.Pi; t += 1 / r {
 			xt := r*math.Cos(t) + float64(x)
 			yt := r*math.Sin(t) + float64(y)
 
