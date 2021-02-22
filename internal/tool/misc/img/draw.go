@@ -76,7 +76,8 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) (cleanup func() erro
 		color.RGBA{0, 255, 255, 255}, // cyan
 		color.RGBA{255, 0, 255, 255}, // magenta
 	})
-	var debugDraw func(string, image.Image) error
+	debugDraw := func(string, image.Image) error { return nil }
+	cleanup = func() error { return nil }
 
 	if d := os.Getenv("LM_DEBUG_DRAW"); d != "" {
 		dgif := &gif.GIF{}
