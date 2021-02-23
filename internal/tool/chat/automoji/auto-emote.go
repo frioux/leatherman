@@ -217,7 +217,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		L := lua.NewState()
 		L.OpenLibs()
-		L.DoString("coroutine=nil;debug=nil;io=nil;math=nil;os=nil;string=nil;table=nil")
+		L.DoString("coroutine=nil;debug=nil;io=nil;os=nil;string=nil;table=nil")
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
