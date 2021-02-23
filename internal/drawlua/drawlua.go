@@ -231,17 +231,33 @@ func registerImageFunctions(L *lua.LState, img ImageSetter) (cleanup func() erro
 		}
 
 		m := (y2 - y1) / (x2 - x1)
-		y := y1
 
-		start, end := x1, x2
-		if start > end {
-			start, end = end, start
-			y = y2
-		}
+		if m >= -1 && m <= 1 {
+			y := y1
+			start, end := x1, x2
+			if start > end {
+				start, end = end, start
+				y = y2
+			}
 
-		for x := start; x <= end; x++ {
-			img.Set(int(math.Round(x)), int(math.Round(y)), c)
-			y += m
+			for x := start; x <= end; x++ {
+				img.Set(int(math.Round(x)), int(math.Round(y)), c)
+				y += m
+			}
+		} else {
+			m1 := (x2 - x1) / (y2 - y1)
+			x := x1
+			start, end := y1, y2
+			if start > end {
+				start, end = end, start
+				x = x2
+			}
+
+			for y := start; y <= end; y++ {
+				img.Set(int(math.Round(x)), int(math.Round(y)), c)
+				x += m1
+			}
+
 		}
 	}
 
