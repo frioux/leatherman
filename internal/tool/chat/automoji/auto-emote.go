@@ -226,7 +226,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		defer done()
 
 		if err := L.DoString(code); err != nil {
-			if errors.Is(err, context.DeadlineExceeded) {
+			if strings.Contains(err.Error(), "context deadline exceeded") {
 				if err := s.MessageReactionAdd(m.ChannelID, m.Message.ID, "⏱"); err != nil {
 					fmt.Fprintln(os.Stderr, err)
 				}
