@@ -6,6 +6,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"image"
+	"image/png"
 	"io"
 	"log"
 	"math/rand"
@@ -14,16 +16,19 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/frioux/leatherman/internal/dropbox"
-	"github.com/frioux/leatherman/internal/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/expfmt"
 	lua "github.com/yuin/gopher-lua"
+
+	"github.com/frioux/leatherman/internal/drawlua"
+	"github.com/frioux/leatherman/internal/dropbox"
+	"github.com/frioux/leatherman/internal/version"
 )
 
 var registry = prometheus.NewRegistry()
@@ -198,6 +203,52 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Message.Content == "||hidden knowledge||" {
 		messageCreateTotal.WithLabelValues("hidden_knowledge").Inc()
 		showMetrics(s, m.ChannelID)
+		return
+	}
+
+	if strings.HasPrefix(m.Message.Content, "```lua\n") && strings.HasSuffix(m.Message.Content, "\n```") {
+		code := m.Message.Content
+		code = strings.TrimPrefix(code, "```lua\n")
+		code = strings.TrimSuffix(code, "\n```")
+
+		messageCreateTotal.WithLabelValues("drawlua").Inc()
+
+		img := image.NewNRGBA(image.Rect(0, 0, 128, 128))
+
+		L := lua.NewState()
+		L.OpenLibs()
+		L.DoString("coroutine=nil;debug=nil;io=nil;math=nil;os=nil;string=nil;table=nil")
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		L.SetContext(ctx)
+		done := drawlua.RegisterDrawFunctions(L, img)
+		defer done()
+
+		if err := L.DoString(code); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+
+		buf := &bytes.Buffer{}
+		if err := png.Encode(buf, img); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+
+		if _, err := s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{
+			Files: []*discordgo.File{
+				{
+					Name:        "drawlua.png",
+					ContentType: "image/png",
+					Reader:      buf,
+				},
+			},
+		}); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+
 		return
 	}
 

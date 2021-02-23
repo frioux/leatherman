@@ -23,7 +23,7 @@ func Eval(img ImageSetter, code []string) error {
 	L := lua.NewState()
 	defer L.Close()
 
-	cleanup := registerImageFunctions(L, img)
+	cleanup := RegisterDrawFunctions(L, img)
 
 	for _, c := range code {
 		if err := L.DoString(c); err != nil {
@@ -43,7 +43,7 @@ func checkColor(L *lua.LState, w int) color.Color {
 	return nil
 }
 
-func registerImageFunctions(L *lua.LState, img ImageSetter) (cleanup func() error) {
+func RegisterDrawFunctions(L *lua.LState, img ImageSetter) (cleanup func() error) {
 	palette := color.Palette([]color.Color{
 		color.Black,
 		color.RGBA{0, 0, 0, 255},     // white
