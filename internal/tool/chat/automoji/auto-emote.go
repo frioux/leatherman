@@ -245,6 +245,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				},
 			},
 		}); err != nil {
+			if errors.Is(err, context.DeadlineExceeded) {
+				if err := s.MessageReactionAdd(m.ChannelID, m.Message.ID, "⏱"); err != nil {
+					fmt.Fprintln(os.Stderr, err)
+				}
+			} else {
+				if err := s.MessageReactionAdd(m.ChannelID, m.Message.ID, "⚠"); err != nil {
+					fmt.Fprintln(os.Stderr, err)
+				}
+			}
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
