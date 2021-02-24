@@ -55,6 +55,7 @@ func RegisterDrawFunctions(L *lua.LState, img ImageSetter) (cleanup func() error
 		color.RGBA{128, 0, 128, 255}, // purple
 		color.RGBA{0, 255, 255, 255}, // cyan
 		color.RGBA{255, 0, 255, 255}, // magenta
+		color.RGBA{0, 0, 0, 0},       // clear
 	})
 	debugDraw := func(string, image.Image) error { return nil }
 	cleanup = func() error { return nil }
@@ -162,6 +163,10 @@ func RegisterDrawFunctions(L *lua.LState, img ImageSetter) (cleanup func() error
 		magenta := L.NewUserData()
 		magenta.Value = palette[9]
 		L.SetGlobal("magenta", magenta)
+
+		clear := L.NewUserData()
+		clear.Value = palette[10]
+		L.SetGlobal("clear", clear)
 	}
 
 	L.SetGlobal("sin", L.NewFunction(func(L *lua.LState) int {

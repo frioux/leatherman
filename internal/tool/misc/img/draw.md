@@ -33,6 +33,7 @@ The following colors are defined as globals for you:
  * purple
  * cyan
  * magenta
+ * clear
 
 ### `sin(t)`
 
