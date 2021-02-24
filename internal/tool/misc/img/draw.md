@@ -65,6 +65,10 @@ filled with fillcolor.
 
 Draws a line from (x1, y1) to (x2, y2) in color.
 
+### `bg(color)`
+
+Fills the whole picture with color.
+
 ## BUGS
 
 Line currently has gaps when the absolute value of the slope is high. I intend

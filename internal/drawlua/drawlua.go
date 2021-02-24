@@ -220,6 +220,18 @@ func RegisterDrawFunctions(L *lua.LState, img ImageSetter) (cleanup func() error
 		return 0
 	}))
 
+	L.SetGlobal("bg", L.NewFunction(func(L *lua.LState) int {
+		c := checkColor(L, 1)
+
+		for x := 0; x < 128; x++ {
+			for y := 0; y < 128; y++ {
+				img.Set(x, y, c)
+			}
+		}
+
+		return 0
+	}))
+
 	line := func(x1, y1, x2, y2 float64, c color.Color) {
 		debugDraw(fmt.Sprintf("line(%f, %f, %f, %f, <c>)", x1, y1, x2, y2), img)
 
