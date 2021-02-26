@@ -26,7 +26,7 @@ require (
 	github.com/yuin/goldmark v1.3.2
 	github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da
 	golang.org/x/text v0.3.5
-	modernc.org/sqlite v1.8.7
+	modernc.org/sqlite v1.8.8
 )
 
 go 1.16
