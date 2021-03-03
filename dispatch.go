@@ -26,6 +26,7 @@ import (
 	"github.com/frioux/leatherman/internal/tool/mail/email"
 	"github.com/frioux/leatherman/internal/tool/misc/backlight"
 	"github.com/frioux/leatherman/internal/tool/misc/bamboo"
+	"github.com/frioux/leatherman/internal/tool/misc/desktop"
 	"github.com/frioux/leatherman/internal/tool/misc/img"
 	"github.com/frioux/leatherman/internal/tool/misc/prependhist"
 	"github.com/frioux/leatherman/internal/tool/misc/smlist"
@@ -60,6 +61,7 @@ func init() {
 		"export-bamboohr-tree": bamboo.ExportOrgChart,
 		"fn":                   fn.Run,
 		"group-by-date":        groupbydate.Run,
+		"media-remote":         desktop.MediaRemote,
 		"minotaur":             minotaur.Run,
 		"name2rune":            uni.ToRune,
 		"netrc-password":       netrcpassword.Run,

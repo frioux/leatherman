@@ -33,6 +33,7 @@ import "embed"
 //go:embed internal/tool/misc/img/draw.md
 //go:embed internal/tool/misc/bamboo/export-bamboohr.md
 //go:embed internal/tool/misc/bamboo/export-bamboohr-tree.md
+//go:embed internal/tool/misc/desktop/media-remote.md
 //go:embed internal/tool/misc/prependhist/prepend-hist.md
 //go:embed internal/tool/misc/smlist/sm-list.md
 //go:embed internal/tool/misc/status/status.md
@@ -107,6 +108,8 @@ var helpPaths = map[string]string{
 	"export-bamboohr": "internal/tool/misc/bamboo/export-bamboohr.md",
 
 	"export-bamboohr-tree": "internal/tool/misc/bamboo/export-bamboohr-tree.md",
+
+	"media-remote": "internal/tool/misc/desktop/media-remote.md",
 
 	"prepend-hist": "internal/tool/misc/prependhist/prepend-hist.md",
 
