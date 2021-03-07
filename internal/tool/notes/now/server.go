@@ -12,13 +12,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/frioux/leatherman/internal/dropbox"
-	"github.com/frioux/leatherman/internal/notes"
-	"github.com/frioux/leatherman/internal/selfupdate"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
+
+	"github.com/frioux/leatherman/internal/dropbox"
+	"github.com/frioux/leatherman/internal/lmhttp"
+	"github.com/frioux/leatherman/internal/notes"
+	"github.com/frioux/leatherman/internal/selfupdate"
 )
 
 // 3. list and sort all files with `todo-` prefix
@@ -35,15 +37,6 @@ const prelude = `<!DOCTYPE html>
 <a href="/list">list</a> | <a href="/sup">sup</a> | <a href="/">now</a>
 <br><br>
 `
-
-type handlerFunc func(http.ResponseWriter, *http.Request) error
-
-func (f handlerFunc) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	if err := f(rw, r); err != nil {
-		rw.WriteHeader(500)
-		fmt.Fprintln(os.Stderr, err)
-	}
-}
 
 func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 	mux := http.NewServeMux()
@@ -79,7 +72,7 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 
 	mux.Handle("/version/", selfupdate.Handler)
 
-	mux.Handle("/", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+	mux.Handle("/", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		if req.URL.Path == "/" {
 			r, err := db.Download(nowPath)
 			if err != nil {
@@ -113,7 +106,7 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 		return err
 	}))
 
-	mux.Handle("/list", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+	mux.Handle("/list", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		stmt, err := z.Preparex(`SELECT title, url FROM articles ORDER BY title`)
 		if err != nil {
 			return err
@@ -133,7 +126,7 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 		return mdwn.Convert(buf.Bytes(), rw)
 	}))
 
-	mux.Handle("/q", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+	mux.Handle("/q", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		q := req.URL.Query().Get("q")
 		if q == "" {
 			q = "SELECT * FROM articles"
@@ -154,9 +147,9 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 		return mdwn.Convert(buf.Bytes(), rw)
 	}))
 
-	mux.Handle("/sup", handlerFunc(sup))
+	mux.Handle("/sup", lmhttp.HandlerFunc(sup))
 
-	mux.Handle("/update", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+	mux.Handle("/update", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		switch req.Method {
 		case "GET":
 			f := req.URL.Query().Get("file")
@@ -211,7 +204,7 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 		return errors.New("invalid method for /update")
 	}))
 
-	mux.Handle("/toggle", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+	mux.Handle("/toggle", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		if err := req.ParseForm(); err != nil {
 			return err
 		}
@@ -252,7 +245,7 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 		return mdwn.Convert(b, rw)
 	}))
 
-	mux.Handle("/add-item", handlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+	mux.Handle("/add-item", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		if err := req.ParseForm(); err != nil {
 			return err
 		}
