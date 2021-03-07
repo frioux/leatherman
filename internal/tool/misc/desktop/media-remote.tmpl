@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>select a player</title>
+    <script src="/media-remote.js"></script>
+</head>
+
+<body>
+    <p>
+       Hover over a player to resume playing on that player.
+       If it's the player you want media keys to work with click the link.
+       After that, <pre>media-remote -pause</pre> (or whatever other subcommands) will use that player.
+    </p>
+    <h1>Players</h1>
+    <ul>
+        {{range .}}
+        <li><a onmouseover="over(this)" onmouseout="out(this)" onclick="selectOutput(this)" href="#">{{.}}</a></li>
+        {{end}}
+    </ul>
+</body>
+
+</html>
