@@ -54,7 +54,7 @@ func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata)
 
 			r, err := cl.Download(e.PathLower)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintf(os.Stderr, "dropbox.Download: %s\n", err)
 				return
 			}
 
@@ -157,7 +157,7 @@ func populateDB(cl dropbox.Client, dir string, z *notes.Zine, tx sqlx.Preparer) 
 	var r dropbox.ListFolderResult
 	r, err := cl.ListFolder(dropbox.ListFolderParams{Path: dir})
 	if err != nil {
-		return err
+		return fmt.Errorf("dropbox.ListFolder: %w", err)
 	}
 
 	entries := r.Entries
@@ -165,7 +165,7 @@ func populateDB(cl dropbox.Client, dir string, z *notes.Zine, tx sqlx.Preparer) 
 	for r.HasMore {
 		r, err = cl.ListFolderContinue(r.Cursor)
 		if err != nil {
-			return err
+			return fmt.Errorf("dropbox.ListFolderContinue: %w", err)
 		}
 
 		entries = append(entries, r.Entries...)
@@ -184,7 +184,7 @@ func populateDB(cl dropbox.Client, dir string, z *notes.Zine, tx sqlx.Preparer) 
 			// unclear what to do about errors here
 			r, err := cl.Download(dir + name)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintf(os.Stderr, "dropbox.Download: %s\n", err)
 				return
 			}
 

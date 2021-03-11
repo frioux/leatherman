@@ -88,6 +88,10 @@ func (cl Client) ListFolder(p ListFolderParams) (ListFolderResult, error) {
 	}
 	defer resp.Body.Close()
 
+	if err := cl.handleError(resp); err != nil {
+		return ListFolderResult{}, err
+	}
+
 	var ret ListFolderResult
 	d := json.NewDecoder(resp.Body)
 

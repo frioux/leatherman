@@ -3,7 +3,6 @@ package dropbox
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -43,12 +42,8 @@ func (cl Client) Download(path string) (io.Reader, error) {
 		return nil, fmt.Errorf("http.Client.Do: %w", err)
 	}
 
-	if resp.StatusCode > 399 {
-		buf := &bytes.Buffer{}
-		if _, err := io.Copy(buf, resp.Body); err != nil {
-			return nil, fmt.Errorf("io.Copy: %w", err)
-		}
-		return nil, errors.New(buf.String())
+	if err := cl.handleError(resp); err != nil {
+		return nil, err
 	}
 
 	return resp.Body, nil
