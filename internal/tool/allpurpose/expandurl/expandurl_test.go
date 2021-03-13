@@ -2,27 +2,25 @@ package expandurl
 
 import (
 	"bytes"
+	_ "embed"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
 	"github.com/frioux/leatherman/internal/testutil"
 )
 
+//go:embed testdata/test.html
+var testhtml []byte
+
 func TestRun(t *testing.T) {
 	t.Parallel()
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		f, err := os.Open("./testdata/test.html")
-		if err != nil {
-			panic(err)
-		}
-		defer f.Close()
-		if _, err := io.Copy(w, f); err != nil {
+		if _, err := io.Copy(w, bytes.NewReader(testhtml)); err != nil {
 			panic(err)
 		}
 	}))
