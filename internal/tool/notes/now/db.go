@@ -58,7 +58,7 @@ func syncEventsToDB(fss fs.FS, z *notes.Zine, events []fsnotify.Event) (err erro
 
 			b, err := fs.ReadFile(fss, e.Name)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "dropbox.Download: %s\n", err)
+				fmt.Fprintf(os.Stderr, "fs.ReadFile: %s\n", err)
 				return
 			}
 
@@ -183,7 +183,7 @@ func populateDB(f fs.FS, z *notes.Zine, tx sqlx.Preparer) error {
 			// unclear what to do about errors here
 			b, err := fs.ReadFile(f, name)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "dropbox.Download: %s\n", err)
+				fmt.Fprintf(os.Stderr, "fs.ReadFile: %s\n", err)
 				return
 			}
 
