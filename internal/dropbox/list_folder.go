@@ -173,6 +173,10 @@ func (cl Client) ListFolderLongPoll(ctx context.Context, cursor string, timeout 
 	}
 	defer resp.Body.Close()
 
+	if err := cl.handleError(resp); err != nil {
+		return false, 0, err
+	}
+
 	var ret struct {
 		Changes bool `json:"changes"`
 		Backoff int  `json:"backoff"`
