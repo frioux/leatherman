@@ -13,8 +13,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/frioux/leatherman/internal/dropbox"
 	_ "modernc.org/sqlite"
+
+	"github.com/frioux/leatherman/internal/dropbox"
+	"github.com/frioux/leatherman/internal/lmfs"
 )
 
 func Serve(args []string, _ io.Reader) error {
@@ -46,7 +48,7 @@ func Serve(args []string, _ io.Reader) error {
 			return err
 		}
 	} else {
-		f = os.DirFS(path)
+		f = lmfs.OpenDirFS(path)
 	}
 
 	generation := make(chan bool)
