@@ -6,9 +6,8 @@ import (
 	"fmt"
 	corehtml "html"
 	"io"
-	"io/ioutil"
+	"io/fs"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -17,7 +16,7 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 
-	"github.com/frioux/leatherman/internal/dropbox"
+	"github.com/frioux/leatherman/internal/lmfs"
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/frioux/leatherman/internal/notes"
 	"github.com/frioux/leatherman/internal/selfupdate"
@@ -38,7 +37,7 @@ const prelude = `<!DOCTYPE html>
 <br><br>
 `
 
-func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
+func server(fss fs.FS, z *notes.Zine, generation *chan bool) (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	mdwn := goldmark.New(
@@ -53,17 +52,8 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 			extension.Table,
 		),
 	)
-	db, err := dropbox.NewClient(dropbox.Client{
-		Token: os.Getenv("LM_DROPBOX_TOKEN"),
-	})
-	if err != nil {
-		return nil, err
-	}
 
-	const (
-		dir     = "/notes/content/posts/"
-		nowPath = dir + "now.md"
-	)
+	const nowPath = "now.md"
 
 	mux.Handle("/favicon", http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 		rw.Header().Add("Content-Type", "image/svg+xml")
@@ -74,12 +64,12 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 
 	mux.Handle("/", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		if req.URL.Path == "/" {
-			r, err := db.Download(nowPath)
+			b, err := fs.ReadFile(fss, nowPath)
 			if err != nil {
 				return err
 			}
 
-			b, err := parseNow(r, time.Now())
+			b, err = parseNow(bytes.NewReader(b), time.Now())
 			if err != nil {
 				return err
 			}
@@ -157,12 +147,7 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 				return errors.New("file parameter required")
 			}
 
-			r, err := db.Download(dir + f)
-			if err != nil {
-				return err
-			}
-
-			b, err := ioutil.ReadAll(r)
+			b, err := fs.ReadFile(fss, f)
 			if err != nil {
 				return err
 			}
@@ -189,11 +174,7 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 			}
 
 			b = strings.ReplaceAll(b, "\r", "") // unix files only!
-			err = db.Create(dropbox.UploadParams{
-				Path: dir + f,
-				Mode: "overwrite",
-			}, strings.NewReader(b))
-			if err != nil {
+			if err := lmfs.WriteFile(fss, f, []byte(b), 0); err != nil {
 				return err
 			}
 			rw.Header().Add("Location", "/"+strings.TrimSuffix(f, ".md"))
@@ -216,20 +197,17 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 			return nil
 		}
 
-		r, err := db.Download(nowPath)
+		b, err := fs.ReadFile(fss, nowPath)
 		if err != nil {
 			return err
 		}
 
-		b, err := toggleNow(r, time.Now(), v)
+		b, err = toggleNow(bytes.NewReader(b), time.Now(), v)
 		if err != nil {
 			return err
 		}
 
-		if err := db.Create(dropbox.UploadParams{
-			Path: nowPath,
-			Mode: "overwrite",
-		}, bytes.NewReader(b)); err != nil {
+		if err := lmfs.WriteFile(fss, nowPath, b, 0); err != nil {
 			return err
 		}
 
@@ -257,20 +235,17 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 			return nil
 		}
 
-		r, err := db.Download(nowPath)
+		b, err := fs.ReadFile(fss, nowPath)
 		if err != nil {
 			return err
 		}
 
-		b, err := addItem(r, time.Now(), v)
+		b, err = addItem(bytes.NewReader(b), time.Now(), v)
 		if err != nil {
 			return err
 		}
 
-		if err := db.Create(dropbox.UploadParams{
-			Path: nowPath,
-			Mode: "overwrite",
-		}, bytes.NewReader(b)); err != nil {
+		if err := lmfs.WriteFile(fss, nowPath, b, 0); err != nil {
 			return err
 		}
 

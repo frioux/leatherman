@@ -1,19 +1,23 @@
 package now
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io/fs"
 	"os"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/frioux/leatherman/internal/dropbox"
-	"github.com/frioux/leatherman/internal/notes"
+	"github.com/fsnotify/fsnotify"
 	"github.com/jmoiron/sqlx"
+
+	"github.com/frioux/leatherman/internal/lmfs"
+	"github.com/frioux/leatherman/internal/notes"
 )
 
-func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata) (err error) {
+func syncEventsToDB(fss fs.FS, z *notes.Zine, events []fsnotify.Event) (err error) {
 	tx, err := z.Beginx()
 	if err != nil {
 		return err
@@ -47,18 +51,18 @@ func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata)
 				articles[i].URL = strings.TrimSuffix(e.Name, ".md")
 			}()
 
-			if e.Tag == "deleted" {
+			if e.Op == fsnotify.Remove {
 				articles[i].deleted = true
 				return
 			}
 
-			r, err := cl.Download(e.PathLower)
+			b, err := fs.ReadFile(fss, e.Name)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "dropbox.Download: %s\n", err)
 				return
 			}
 
-			articles[i].Article, err = notes.ReadArticle(r)
+			articles[i].Article, err = notes.ReadArticle(bytes.NewReader(b))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
@@ -85,13 +89,20 @@ func syncEventsToDB(cl dropbox.Client, z *notes.Zine, events []dropbox.Metadata)
 	return nil
 }
 
-func maintainDB(cl dropbox.Client, dir string, generation *chan bool, z *notes.Zine) {
-	watcher := make(chan []dropbox.Metadata)
-	go func() { cl.Longpoll(context.Background(), dir, watcher) }()
+func maintainDB(fss fs.FS, generation *chan bool, z *notes.Zine) {
+	wfs, ok := fss.(lmfs.WatchFS)
+	if !ok {
+		fmt.Fprintf(os.Stderr, "cannot maintainDB on an FS that can't watch (fs is a %T)\n", fss)
+		return
+	}
+	watcher, err := wfs.Watch(context.Background(), ".")
+	if err != nil {
+		panic(err)
+	}
 	go func() {
 		for events := range watcher {
-			if err := syncEventsToDB(cl, z, events); err != nil {
-				fmt.Fprintln(os.Stderr, err)
+			if err := syncEventsToDB(fss, z, events); err != nil {
+				fmt.Fprintf(os.Stderr, "syncEventsToDB: %s\n", err)
 			}
 			close(*generation)
 			*generation = make(chan bool)
@@ -100,12 +111,12 @@ func maintainDB(cl dropbox.Client, dir string, generation *chan bool, z *notes.Z
 	go func() {
 		for {
 			time.Sleep(time.Hour)
-			rebuildDB(cl, dir, z)
+			rebuildDB(fss, z)
 		}
 	}()
 }
 
-func rebuildDB(cl dropbox.Client, dir string, z *notes.Zine) (err error) {
+func rebuildDB(f fs.FS, z *notes.Zine) (err error) {
 	tx, err := z.Beginx()
 	if err != nil {
 		return err
@@ -124,7 +135,7 @@ func rebuildDB(cl dropbox.Client, dir string, z *notes.Zine) (err error) {
 		return err
 	}
 
-	if err := populateDB(cl, dir, z, tx); err != nil {
+	if err := populateDB(f, z, tx); err != nil {
 		return err
 	}
 
@@ -151,24 +162,12 @@ func clearDB(z *notes.Zine, tx sqlx.Preparer) error {
 	return nil
 }
 
-func populateDB(cl dropbox.Client, dir string, z *notes.Zine, tx sqlx.Preparer) error {
+func populateDB(f fs.FS, z *notes.Zine, tx sqlx.Preparer) error {
 	t0 := time.Now()
 
-	var r dropbox.ListFolderResult
-	r, err := cl.ListFolder(dropbox.ListFolderParams{Path: dir})
+	entries, err := fs.ReadDir(f, ".")
 	if err != nil {
-		return fmt.Errorf("dropbox.ListFolder: %w", err)
-	}
-
-	entries := r.Entries
-
-	for r.HasMore {
-		r, err = cl.ListFolderContinue(r.Cursor)
-		if err != nil {
-			return fmt.Errorf("dropbox.ListFolderContinue: %w", err)
-		}
-
-		entries = append(entries, r.Entries...)
+		return fmt.Errorf("fs.ReadDir: %w", err)
 	}
 
 	articles := make([]notes.Article, len(entries))
@@ -176,19 +175,19 @@ func populateDB(cl dropbox.Client, dir string, z *notes.Zine, tx sqlx.Preparer) 
 	for i, e := range entries {
 		wg.Add(1)
 
-		name := e.Name
+		name := e.Name()
 		i := i
 		go func() {
 			defer wg.Done()
 
 			// unclear what to do about errors here
-			r, err := cl.Download(dir + name)
+			b, err := fs.ReadFile(f, name)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "dropbox.Download: %s\n", err)
 				return
 			}
 
-			articles[i], err = notes.ReadArticle(r)
+			articles[i], err = notes.ReadArticle(bytes.NewReader(b))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
@@ -210,7 +209,7 @@ func populateDB(cl dropbox.Client, dir string, z *notes.Zine, tx sqlx.Preparer) 
 	return nil
 }
 
-func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine, err error) {
+func loadDB(f fs.FS, generation *chan bool) (z *notes.Zine, err error) {
 	z, err = notes.NewZine("")
 	if err != nil {
 		return nil, err
@@ -229,10 +228,10 @@ func loadDB(cl dropbox.Client, dir string, generation *chan bool) (z *notes.Zine
 		}
 	}()
 
-	if err := populateDB(cl, dir, z, tx); err != nil {
-		return nil, err
+	if err := populateDB(f, z, tx); err != nil {
+		return nil, fmt.Errorf("populateDB: %w", err)
 	}
 
-	maintainDB(cl, dir, generation, z)
+	maintainDB(f, generation, z)
 	return z, nil
 }

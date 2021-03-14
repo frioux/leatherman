@@ -1,8 +1,7 @@
 package automoji
 
 import (
-	"bufio"
-	"io"
+	"bytes"
 	"os"
 	"regexp"
 	"strings"
@@ -17,24 +16,24 @@ func loadLua(dbCl dropbox.Client, path string) error {
 	defer luaMu.Unlock()
 
 	var (
-		r   io.Reader
+		b   []byte
 		err error
 	)
 	if strings.HasPrefix(path, "file://") {
 		path = strings.TrimPrefix(path, "file://")
-		r, err = os.Open(path)
+		b, err = os.ReadFile(path)
 		if err != nil {
 			return err
 		}
 
 	} else {
-		r, err = dbCl.Download(path)
+		b, err = dbCl.Download(path)
 		if err != nil {
 			return err
 		}
 	}
 
-	reader := bufio.NewReader(r)
+	reader := bytes.NewReader(b)
 	chunk, err := parse.Parse(reader, ":memory:")
 	if err != nil {
 		return err

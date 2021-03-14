@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
-	"os"
-	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -16,7 +14,7 @@ import (
 )
 
 type Zine struct {
-	Root string
+	fs.FS
 
 	PublicPrefix string
 
@@ -102,11 +100,11 @@ func (z *Zine) Load(as *[]Article) error {
 	var files []string
 
 	// parse index first so it can override header and footer
-	if _, err := z.tpl.ParseFiles(z.Root + "/index.tmpl"); err != nil {
+	if _, err := z.tpl.ParseFS(z.FS, "index.tmpl"); err != nil {
 		return err
 	}
 
-	if err := filepath.WalkDir(z.Root, func(path string, _ fs.DirEntry, err error) error {
+	if err := fs.WalkDir(z.FS, ".", func(path string, _ fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -131,16 +129,13 @@ func (z *Zine) Load(as *[]Article) error {
 	for _, f := range files {
 		var err error
 
-		a, err = readArticleFromFile(f)
+		a, err = readArticleFromFS(z.FS, f)
 		if err != nil {
 			return fmt.Errorf("error parsing %s: %w", f, err)
 		}
 		a.Filename = f
 
-		a.URL, err = filepath.Rel(z.Root, f)
-		if err != nil {
-			return fmt.Errorf("error getting relname for %s: %w", f, err)
-		}
+		a.URL = f
 		a.URL = z.PublicPrefix + a.URL
 		if a.Filename == "index.tmpl" || strings.HasSuffix(a.Filename, "index.tmpl") {
 			a.URL = strings.TrimSuffix(a.URL, "index.tmpl")
@@ -199,8 +194,8 @@ func (z *Zine) Render(a Article) ([]byte, error) {
 	return out.Bytes(), nil
 }
 
-func readArticleFromFile(f string) (Article, error) {
-	r, err := os.Open(f)
+func readArticleFromFS(fss fs.FS, f string) (Article, error) {
+	r, err := fss.Open(f)
 	if err != nil {
 		return Article{}, err
 	}

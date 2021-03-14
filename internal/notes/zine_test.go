@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"os"
 	"testing"
 
 	"github.com/frioux/leatherman/internal/testutil"
@@ -160,7 +161,7 @@ func BenchmarkLoadNilNil(b *testing.B) {
 		if err != nil {
 			b.Fatalf("couldn't create zine: %s", err)
 		}
-		z.Root = "testdata"
+		z.FS = os.DirFS("testdata")
 
 		b.StartTimer()
 		if err := z.Load(nil); err != nil {
@@ -168,8 +169,6 @@ func BenchmarkLoadNilNil(b *testing.B) {
 		}
 	}
 	b.StopTimer()
-
-	S = z.Root
 }
 
 func BenchmarkLoadXY(b *testing.B) {
@@ -185,7 +184,7 @@ func BenchmarkLoadXY(b *testing.B) {
 		if err != nil {
 			b.Fatalf("couldn't create zine: %s", err)
 		}
-		z.Root = "testdata"
+		z.FS = os.DirFS("testdata")
 
 		b.StartTimer()
 		var as []Article
@@ -195,7 +194,5 @@ func BenchmarkLoadXY(b *testing.B) {
 		c += len(as)
 	}
 	b.StopTimer()
-
-	S = z.Root
 	C = c
 }

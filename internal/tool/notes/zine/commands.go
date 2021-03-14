@@ -63,7 +63,7 @@ func q(args []string) error {
 	if err != nil {
 		return err
 	}
-	z.Root = root
+	z.FS = os.DirFS(root)
 	if err := z.Load(nil); err != nil {
 		return err
 	}
@@ -100,8 +100,8 @@ func render(args []string) error {
 	if err != nil {
 		return err
 	}
-	z.Root = root
 	z.PublicPrefix = publicPrefix
+	z.FS = os.DirFS(root)
 
 	metas := []notes.Article{}
 	if err := z.Load(&metas); err != nil {
@@ -198,7 +198,7 @@ func debug(args []string) error {
 	if err != nil {
 		return err
 	}
-	z.Root = root
+	z.FS = os.DirFS(root)
 
 	metas := []notes.Article{}
 	if err := z.Load(&metas); err != nil {

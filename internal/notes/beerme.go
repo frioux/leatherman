@@ -2,6 +2,7 @@ package notes
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -46,11 +47,11 @@ func beerMe(r io.Reader) (string, error) {
 
 func inspireMe(cl dropbox.Client) func(_ string, _ []twilio.Media) (string, error) {
 	return func(_ string, _ []twilio.Media) (string, error) {
-		r, err := cl.Download("/notes/content/posts/inspiration.md")
+		b, err := cl.Download("/notes/content/posts/inspiration.md")
 		if err != nil {
 			return personality.Err(), fmt.Errorf("dropbox.Download: %w", err)
 		}
-		n, err := beerMe(r)
+		n, err := beerMe(bytes.NewReader(b))
 		if err != nil {
 			return personality.Err(), err
 		}

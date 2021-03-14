@@ -24,7 +24,7 @@ func encodeDownloadParams(path string) (string, error) {
 }
 
 // Download a file
-func (cl Client) Download(path string) (io.Reader, error) {
+func (cl Client) Download(path string) ([]byte, error) {
 	req, err := http.NewRequest("POST", "https://content.dropboxapi.com/2/files/download", &bytes.Buffer{})
 	if err != nil {
 		return nil, fmt.Errorf("http.NewRequest: %w", err)
@@ -41,10 +41,11 @@ func (cl Client) Download(path string) (io.Reader, error) {
 	if err != nil {
 		return nil, fmt.Errorf("http.Client.Do: %w", err)
 	}
+	defer resp.Body.Close()
 
 	if err := cl.handleError(resp); err != nil {
 		return nil, err
 	}
 
-	return resp.Body, nil
+	return io.ReadAll(resp.Body)
 }
