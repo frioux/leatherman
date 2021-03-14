@@ -9,8 +9,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"time"
-
-	"github.com/frioux/leatherman/internal/dropbox"
 )
 
 var errARGone = errors.New("auto-reload channel closed")
@@ -33,7 +31,7 @@ func doReload(ch <-chan struct{}, dir string, generation *chan bool) error {
 	}
 }
 
-func autoReload(db dropbox.Client, h http.Handler, generation *chan bool, dir string) (handler http.Handler, err error) {
+func autoReload(h http.Handler, generation *chan bool) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		f, ok := rw.(http.Flusher)
 		if !ok {
@@ -148,5 +146,5 @@ func autoReload(db dropbox.Client, h http.Handler, generation *chan bool, dir st
 				fmt.Fprint(rw, js)
 			}
 		}
-	}), nil
+	})
 }

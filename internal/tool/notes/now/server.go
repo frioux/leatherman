@@ -286,10 +286,5 @@ func server(z *notes.Zine, generation *chan bool) (http.Handler, error) {
 		return mdwn.Convert(b, rw)
 	}))
 
-	arMux, err := autoReload(db, mux, generation, dir)
-	if err != nil {
-		return nil, err
-	}
-
-	return arMux, nil
+	return autoReload(mux, generation), nil
 }
