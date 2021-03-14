@@ -126,6 +126,8 @@ func (f FS) Watch(ctx context.Context, dir string) (chan []fsnotify.Event, error
 					events[i].Op = fsnotify.Remove
 				case "file":
 					events[i].Op = fsnotify.Create
+				case "folder":
+					events[i].Op = fsnotify.Create
 				default:
 					panic("unknown longpoll tag: " + m.Tag)
 				}
