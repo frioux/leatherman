@@ -21,7 +21,7 @@ require (
 	github.com/mattn/go-isatty v0.0.12
 	github.com/pierrec/lz4/v3 v3.3.2
 	github.com/prometheus/client_golang v1.9.0
-	github.com/prometheus/common v0.18.0
+	github.com/prometheus/common v0.19.0
 	github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3
 	github.com/ulikunitz/xz v0.5.10
 	github.com/yuin/goldmark v1.3.2
