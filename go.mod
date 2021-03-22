@@ -24,7 +24,7 @@ require (
 	github.com/prometheus/common v0.19.0
 	github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3
 	github.com/ulikunitz/xz v0.5.10
-	github.com/yuin/goldmark v1.3.2
+	github.com/yuin/goldmark v1.3.3
 	github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da
 	golang.org/x/text v0.3.5
 	modernc.org/sqlite v1.10.0
