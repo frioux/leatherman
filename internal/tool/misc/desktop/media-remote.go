@@ -37,7 +37,7 @@ func MediaRemote(args []string, _ io.Reader) error {
 	fs.BoolVar(&pause, "pause", false, "calls org.mpris.MediaPlayer2.Player.Pause method")
 	fs.BoolVar(&playPause, "play-pause", false, "calls org.mpris.MediaPlayer2.Player.PlayPause method")
 	fs.BoolVar(&next, "next", false, "calls org.mpris.MediaPlayer2.Player.Next method")
-	fs.BoolVar(&prev, "prev", false, "calls org.mpris.MediaPlayer2.Player.Prev method")
+	fs.BoolVar(&prev, "prev", false, "calls org.mpris.MediaPlayer2.Player.Previous method")
 	fs.StringVar(&raw, "raw", "", "calls whatever method you pass with no arguments")
 	fs.BoolVar(&selectPlayerFlag, "select-player", false, "selects  player")
 	fs.DurationVar(&timeout, "timeout", 3*time.Minute, "after this amount of time the program will shut down")
@@ -89,7 +89,7 @@ func MediaRemote(args []string, _ io.Reader) error {
 	case next:
 		method += "Player.Next"
 	case prev:
-		method += "Player.Prev"
+		method += "Player.Previous"
 	case raw != "":
 		method = raw
 	case selectPlayerFlag:
