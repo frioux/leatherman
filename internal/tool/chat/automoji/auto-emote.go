@@ -9,34 +9,21 @@ import (
 	"image"
 	"image/png"
 	"io"
-	"log"
 	"math/rand"
-	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/common/expfmt"
 	lua "github.com/yuin/gopher-lua"
 
 	"github.com/frioux/leatherman/internal/drawlua"
 	"github.com/frioux/leatherman/internal/dropbox"
 	"github.com/frioux/leatherman/internal/version"
 )
-
-var registry = prometheus.NewRegistry()
-
-func mustRegister(cs ...prometheus.Collector) {
-	registry.MustRegister(cs...)
-	prometheus.MustRegister(cs...)
-}
 
 var luaC string
 
@@ -94,11 +81,6 @@ func Run(args []string, _ io.Reader) error {
 		go dbCl.Longpoll(context.Background(), filepath.Dir(p), responsesChanged)
 	}
 
-	go func() {
-		http.Handle("/metrics", promhttp.Handler())
-		log.Fatal(http.ListenAndServe(":8080", nil))
-	}()
-
 	token := os.Getenv("LM_DISCORD_TOKEN")
 	if token == "" {
 		return errors.New("set LM_DISCORD_TOKEN to use auto-emote")
@@ -133,18 +115,8 @@ var maxes = map[int]int{
 	5: 10,
 }
 
-var reactTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-	Name: "automoji_react_total",
-	Help: "counter incremented each time a message is reacted to",
-}, []string{"max"})
-
-func init() {
-	mustRegister(reactTotal)
-}
-
 func react(s *discordgo.Session, channelID, messageID string, es *emojiSet) {
 	max := maxes[rand.Intn(6)]
-	reactTotal.WithLabelValues(strconv.Itoa(max)).Inc()
 	for i, e := range es.all(max) {
 		// the 20 here is to limit to possibly fewer than were returned
 		if i == 20 {
@@ -156,22 +128,10 @@ func react(s *discordgo.Session, channelID, messageID string, es *emojiSet) {
 	}
 }
 
-var messageReactionAddTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-	Name: "automoji_message_reaction_add_total",
-	Help: "counter incremented for each message reaction add",
-}, []string{"react"})
-
-func init() {
-	mustRegister(messageReactionAddTotal)
-}
-
 func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 	if (a.GuildID != "" && a.Emoji.Name != "bot") || (a.GuildID == "" && a.Emoji.Name != "🤖") {
-		messageReactionAddTotal.WithLabelValues("no").Inc()
 		return
 	}
-
-	messageReactionAddTotal.WithLabelValues("yes").Inc()
 
 	m, err := s.ChannelMessage(a.ChannelID, a.MessageID)
 	if err != nil {
@@ -187,31 +147,14 @@ func emojiAdd(s *discordgo.Session, a *discordgo.MessageReactionAdd) {
 	react(s, a.ChannelID, a.MessageID, es)
 }
 
-var messageCreateTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-	Name: "automoji_message_create_total",
-	Help: "counter incremented for each message create",
-}, []string{"react"})
-
-func init() {
-	mustRegister(messageCreateTotal)
-}
-
 var luaFn *lua.FunctionProto
 var luaMu = &sync.Mutex{}
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Message.Content == "||hidden knowledge||" {
-		messageCreateTotal.WithLabelValues("hidden_knowledge").Inc()
-		showMetrics(s, m.ChannelID)
-		return
-	}
-
 	if strings.HasPrefix(m.Message.Content, "```lua\n") && strings.HasSuffix(m.Message.Content, "\n```") {
 		code := m.Message.Content
 		code = strings.TrimPrefix(code, "```lua\n")
 		code = strings.TrimSuffix(code, "\n```")
-
-		messageCreateTotal.WithLabelValues("drawlua").Inc()
 
 		img := image.NewNRGBA(image.Rect(0, 0, 128, 128))
 
@@ -262,7 +205,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if m.Message.Content == "||version||" {
-		messageCreateTotal.WithLabelValues("version").Inc()
 		if _, err := s.ChannelMessageSend(m.ChannelID, version.Version); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
@@ -278,38 +220,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	lucky := rand.Intn(100) == 0
 
 	if m == nil || m.Message == nil {
-		messageCreateTotal.WithLabelValues("wtf").Inc()
 		return
 	}
 
 	if !lucky && len(es.required) == 0 {
-		messageCreateTotal.WithLabelValues("unlucky").Inc()
 		return
 	}
 
 	if len(es.required) == 0 {
-		messageCreateTotal.WithLabelValues("lucky").Inc()
 		es.required = append(es.required, "🎰")
 	}
 
 	react(s, m.ChannelID, m.ID, es)
-}
-
-func showMetrics(s *discordgo.Session, channelID string) {
-	ms, err := registry.Gather()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
-	}
-
-	buf := &bytes.Buffer{}
-	buf.Write([]byte("```\n"))
-	for _, m := range ms {
-		expfmt.MetricFamilyToText(buf, m)
-	}
-	buf.Write([]byte("```\n"))
-
-	if _, err := s.ChannelMessageSend(channelID, buf.String()); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
 }
