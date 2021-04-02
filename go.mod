@@ -24,7 +24,7 @@ require (
 	github.com/ulikunitz/xz v0.5.10
 	github.com/yuin/goldmark v1.3.3
 	github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da
-	golang.org/x/text v0.3.5
+	golang.org/x/text v0.3.6
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	modernc.org/sqlite v1.10.0
