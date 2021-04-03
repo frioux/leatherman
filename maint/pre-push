@@ -1,0 +1,13 @@
+#!/bin/sh
+
+err=$(GOOS=windows go build -o /dev/null)
+if [ $? -ne 0 ]; then
+        echo "$err"
+        exit 1
+fi
+
+err=$(go test ./...)
+if [ $? -ne 0 ]; then
+        echo "$err"
+        exit 1
+fi
