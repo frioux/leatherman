@@ -100,7 +100,8 @@ func doUpdate(url string) {
 
 	err = isSameFile(curp)
 	if err != nil {
-		return
+		fmt.Fprintf(os.Stderr, "not same file (%s) assuming update is ready, exiting\n", err)
+		os.Exit(0)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
