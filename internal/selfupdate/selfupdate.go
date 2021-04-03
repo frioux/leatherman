@@ -11,6 +11,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/frioux/leatherman/internal/lmhttp"
@@ -95,6 +96,23 @@ func doUpdate(url string) {
 	curp, err := os.Executable()
 	if err != nil {
 		err = fmt.Errorf("couldn't get os.Executable: %w", err)
+		return
+	}
+
+	statExe, err := os.Stat(curp)
+	if err != nil {
+		err = fmt.Errorf("couldn't stat %s: %w", curp, err)
+		return
+	}
+
+	statSelf, err := os.Stat("/proc/self/exe")
+	if err != nil {
+		err = fmt.Errorf("couldn't stat /proc/self/exec: %w", err)
+		return
+	}
+
+	if statExe.Sys().(*syscall.Stat_t).Ino != statSelf.Sys().(*syscall.Stat_t).Ino {
+		err = fmt.Errorf("inodes don't match, something else must be updating already")
 		return
 	}
 
