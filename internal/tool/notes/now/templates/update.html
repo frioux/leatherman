@@ -1,0 +1,11 @@
+{{ template "header.html" .}}
+
+<form action="/update" method="post">
+        <button>Save</button>
+        <br>
+        <input type="hidden" name="file" value="{{.File}}" />
+        <textarea rows="50" cols="80" name="value">{{.Content}}</textarea>
+        <br>
+        <button>Save</button>
+</form>
+{{ template "footer.html" .}}

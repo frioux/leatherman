@@ -1,0 +1,16 @@
+{{ template "header.html" .}}
+
+<dl>
+        <dt>retropie</dt> <dd>{{.RetroPie}}</dd>        
+        <dt>steamos</dt> <dd>{{.SteamOS}}</dd>        
+        <dt>pi400</dt> <dd>{{.Pi400}}</dd>        
+</dl>
+
+<h2>Versions</h2>
+<ul>
+{{- range .Versions}}
+  <li>{{.HTML}}</li>
+{{- end -}}
+</ul>
+{{ template "footer.html" .}}
+

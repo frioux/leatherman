@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	corehtml "html"
 	"io"
 	"io/fs"
 	"net/http"
@@ -26,25 +25,14 @@ import (
 //   * list(db) ([]file, error)
 //   * render
 
-const prelude = `<!DOCTYPE html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1" /> 
-<title>%s</title>
-<link rel="icon" href="/favicon">
-</head>
-<a href="/list">list</a> | <a href="/sup">sup</a> | <a href="/">now</a>
-<br><br>
-`
-
-func handlerAddItem(fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handler {
+func handlerAddItem(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		if err := req.ParseForm(); err != nil {
 			return err
 		}
 
-		v := req.Form.Get("item")
-		if v == "" {
+		i := req.Form.Get("item")
+		if i == "" {
 			rw.WriteHeader(400)
 			fmt.Fprint(rw, "missing item parameter")
 			return nil
@@ -55,7 +43,7 @@ func handlerAddItem(fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Hand
 			return err
 		}
 
-		b, err = addItem(bytes.NewReader(b), time.Now(), v)
+		b, err = addItem(bytes.NewReader(b), time.Now(), i)
 		if err != nil {
 			return err
 		}
@@ -64,16 +52,20 @@ func handlerAddItem(fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Hand
 			return err
 		}
 
+		rw.Header().Add("Location", "/")
+		rw.WriteHeader(303)
+
 		b, err = parseNow(bytes.NewReader(b), time.Now())
 		if err != nil {
 			return err
 		}
 
-		rw.Header().Add("Location", "/")
-		rw.WriteHeader(303)
+		v := &HTMLVars{Zine: z, Title: "now"}
+		if err := mdwn.Convert(b, v); err != nil {
+			return err
+		}
 
-		fmt.Fprintln(rw, prelude)
-		return mdwn.Convert(b, rw)
+		return tpl.ExecuteTemplate(rw, "simple.html", v)
 	})
 }
 
@@ -91,41 +83,29 @@ func handlerList(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown) http.Handler 
 			return err
 		}
 
-		articles := make([]struct{ Title, URL string }, 0, 1000)
-		if err := stmt.Select(&articles); err != nil {
+		v := listVars{HTMLVars: &HTMLVars{Zine: z}}
+		if err := stmt.Select(&v.Articles); err != nil {
 			return err
 		}
 
-		buf := &bytes.Buffer{}
-		for _, e := range articles {
-			fmt.Fprintln(buf, " * ["+e.Title+"]("+e.URL+")")
-		}
-
-		fmt.Fprintf(rw, prelude, "now: list")
-		return mdwn.Convert(buf.Bytes(), rw)
+		return tpl.ExecuteTemplate(rw, "list.html", v)
 	})
 }
 
 func handlerQ(z *notes.Zine, mdwn goldmark.Markdown) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		v := qVars{HTMLVars: &HTMLVars{Zine: z}}
 		q := req.URL.Query().Get("q")
 		if q == "" {
 			q = "SELECT * FROM articles"
 		}
-		ret, err := z.Q(q)
+		var err error
+		v.Records, err = z.Q(q)
 		if err != nil {
 			return err
 		}
 
-		buf := &bytes.Buffer{}
-		fmt.Fprintf(buf, "```\n")
-		for _, e := range ret {
-			fmt.Fprintf(buf, "%v\n", e)
-		}
-		fmt.Fprintf(buf, "```\n")
-
-		fmt.Fprintf(rw, prelude, "now: q")
-		return mdwn.Convert(buf.Bytes(), rw)
+		return tpl.ExecuteTemplate(rw, "q.html", v)
 	})
 }
 
@@ -142,8 +122,14 @@ func handlerRoot(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath strin
 				return err
 			}
 
-			fmt.Fprintf(rw, prelude, "now")
-			return mdwn.Convert(b, rw)
+			v := &HTMLVars{Zine: z, Title: "now"}
+			if err := mdwn.Convert(b, v); err != nil {
+				return err
+			}
+
+			if err := tpl.ExecuteTemplate(rw, "simple.html", v); err != nil {
+				return err
+			}
 		}
 
 		f := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/") + ".md"
@@ -152,27 +138,35 @@ func handlerRoot(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath strin
 			return fmt.Errorf("LoadArticle: %w", err)
 		}
 
-		fmt.Fprintf(rw, prelude, "now: "+a.Title)
-		fmt.Fprintf(rw, `<br><a href="/update?file=%s">Update %s</a><br>`, f, f)
+		v := articleVars{
+			HTMLVars:     &HTMLVars{Zine: z},
+			ArticleTitle: a.Title,
+			Filename:     f,
+		}
 
 		b, err := z.Render(a)
 		if err != nil {
 			return fmt.Errorf("Render: %w", err)
 		}
 		buf := bytes.NewBuffer(b)
-		_, err = io.Copy(rw, buf)
-		return err
+		if _, err := io.Copy(v, buf); err != nil {
+			return err
+		}
+		if err := tpl.ExecuteTemplate(rw, "article.html", v); err != nil {
+			return err
+		}
+		return nil
 	})
 }
 
-func handlerToggle(fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handler {
+func handlerToggle(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		if err := req.ParseForm(); err != nil {
 			return err
 		}
 
-		v := req.Form.Get("chunk")
-		if v == "" {
+		c := req.Form.Get("chunk")
+		if c == "" {
 			rw.WriteHeader(400)
 			fmt.Fprint(rw, "missing chunk parameter")
 			return nil
@@ -183,7 +177,7 @@ func handlerToggle(fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handl
 			return err
 		}
 
-		b, err = toggleNow(bytes.NewReader(b), time.Now(), v)
+		b, err = toggleNow(bytes.NewReader(b), time.Now(), c)
 		if err != nil {
 			return err
 		}
@@ -192,16 +186,21 @@ func handlerToggle(fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handl
 			return err
 		}
 
+		rw.Header().Add("Location", "/")
+		rw.WriteHeader(303)
+
 		b, err = parseNow(bytes.NewReader(b), time.Now())
 		if err != nil {
 			return err
 		}
 
-		rw.Header().Add("Location", "/")
-		rw.WriteHeader(303)
+		v := &HTMLVars{Zine: z, Title: "now"}
+		if err := mdwn.Convert(b, v); err != nil {
+			return err
+		}
 
-		fmt.Fprintln(rw, prelude)
-		return mdwn.Convert(b, rw)
+		return tpl.ExecuteTemplate(rw, "simple.html", v)
+
 	})
 }
 
@@ -219,16 +218,13 @@ func handlerUpdate(z *notes.Zine, fss fs.FS) http.Handler {
 				return err
 			}
 
-			fmt.Fprintf(rw, prelude, "now: update "+f)
-			const form = `
-<form action="/update" method="post">
-	<input type="hidden" name="file" value="%s" />
-	<textarea rows="50" cols="80" name="value">%s</textarea>
-	<button>Save</button>
-</form>
-			`
-			fmt.Fprintf(rw, form, f, corehtml.EscapeString(string(b)))
-			return nil
+			v := updateVars{
+				HTMLVars: &HTMLVars{Zine: z},
+				File:     f,
+				Content:  string(b),
+			}
+
+			return tpl.ExecuteTemplate(rw, "update.html", v)
 		case "POST":
 			f := req.FormValue("file")
 			if f == "" {
@@ -281,13 +277,13 @@ func server(fss fs.FS, z *notes.Zine, generation *chan bool) (http.Handler, erro
 
 	mux.Handle("/q", handlerQ(z, mdwn))
 
-	mux.Handle("/sup", handlerSup())
+	mux.Handle("/sup", handlerSup(z))
 
 	mux.Handle("/update", handlerUpdate(z, fss))
 
-	mux.Handle("/toggle", handlerToggle(fss, mdwn, nowPath))
+	mux.Handle("/toggle", handlerToggle(z, fss, mdwn, nowPath))
 
-	mux.Handle("/add-item", handlerAddItem(fss, mdwn, nowPath))
+	mux.Handle("/add-item", handlerAddItem(z, fss, mdwn, nowPath))
 
 	return autoReload(mux, generation), nil
 }

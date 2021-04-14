@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	"github.com/frioux/leatherman/internal/lmhttp"
+	"github.com/frioux/leatherman/internal/notes"
 )
 
 func loadPeers() ([]string, error) {
@@ -42,32 +44,38 @@ func loadPeers() ([]string, error) {
 	return ret, nil
 }
 
-func peerVersion(ctx context.Context, hostname string) (ret string) {
-	defer func() { ret = hostname + ": " + ret }()
+func peerVersion(ctx context.Context, hostname string) (ret option) {
+	defer func() {
+		if ret.error != nil {
+			ret.error = fmt.Errorf("%s: %w", hostname, ret.error)
+		} else {
+			ret.value = fmt.Sprintf("%s: %s", hostname, ret.value)
+		}
+	}()
 	resp, err := lmhttp.Get(ctx, "http://"+hostname+":8081/version")
 	if err != nil {
-		return err.Error()
+		return option{error: err}
 	}
 	defer resp.Body.Close()
 
 	s := bufio.NewScanner(resp.Body)
 	for s.Scan() {
-		return s.Text() // silly, return first line
+		return option{value: s.Text()} // silly, return first line
 	}
 
-	return "???"
+	return option{error: errors.New("???")}
 }
 
-func allVersions(ctx context.Context) []string {
+func allVersions(ctx context.Context) []option {
 	peers, err := loadPeers()
 	if err != nil {
-		return []string{"couldn't load peers: " + err.Error()}
+		return []option{{error: fmt.Errorf("couldn't load peers: %w", err)}}
 	}
 
 	wg := &sync.WaitGroup{}
 	wg.Add(len(peers))
 
-	ret := make([]string, len(peers))
+	ret := make([]option, len(peers))
 
 	for i, p := range peers {
 		go func(i int, p string) {
@@ -81,91 +89,70 @@ func allVersions(ctx context.Context) []string {
 	return ret
 }
 
-func handlerSup() http.Handler {
+func handlerSup(z *notes.Zine) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		ctx, cancel := context.WithTimeout(req.Context(), 2*time.Second)
 		defer cancel()
 
+		v := supVars{HTMLVars: &HTMLVars{Zine: z}}
 		wg := &sync.WaitGroup{}
 
 		wg.Add(1)
-		var rpi struct{ Game string }
 		go func() {
 			defer wg.Done()
 			resp, err := lmhttp.Get(ctx, "http://retropie:8081/retropie")
 			if err != nil {
 				// whyyyyy
-				rpi.Game = err.Error()
+				v.retroPie.error = err
 				return
 			}
 			defer resp.Body.Close()
 
+			var decodeable struct{ Game string }
 			dec := json.NewDecoder(resp.Body)
-			if err := dec.Decode(&rpi); err != nil {
-				// ugh wtf
-				rpi.Game = "ERR: " + err.Error()
-			}
+			v.retroPie.error = dec.Decode(&decodeable)
+			v.retroPie.value = decodeable.Game
 		}()
 
 		wg.Add(1)
-		var steamos []byte
 		go func() {
 			defer wg.Done()
 			resp, err := lmhttp.Get(ctx, "http://steamos:8081/steambox")
 			if err != nil {
-				// I don't like it
-				steamos = []byte(err.Error())
+				v.steamOS.error = err
 				return
 			}
 			defer resp.Body.Close()
 
-			steamos, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				// I should have thought this through more carefully
-				steamos = []byte("ERR: " + err.Error())
-			}
+			v.steamOS.value, v.steamOS.error = ioutil.ReadAll(resp.Body)
 		}()
 
 		wg.Add(1)
-		var pi400 []byte
 		go func() {
 			defer wg.Done()
 			resp, err := lmhttp.Get(ctx, "http://pi400:8081/x11title")
 			if err != nil {
-				// I don't like it
-				pi400 = []byte(err.Error())
+				v.pi400.error = err
 				return
 			}
 			defer resp.Body.Close()
 
-			pi400, err = ioutil.ReadAll(resp.Body)
+			b, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
-				// I should have thought this through more carefully
-				pi400 = []byte("ERR: " + err.Error())
+				v.pi400.error = err
 			} else {
-				pi400 = []byte(`<a href="http://pi400:8081/x11shot">` + string(pi400) + `</a>`)
+				v.pi400.value = `<a href="http://pi400:8081/x11shot">` + string(b) + `</a>`
 			}
 		}()
 
 		wg.Add(1)
-		var versions []string
 		go func() {
 			defer wg.Done()
-			versions = allVersions(ctx)
+			v.Versions = allVersions(ctx)
 		}()
 
 		wg.Wait()
 
-		fmt.Fprintf(rw, prelude, "now: sup")
-		fmt.Fprintf(rw, "retropie: %s<br>\n", rpi.Game)
-		fmt.Fprintf(rw, "steamos: %s<br>\n", steamos)
-		fmt.Fprintf(rw, "pi400: %s<br>\n", pi400)
-		fmt.Fprintln(rw, "\n<br>versions:<br><ul>")
-		for _, v := range versions {
-			fmt.Fprintf(rw, "<li>%s</li>\n", v)
-		}
-		fmt.Fprintln(rw, "</ul>")
-
-		return nil
+		return tpl.ExecuteTemplate(rw, "sup.html", v)
 	})
 }

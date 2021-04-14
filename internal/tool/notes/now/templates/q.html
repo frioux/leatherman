@@ -1,0 +1,7 @@
+{{ template "header.html" .}}
+<pre>
+{{- range .Records}}
+{{printf "%#v" . }}
+{{- end -}}
+</pre>
+{{ template "footer.html" .}}
