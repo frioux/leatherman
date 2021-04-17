@@ -37,32 +37,100 @@ const prelude = `<!DOCTYPE html>
 <br><br>
 `
 
-func server(fss fs.FS, z *notes.Zine, generation *chan bool) (http.Handler, error) {
-	mux := http.NewServeMux()
+func handlerAddItem(fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handler {
+	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		if err := req.ParseForm(); err != nil {
+			return err
+		}
 
-	mdwn := goldmark.New(
-		goldmark.WithParserOptions(
-			parser.WithAutoHeadingID(),
-		),
-		goldmark.WithRendererOptions(
-			html.WithUnsafe(),
-		),
-		goldmark.WithExtensions(
-			extension.Strikethrough,
-			extension.Table,
-		),
-	)
+		v := req.Form.Get("item")
+		if v == "" {
+			rw.WriteHeader(400)
+			fmt.Fprint(rw, "missing item parameter")
+			return nil
+		}
 
-	const nowPath = "now.md"
+		b, err := fs.ReadFile(fss, nowPath)
+		if err != nil {
+			return err
+		}
 
-	mux.Handle("/favicon", http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
+		b, err = addItem(bytes.NewReader(b), time.Now(), v)
+		if err != nil {
+			return err
+		}
+
+		if err := lmfs.WriteFile(fss, nowPath, b, 0); err != nil {
+			return err
+		}
+
+		b, err = parseNow(bytes.NewReader(b), time.Now())
+		if err != nil {
+			return err
+		}
+
+		rw.Header().Add("Location", "/")
+		rw.WriteHeader(303)
+
+		fmt.Fprintln(rw, prelude)
+		return mdwn.Convert(b, rw)
+	})
+}
+
+func handlerFavicon() http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 		rw.Header().Add("Content-Type", "image/svg+xml")
 		fmt.Fprintln(rw, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">☕</text></svg>`)
-	}))
+	})
+}
 
-	mux.Handle("/version/", selfupdate.Handler)
+func handlerList(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown) http.Handler {
+	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		stmt, err := z.Preparex(`SELECT title, url FROM articles ORDER BY title`)
+		if err != nil {
+			return err
+		}
 
-	mux.Handle("/", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		articles := make([]struct{ Title, URL string }, 0, 1000)
+		if err := stmt.Select(&articles); err != nil {
+			return err
+		}
+
+		buf := &bytes.Buffer{}
+		for _, e := range articles {
+			fmt.Fprintln(buf, " * ["+e.Title+"]("+e.URL+")")
+		}
+
+		fmt.Fprintf(rw, prelude, "now: list")
+		return mdwn.Convert(buf.Bytes(), rw)
+	})
+}
+
+func handlerQ(z *notes.Zine, mdwn goldmark.Markdown) http.Handler {
+	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		q := req.URL.Query().Get("q")
+		if q == "" {
+			q = "SELECT * FROM articles"
+		}
+		ret, err := z.Q(q)
+		if err != nil {
+			return err
+		}
+
+		buf := &bytes.Buffer{}
+		fmt.Fprintf(buf, "```\n")
+		for _, e := range ret {
+			fmt.Fprintf(buf, "%v\n", e)
+		}
+		fmt.Fprintf(buf, "```\n")
+
+		fmt.Fprintf(rw, prelude, "now: q")
+		return mdwn.Convert(buf.Bytes(), rw)
+	})
+}
+
+func handlerRoot(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handler {
+	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		if req.URL.Path == "/" {
 			b, err := fs.ReadFile(fss, nowPath)
 			if err != nil {
@@ -94,52 +162,51 @@ func server(fss fs.FS, z *notes.Zine, generation *chan bool) (http.Handler, erro
 		buf := bytes.NewBuffer(b)
 		_, err = io.Copy(rw, buf)
 		return err
-	}))
+	})
+}
 
-	mux.Handle("/list", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		stmt, err := z.Preparex(`SELECT title, url FROM articles ORDER BY title`)
+func handlerToggle(fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handler {
+	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		if err := req.ParseForm(); err != nil {
+			return err
+		}
+
+		v := req.Form.Get("chunk")
+		if v == "" {
+			rw.WriteHeader(400)
+			fmt.Fprint(rw, "missing chunk parameter")
+			return nil
+		}
+
+		b, err := fs.ReadFile(fss, nowPath)
 		if err != nil {
 			return err
 		}
 
-		articles := make([]struct{ Title, URL string }, 0, 1000)
-		if err := stmt.Select(&articles); err != nil {
-			return err
-		}
-
-		buf := &bytes.Buffer{}
-		for _, e := range articles {
-			fmt.Fprintln(buf, " * ["+e.Title+"]("+e.URL+")")
-		}
-
-		fmt.Fprintf(rw, prelude, "now: list")
-		return mdwn.Convert(buf.Bytes(), rw)
-	}))
-
-	mux.Handle("/q", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		q := req.URL.Query().Get("q")
-		if q == "" {
-			q = "SELECT * FROM articles"
-		}
-		ret, err := z.Q(q)
+		b, err = toggleNow(bytes.NewReader(b), time.Now(), v)
 		if err != nil {
 			return err
 		}
 
-		buf := &bytes.Buffer{}
-		fmt.Fprintf(buf, "```\n")
-		for _, e := range ret {
-			fmt.Fprintf(buf, "%v\n", e)
+		if err := lmfs.WriteFile(fss, nowPath, b, 0); err != nil {
+			return err
 		}
-		fmt.Fprintf(buf, "```\n")
 
-		fmt.Fprintf(rw, prelude, "now: q")
-		return mdwn.Convert(buf.Bytes(), rw)
-	}))
+		b, err = parseNow(bytes.NewReader(b), time.Now())
+		if err != nil {
+			return err
+		}
 
-	mux.Handle("/sup", lmhttp.HandlerFunc(sup))
+		rw.Header().Add("Location", "/")
+		rw.WriteHeader(303)
 
-	mux.Handle("/update", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		fmt.Fprintln(rw, prelude)
+		return mdwn.Convert(b, rw)
+	})
+}
+
+func handlerUpdate(z *notes.Zine, fss fs.FS) http.Handler {
+	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
 		switch req.Method {
 		case "GET":
 			f := req.URL.Query().Get("file")
@@ -183,83 +250,44 @@ func server(fss fs.FS, z *notes.Zine, generation *chan bool) (http.Handler, erro
 			return nil
 		}
 		return errors.New("invalid method for /update")
-	}))
+	})
+}
 
-	mux.Handle("/toggle", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		if err := req.ParseForm(); err != nil {
-			return err
-		}
+func server(fss fs.FS, z *notes.Zine, generation *chan bool) (http.Handler, error) {
+	mux := http.NewServeMux()
 
-		v := req.Form.Get("chunk")
-		if v == "" {
-			rw.WriteHeader(400)
-			fmt.Fprint(rw, "missing chunk parameter")
-			return nil
-		}
+	mdwn := goldmark.New(
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
+		),
+		goldmark.WithRendererOptions(
+			html.WithUnsafe(),
+		),
+		goldmark.WithExtensions(
+			extension.Strikethrough,
+			extension.Table,
+		),
+	)
 
-		b, err := fs.ReadFile(fss, nowPath)
-		if err != nil {
-			return err
-		}
+	const nowPath = "now.md"
 
-		b, err = toggleNow(bytes.NewReader(b), time.Now(), v)
-		if err != nil {
-			return err
-		}
+	mux.Handle("/favicon", handlerFavicon())
 
-		if err := lmfs.WriteFile(fss, nowPath, b, 0); err != nil {
-			return err
-		}
+	mux.Handle("/version/", selfupdate.Handler)
 
-		b, err = parseNow(bytes.NewReader(b), time.Now())
-		if err != nil {
-			return err
-		}
+	mux.Handle("/", handlerRoot(z, fss, mdwn, nowPath))
 
-		rw.Header().Add("Location", "/")
-		rw.WriteHeader(303)
+	mux.Handle("/list", handlerList(z, fss, mdwn))
 
-		fmt.Fprintln(rw, prelude)
-		return mdwn.Convert(b, rw)
-	}))
+	mux.Handle("/q", handlerQ(z, mdwn))
 
-	mux.Handle("/add-item", lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		if err := req.ParseForm(); err != nil {
-			return err
-		}
+	mux.Handle("/sup", handlerSup())
 
-		v := req.Form.Get("item")
-		if v == "" {
-			rw.WriteHeader(400)
-			fmt.Fprint(rw, "missing item parameter")
-			return nil
-		}
+	mux.Handle("/update", handlerUpdate(z, fss))
 
-		b, err := fs.ReadFile(fss, nowPath)
-		if err != nil {
-			return err
-		}
+	mux.Handle("/toggle", handlerToggle(fss, mdwn, nowPath))
 
-		b, err = addItem(bytes.NewReader(b), time.Now(), v)
-		if err != nil {
-			return err
-		}
-
-		if err := lmfs.WriteFile(fss, nowPath, b, 0); err != nil {
-			return err
-		}
-
-		b, err = parseNow(bytes.NewReader(b), time.Now())
-		if err != nil {
-			return err
-		}
-
-		rw.Header().Add("Location", "/")
-		rw.WriteHeader(303)
-
-		fmt.Fprintln(rw, prelude)
-		return mdwn.Convert(b, rw)
-	}))
+	mux.Handle("/add-item", handlerAddItem(fss, mdwn, nowPath))
 
 	return autoReload(mux, generation), nil
 }
