@@ -105,7 +105,7 @@ func (f FS) ReadFile(name string) ([]byte, error) {
 	return b, nil
 }
 
-func (f FS) Remove(name string) error { return f.cl.Delete(name) }
+func (f FS) Remove(name string) error { return f.cl.Delete(filepath.Join(f.dir, name)) }
 
 func (f FS) Watch(ctx context.Context, dir string) (chan []fsnotify.Event, error) {
 
