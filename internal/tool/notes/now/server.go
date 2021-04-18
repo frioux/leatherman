@@ -206,8 +206,8 @@ func handlerToggle(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath str
 
 func handlerUpdate(z *notes.Zine, fss fs.FS) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
-		switch req.Method {
-		case "GET":
+		switch {
+		case req.Method == "GET":
 			f := req.URL.Query().Get("file")
 			if f == "" {
 				return errors.New("file parameter required")
@@ -225,7 +225,7 @@ func handlerUpdate(z *notes.Zine, fss fs.FS) http.Handler {
 			}
 
 			return tpl.ExecuteTemplate(rw, "update.html", v)
-		case "POST":
+		case req.Method == "POST" && req.FormValue("delete") != "1":
 			f := req.FormValue("file")
 			if f == "" {
 				return errors.New("file parameter required")
@@ -243,6 +243,20 @@ func handlerUpdate(z *notes.Zine, fss fs.FS) http.Handler {
 			rw.Header().Add("Location", "/"+strings.TrimSuffix(f, ".md"))
 			rw.WriteHeader(303)
 			fmt.Fprint(rw, "Successfully updated")
+			return nil
+		case req.Method == "POST" && req.FormValue("delete") == "1":
+			f := req.FormValue("file")
+			if f == "" {
+				return errors.New("file parameter required")
+			}
+
+			if err := lmfs.Remove(fss, f); err != nil {
+				return err
+			}
+
+			rw.Header().Add("Location", "/")
+			rw.WriteHeader(303)
+			fmt.Fprint(rw, "Successfully deleted")
 			return nil
 		}
 		return errors.New("invalid method for /update")
