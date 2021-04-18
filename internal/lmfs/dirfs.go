@@ -66,6 +66,8 @@ func addDir(watcher *fsnotify.Watcher, path string) error {
 	})
 }
 
+func (fss dirFS) Remove(name string) error { return os.Remove(string(fss) + "/" + name) }
+
 func (fss dirFS) Watch(ctx context.Context, path string) (chan []fsnotify.Event, error) {
 	watchroot := filepath.Join(string(fss), path)
 	ch := make(chan []fsnotify.Event)

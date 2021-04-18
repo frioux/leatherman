@@ -76,3 +76,17 @@ func Watch(ctx context.Context, fss fs.FS, dir string) (chan []fsnotify.Event, e
 
 	return wfs.Watch(ctx, dir)
 }
+
+type RemoveFS interface {
+	fs.FS
+	Remove(string) error
+}
+
+func Remove(fss fs.FS, path string) error {
+	rfs, ok := fss.(RemoveFS)
+	if !ok {
+		return errUnsupported
+	}
+
+	return rfs.Remove(path)
+}
