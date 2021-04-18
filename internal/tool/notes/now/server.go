@@ -130,12 +130,14 @@ func handlerRoot(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath strin
 			if err := tpl.ExecuteTemplate(rw, "simple.html", v); err != nil {
 				return err
 			}
+
+			return nil
 		}
 
 		f := strings.TrimSuffix(strings.TrimPrefix(req.URL.Path, "/"), "/") + ".md"
 		a, err := z.LoadArticle(z.DB, f)
 		if err != nil {
-			return fmt.Errorf("LoadArticle: %w", err)
+			return fmt.Errorf("LoadArticle (%s): %w", f, err)
 		}
 
 		v := articleVars{
