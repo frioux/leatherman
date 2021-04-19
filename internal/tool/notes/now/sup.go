@@ -124,7 +124,8 @@ func handlerSup(z *notes.Zine) http.Handler {
 			}
 			defer resp.Body.Close()
 
-			v.steamOS.value, v.steamOS.error = ioutil.ReadAll(resp.Body)
+			b, err := ioutil.ReadAll(resp.Body)
+			v.steamOS.value, v.steamOS.error = string(b), err
 		}()
 
 		wg.Add(1)
