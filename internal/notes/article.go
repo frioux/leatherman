@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"regexp"
 
 	"github.com/tailscale/hujson"
 )
@@ -29,7 +30,14 @@ type Article struct {
 	Extra map[string]string
 
 	Body []byte
+
+	// MarkdownLua can be used both to filter the Body at render time as
+	// well as allowing interactive functionality implemented in the page
+	// itself
+	MarkdownLua []byte
 }
+
+var mdluaMatcher = regexp.MustCompile("(?s)```mdlua\n(.*?)```\n")
 
 func ReadArticle(r io.Reader) (Article, error) {
 	var a Article
@@ -38,7 +46,7 @@ func ReadArticle(r io.Reader) (Article, error) {
 	if err != nil {
 		return a, fmt.Errorf("hujson.Decoder.Decode: %w", err)
 	}
-	a.Body, err = ioutil.ReadAll(d.Buffered())
+	raw, err := ioutil.ReadAll(d.Buffered())
 	if err != nil {
 		return a, fmt.Errorf("hujson.Decoder.Buffered+ioutil.ReadAll: %w", err)
 	}
@@ -48,7 +56,14 @@ func ReadArticle(r io.Reader) (Article, error) {
 		return a, err
 	}
 
-	a.Body = append(a.Body, c...)
+	raw = append(raw, c...)
+
+	found := mdluaMatcher.FindAllSubmatch(raw, -1)
+	for _, f := range found {
+		a.MarkdownLua = append(a.MarkdownLua, f[1]...)
+	}
+
+	a.Body = mdluaMatcher.ReplaceAll(raw, nil)
 
 	return a, err
 }

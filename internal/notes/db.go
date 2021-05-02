@@ -15,11 +15,12 @@ CREATE TABLE articles (
 	filename,
 	reviewed_on NULLABLE,
 	review_by NULLABLE,
-	body
+	body,
+	markdownlua
 );
 CREATE TABLE article_tag ( id, tag );
-CREATE VIEW _ ( id, title, url, filename, body, reviewed_on, review_by, tag) AS
-	SELECT a.rowid, title, url, filename, body, reviewed_on, review_by, tag
+CREATE VIEW _ ( id, title, url, filename, body, markdownlua, reviewed_on, review_by, tag) AS
+	SELECT a.rowid, title, url, filename, body, markdownlua, reviewed_on, review_by, tag
 	FROM articles a
 	JOIN article_tag at ON a.rowid = at.id;
 `
@@ -85,12 +86,12 @@ func (d *DB) InsertArticle(db sqlx.Preparer, a Article) error {
 	}
 
 	stmt, err := sqlx.Preparex(db, `INSERT INTO articles (
-		title, url, filename, reviewed_on, review_by, body
-	) VALUES (?, ?, ?, ?, ?, ?)`)
+		title, url, filename, reviewed_on, review_by, body, markdownlua
+	) VALUES (?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		return err
 	}
-	r, err := stmt.Exec(a.Title, a.URL, a.Filename, a.ReviewedOn, a.ReviewBy, string(a.Body))
+	r, err := stmt.Exec(a.Title, a.URL, a.Filename, a.ReviewedOn, a.ReviewBy, string(a.Body), string(a.MarkdownLua))
 	if err != nil {
 		return err
 	}
@@ -114,7 +115,7 @@ func (d *DB) InsertArticle(db sqlx.Preparer, a Article) error {
 
 func (d *DB) LoadArticle(db sqlx.Preparer, name string) (Article, error) {
 	stmt, err := sqlx.Preparex(db, `
-	SELECT rowid, title, url, filename, reviewed_on, review_by, body
+	SELECT rowid, title, url, filename, reviewed_on, review_by, body, markdownlua
 	FROM articles
 	WHERE filename = ?
 	`)

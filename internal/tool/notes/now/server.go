@@ -14,6 +14,7 @@ import (
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
+	lua "github.com/yuin/gopher-lua"
 
 	"github.com/frioux/leatherman/internal/lmfs"
 	"github.com/frioux/leatherman/internal/lmhttp"
@@ -138,6 +139,16 @@ func handlerRoot(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath strin
 		a, err := z.LoadArticle(z.DB, f)
 		if err != nil {
 			return fmt.Errorf("LoadArticle (%s): %w", f, err)
+		}
+
+		if l := req.URL.Query().Get("lua"); l != "" {
+			L := lua.NewState()
+			defer L.Close()
+
+			a.MarkdownLua = append(a.MarkdownLua, []byte("\n"+l+"()\n")...)
+			if err := L.DoString(string(a.MarkdownLua)); err != nil {
+				return fmt.Errorf("couldn't load lua: %w\n%s", err, a.MarkdownLua)
+			}
 		}
 
 		v := articleVars{
