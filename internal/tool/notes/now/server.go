@@ -18,6 +18,8 @@ import (
 
 	"github.com/frioux/leatherman/internal/lmfs"
 	"github.com/frioux/leatherman/internal/lmhttp"
+	"github.com/frioux/leatherman/internal/lmlua"
+	"github.com/frioux/leatherman/internal/lmlua/luanotes"
 	"github.com/frioux/leatherman/internal/notes"
 	"github.com/frioux/leatherman/internal/selfupdate"
 )
@@ -145,7 +147,48 @@ func handlerRoot(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath strin
 			L := lua.NewState()
 			defer L.Close()
 
-			a.MarkdownLua = append(a.MarkdownLua, []byte("\n"+l+"()\n")...)
+			lmlua.RegisterFSType(L)
+			lmlua.RegisterGoqueryPackage(L)
+			lmlua.RegisterHTTPPackage(L)
+			lmlua.RegisterRegexpPackage(L)
+			luanotes.RegisterNotesPackage(L)
+
+			//  * article
+			//    * :bytes()
+			//    * :title()
+			//    * :filename()
+			//    * :url()
+			//    * :raw()
+			//    * :tags()
+			//    * :reviewed_on()
+			//    * :review_by()
+			//    * :extra()
+			//    * :body()
+			//    * :markdownlua()
+			//  * fs
+			//    * :open()
+			//    * :create()
+			//    * :writefile()
+
+			udRW := L.NewUserData()
+			udRW.Value = rw
+			L.SetMetatable(udRW, L.GetTypeMetatable("responsewriter"))
+			L.SetGlobal("rw", udRW)
+
+			udReq := L.NewUserData()
+			udReq.Value = req
+			L.SetMetatable(udReq, L.GetTypeMetatable("request"))
+			L.SetGlobal("req", udReq)
+
+			L.SetGlobal("f", lua.LString(f))
+
+			fmt.Println("type for fss: ", L.GetTypeMetatable("fs"))
+			udFS := L.NewUserData()
+			udFS.Value = fss
+			L.SetMetatable(udFS, L.GetTypeMetatable("fs"))
+			L.SetGlobal("fss", udFS)
+
+			a.MarkdownLua = append(a.MarkdownLua, []byte("\n"+l+"(rw, req)\n")...)
 			if err := L.DoString(string(a.MarkdownLua)); err != nil {
 				return fmt.Errorf("couldn't load lua: %w\n%s", err, a.MarkdownLua)
 			}

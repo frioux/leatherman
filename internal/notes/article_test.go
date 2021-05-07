@@ -8,7 +8,7 @@ import (
 )
 
 func TestReadArticle(t *testing.T) {
-	a, err := ReadArticle(strings.NewReader(`
+	str := `
 {
 	"title": "frew",
 	"tags": ["foo", "bar"],
@@ -17,15 +17,18 @@ func TestReadArticle(t *testing.T) {
 }
 # markdown
 
-goes here`))
+goes here`
+
+	a, err := ReadArticle(strings.NewReader(str))
 
 	if err != nil {
 		t.Fatalf("couldn't readMetadata: %s", err)
 	}
 	testutil.Equal(t, a, Article{
-		Title: "frew",
-		Tags:  []string{"foo", "bar"},
-		Extra: map[string]string{"foo": "bar"},
+		Title:       "frew",
+		Tags:        []string{"foo", "bar"},
+		Extra:       map[string]string{"foo": "bar"},
+		RawContents: []byte(str),
 		Body: []byte(`
 # markdown
 
@@ -34,7 +37,7 @@ goes here`),
 }
 
 func TestReadArticleAndLua(t *testing.T) {
-	a, err := ReadArticle(strings.NewReader(`
+	str := `
 {
 	"title": "frew",
 	"tags": ["foo", "bar"],
@@ -53,15 +56,17 @@ end
 function bar()
 
 end
-` + "```\n"))
+` + "```\n"
+	a, err := ReadArticle(strings.NewReader(str))
 
 	if err != nil {
 		t.Fatalf("couldn't readMetadata: %s", err)
 	}
 	testutil.Equal(t, a, Article{
-		Title: "frew",
-		Tags:  []string{"foo", "bar"},
-		Extra: map[string]string{"foo": "bar"},
+		Title:       "frew",
+		Tags:        []string{"foo", "bar"},
+		Extra:       map[string]string{"foo": "bar"},
+		RawContents: []byte(str),
 		Body: []byte(`
 # markdown
 

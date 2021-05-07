@@ -129,7 +129,7 @@ func (z *Zine) Load(as *[]Article) error {
 	for _, f := range files {
 		var err error
 
-		a, err = readArticleFromFS(z.FS, f)
+		a, err = ReadArticleFromFS(z.FS, f)
 		if err != nil {
 			return fmt.Errorf("error parsing %s: %w", f, err)
 		}
@@ -194,7 +194,7 @@ func (z *Zine) Render(a Article) ([]byte, error) {
 	return out.Bytes(), nil
 }
 
-func readArticleFromFS(fss fs.FS, f string) (Article, error) {
+func ReadArticleFromFS(fss fs.FS, f string) (Article, error) {
 	r, err := fss.Open(f)
 	if err != nil {
 		return Article{}, err

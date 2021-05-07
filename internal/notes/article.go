@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -35,15 +36,29 @@ type Article struct {
 	// well as allowing interactive functionality implemented in the page
 	// itself
 	MarkdownLua []byte
+
+	// RawContents contains the full, unparsed contents of the source
+	// file.
+	RawContents []byte
 }
 
 var mdluaMatcher = regexp.MustCompile("(?s)```mdlua\n(.*?)```\n")
 
 func ReadArticle(r io.Reader) (Article, error) {
-	var a Article
-	d := hujson.NewDecoder(r)
-	err := d.Decode(&a)
+	// copy data so we can store the raw bytes in the Article for later
+	// recovery.  I would like to be able to rebuild the raw data based on
+	// the contents of Article, but this is easier and good enough for now.
+	b, err := io.ReadAll(r)
 	if err != nil {
+		return Article{}, err
+	}
+
+	a := Article{RawContents: b}
+
+	r = bytes.NewReader(b)
+	d := hujson.NewDecoder(r)
+
+	if err := d.Decode(&a); err != nil {
 		return a, fmt.Errorf("hujson.Decoder.Decode: %w", err)
 	}
 	raw, err := ioutil.ReadAll(d.Buffered())
