@@ -100,7 +100,7 @@ echo "---\nfoo: 1" | leatherman yaml2json
  * `draw`: Draws images with lua. ([internal/tool/misc/img/draw.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/img/draw.md))
  * `export-bamboohr`: Exports company directory as JSON. ([internal/tool/misc/bamboo/export-bamboohr.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/bamboo/export-bamboohr.md))
  * `export-bamboohr-tree`: Exports company org chart as JSON. ([internal/tool/misc/bamboo/export-bamboohr-tree.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/bamboo/export-bamboohr-tree.md))
- * `media-remote`:  ([internal/tool/misc/desktop/media-remote.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/desktop/media-remote.md))
+ * `media-remote`: `media-remote` control media players on Linux. ([internal/tool/misc/desktop/media-remote.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/desktop/media-remote.md))
  * `prepend-hist`: Combines a history file and stdin. ([internal/tool/misc/prependhist/prepend-hist.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/prependhist/prepend-hist.md))
  * `sm-list`: Lists coffee from sweetmarias as JSON. ([internal/tool/misc/smlist/sm-list.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/smlist/sm-list.md))
  * `status`: Serves information about host machine. ([internal/tool/misc/status/status.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/status/status.md))
@@ -111,7 +111,7 @@ echo "---\nfoo: 1" | leatherman yaml2json
 
  * `amygdala`: Automated assistant. ([internal/tool/notes/amygdala/amygdala.md](https://github.com/frioux/leatherman/blob/main/internal/tool/notes/amygdala/amygdala.md))
  * `brainstem`: Interacts with amygdala without using any server components. ([internal/tool/notes/brainstem/brainstem.md](https://github.com/frioux/leatherman/blob/main/internal/tool/notes/brainstem/brainstem.md))
- * `notes`: Serves my notes via Dropbox. ([internal/tool/notes/now/notes.md](https://github.com/frioux/leatherman/blob/main/internal/tool/notes/now/notes.md))
+ * `notes`: Serves my notes from disk or Dropbox. ([internal/tool/notes/now/notes.md](https://github.com/frioux/leatherman/blob/main/internal/tool/notes/now/notes.md))
  * `proj`: Integrates my various project management tools. ([internal/tool/notes/proj/proj.md](https://github.com/frioux/leatherman/blob/main/internal/tool/notes/proj/proj.md))
  * `zine`: Read only view of my notes via the filesystem. ([internal/tool/notes/zine/zine.md](https://github.com/frioux/leatherman/blob/main/internal/tool/notes/zine/zine.md))
 
