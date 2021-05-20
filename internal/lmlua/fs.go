@@ -10,7 +10,6 @@ import (
 )
 
 func RegisterFSType(L *lua.LState) {
-	fmt.Println("registering fs type")
 	mt := L.NewTypeMetatable("fs")
 	L.SetGlobal("fs", mt)
 	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), fsMethods))

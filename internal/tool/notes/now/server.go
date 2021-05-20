@@ -182,7 +182,6 @@ func handlerRoot(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath strin
 
 			L.SetGlobal("f", lua.LString(f))
 
-			fmt.Println("type for fss: ", L.GetTypeMetatable("fs"))
 			udFS := L.NewUserData()
 			udFS.Value = fss
 			L.SetMetatable(udFS, L.GetTypeMetatable("fs"))
