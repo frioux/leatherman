@@ -26,12 +26,12 @@ func (cl Client) GetMetadata(p GetMetadataParams) (Metadata, error) {
 	e := json.NewEncoder(body)
 
 	if err := e.Encode(p); err != nil {
-		return Metadata{}, err
+		return Metadata{}, fmt.Errorf("dropbox.Client.GetMetadata: json.Encode: %w", err)
 	}
 
 	req, err := http.NewRequest("POST", "https://api.dropboxapi.com/2/files/get_metadata", body)
 	if err != nil {
-		return Metadata{}, fmt.Errorf("http.NewRequest: %w", err)
+		return Metadata{}, fmt.Errorf("dropbox.Client.GetMetadata: http.NewRequest: %w", err)
 	}
 
 	req.Header.Set("Authorization", "Bearer "+cl.Token)
@@ -39,7 +39,7 @@ func (cl Client) GetMetadata(p GetMetadataParams) (Metadata, error) {
 
 	resp, err := cl.Do(req)
 	if err != nil {
-		return Metadata{}, fmt.Errorf("http.Client.Do: %w", err)
+		return Metadata{}, fmt.Errorf("dropbox.Client.GetMetadata: http.Client.Do: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -47,7 +47,7 @@ func (cl Client) GetMetadata(p GetMetadataParams) (Metadata, error) {
 	d := json.NewDecoder(resp.Body)
 
 	if err := d.Decode(&ret); err != nil {
-		return Metadata{}, err
+		return Metadata{}, fmt.Errorf("dropbox.Client.GetMetadata: json.Decode: %w", err)
 	}
 
 	return ret, nil

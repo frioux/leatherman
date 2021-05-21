@@ -40,9 +40,21 @@ func (f FS) getmeta(path string) (*DropboxDirEntry, error) {
 	}, nil
 }
 
-func (f FS) Open(name string) (fs.File, error) { return f.getmeta(name) }
+func (f FS) Open(name string) (fs.File, error) {
+	r, err := f.getmeta(name)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't open %s: %w", name, err)
+	}
+	return r, nil
+}
 
-func (f FS) Stat(name string) (fs.FileInfo, error) { return f.getmeta(name) }
+func (f FS) Stat(name string) (fs.FileInfo, error) {
+	r, err := f.getmeta(name)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't stat %s: %w", name, err)
+	}
+	return r, nil
+}
 
 func (f FS) ReadDir(name string) ([]fs.DirEntry, error) { return f.readDir(name, -1) }
 
