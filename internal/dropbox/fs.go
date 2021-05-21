@@ -29,6 +29,7 @@ type FS struct {
 }
 
 func (f FS) getmeta(path string) (*DropboxDirEntry, error) {
+	path = filepath.Join(f.dir, path)
 	s, err := f.cl.GetMetadata(GetMetadataParams{Path: path})
 	if err != nil {
 		return nil, err
@@ -183,7 +184,7 @@ func (e *DropboxDirEntry) Read(b []byte) (int, error) {
 	}
 
 	if e.Reader == nil {
-		bs, err := e.fs.ReadFile(e.dir + "/" + e.Name())
+		bs, err := e.fs.ReadFile(e.Name())
 		if err != nil {
 			return 0, err
 		}
