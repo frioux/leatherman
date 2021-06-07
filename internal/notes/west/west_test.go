@@ -85,7 +85,7 @@ func TestAST(t *testing.T) {
 //go:embed testdata/000.md
 var _000 []byte
 
-func TestParse(t *testing.T) {
+func TestParseBasic(t *testing.T) {
 	d := Parse(_000)
 	var linkCount int
 	Walk(d, func(n Node) error {
@@ -102,4 +102,22 @@ func TestParse(t *testing.T) {
 	if linkCount != 2 {
 		t.Error("expected link count of 2")
 	}
+}
+
+func TestParseEarlyExit(t *testing.T) {
+	d := Parse(_000)
+	var runCount int
+	Walk(d, func(n Node) error {
+		runCount += 1
+		if l, ok := n.(*Link); ok {
+			if l.Text == "link" {
+				return WalkBreak
+			}
+
+			if l.Text == "link2" {
+				t.Error("walk didn't break")
+			}
+		}
+		return nil
+	})
 }

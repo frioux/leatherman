@@ -216,9 +216,15 @@ func Walk(n Node, w WalkFn) error {
 }
 
 func walk(n Node, w WalkFn) error {
-	switch w(n) {
-	case WalkBreak, WalkNoRecurse:
+	err := w(n)
+	switch err {
+	case WalkBreak:
+		return WalkBreak
+	case WalkNoRecurse:
 		return nil
+	}
+	if err != nil {
+		return err
 	}
 
 	if b, ok := n.(Block); ok {
@@ -226,7 +232,7 @@ func walk(n Node, w WalkFn) error {
 			err := walk(m, w)
 			switch err {
 			case WalkBreak:
-				break
+				return WalkBreak
 			case WalkNoRecurse:
 				return nil
 			}
