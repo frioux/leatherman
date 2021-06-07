@@ -235,6 +235,10 @@ func walk(n Node, w WalkFn) error {
 				return WalkBreak
 			case WalkNoRecurse:
 				return nil
+			default:
+				if err != nil {
+					return err
+				}
 			}
 
 		}
