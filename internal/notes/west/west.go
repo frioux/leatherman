@@ -6,8 +6,6 @@ import (
 	"strconv"
 )
 
-var Debug string
-
 type Pos int
 
 type Block interface {
@@ -34,7 +32,7 @@ func (d *Document) Markdown() []byte {
 		ret = append(ret, d.Markdown()...)
 	}
 
-	if Debug != "" {
+	if debug {
 		got := len(ret)
 		expect := int(d.end - d.start)
 		if got != expect {
@@ -69,7 +67,7 @@ func (h *Header) Markdown() []byte {
 	ret = append(ret, h.Inline.Markdown()...)
 	ret = append(ret, '\n')
 
-	if Debug != "" {
+	if debug {
 		got := len(ret)
 		expect := int(h.end - h.start)
 		if got != expect {
@@ -105,7 +103,7 @@ func (i *Inline) Markdown() []byte {
 		ret = append(ret, i.Markdown()...)
 	}
 
-	if Debug != "" {
+	if debug {
 		got := len(ret)
 		expect := int(i.end - i.start)
 		if got != expect {

@@ -125,7 +125,7 @@ func Parse(in []byte) *Document {
 		curPos += Pos(len(line) + 1 /* \n */)
 	}
 
-	if Debug != "" {
+	if debug {
 		if len(in) != int(ret.end) {
 			panic(fmt.Sprintf("length of bytes (%d) doesn't match final position (%d)", len(in), int(ret.end)))
 		}
