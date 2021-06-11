@@ -137,12 +137,15 @@ func (t *Text) Markdown() []byte { return []byte(t.Text) }
 type Link struct {
 	start, end Pos
 
-	Text, HRef string
+	Body *Inline
+	HRef string
 }
 
-func (l *Link) Start() Pos       { return l.start }
-func (l *Link) End() Pos         { return l.end }
-func (l *Link) Markdown() []byte { return []byte("[" + l.Text + "](" + l.HRef + ")") }
+func (l *Link) Start() Pos { return l.start }
+func (l *Link) End() Pos   { return l.end }
+func (l *Link) Markdown() []byte {
+	return []byte("[" + string(l.Body.Markdown()) + "](" + l.HRef + ")")
+}
 
 type List struct {
 	start, end Pos
@@ -188,13 +191,13 @@ func (l *ListItem) Markdown() []byte {
 type CodeFenceBlock struct {
 	start, end Pos
 
-	lang, body string
+	fence, lang, body string
 }
 
 func (b *CodeFenceBlock) Start() Pos { return b.start }
 func (b *CodeFenceBlock) End() Pos   { return b.end }
 func (b *CodeFenceBlock) Markdown() []byte {
-	return []byte("```" + b.lang + "\n" + b.body + "```\n")
+	return []byte(b.fence + b.lang + "\n" + b.body + b.fence + "\n")
 }
 
 var (

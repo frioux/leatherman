@@ -2,134 +2,244 @@ package west
 
 import (
 	"bytes"
-	"fmt"
 	"regexp"
+	"strconv"
 )
 
-var (
-	// matches ```ruby, 0=start, 1=end, 2=langstart, 3=langend
-	codeFenceLang = regexp.MustCompile("^```" + `(\S+)?$`)
-
-	// matches ```, 0=start, 1=end
-	codeFence = regexp.MustCompile("^```$")
-
-	// matches  * foo, 0=start, 1=end, 2=bulstart, 3=bulend, 4=instart, 5=inend
-	bullet = regexp.MustCompile(`^(\s*[*-]\s+)(.*)`)
-
-	// matches [link](/to_content), 0=start, 1=end, 2=instart, 3=inend, 4=linstart, 5=linend
-	link = regexp.MustCompile(`\[([^\]]+)\]\(([^\)]+)\)`)
-
-	// matches foo | bar | baz, 0=start, 1=end, TODO document the rest
-	tableRow = regexp.MustCompile(`^([^|]+\|)+`)
-
-	// matches `inline text`, 0=start, 1=end, 2=textstart, 3=textend
-	inlineCode = regexp.MustCompile("`([^`]+)`")
-)
-
-type State int
-
-const (
-	raw State = iota
-	list
-	table
-	code
-)
-
-func parseInnerLine(in []byte, startPos Pos) []Node {
-	ret := []Node{}
-	if offsets := link.FindAllSubmatchIndex(in, -1); offsets != nil {
-		seen := 0
-		for _, o := range offsets {
-			if o[0] > seen {
-				ret = append(ret, parseInnerLine(in[seen:o[0]], startPos+Pos(seen))...) // non-Link
-			}
-			ret = append(ret, &Link{start: startPos + Pos(o[0]), end: startPos + Pos(o[1]), Text: string(in[o[2]:o[3]]), HRef: string(in[o[4]:o[5]])})
-			seen = o[1]
-		}
-
-		if offsets[len(offsets)-1][1] < len(in) {
-			ret = append(ret, parseInnerLine(in[offsets[len(offsets)-1][1]:], startPos+Pos(offsets[len(offsets)-1][1]))...)
-		}
-	} else {
-		ret = append(ret, &Text{start: startPos, end: startPos + Pos(len(in)), Text: string(in)})
-	}
-
-	return ret
+func Parse(b []byte) *Document {
+	p := NewParser(b)
+	d := &Document{}
+	p.Parse(d)
+	return d
 }
 
-func parseInline(in []byte, startPos Pos) *Inline {
-	ret := &Inline{
-		start: startPos,
-		end:   startPos + Pos(len(in)),
-		Nodes: []Node{},
-	}
-
-	if offsets := inlineCode.FindAllSubmatchIndex(in, -1); offsets != nil {
-		seen := 0
-		for _, o := range offsets {
-			if o[0] > seen {
-				ret.Nodes = append(ret.Nodes, parseInnerLine(in[seen:o[0]], startPos+Pos(seen))...) // non-Code
-			}
-			ret.Nodes = append(ret.Nodes, &InlineCode{start: startPos + Pos(o[0]), end: startPos + Pos(o[1]), Text: string(in[o[2]:o[3]])})
-			seen = o[1]
-		}
-
-		if offsets[len(offsets)-1][1] < len(in) {
-			ret.Nodes = append(ret.Nodes, parseInnerLine(in[offsets[len(offsets)-1][1]:], startPos+Pos(offsets[len(offsets)-1][1]))...)
-		}
-	} else {
-		ret.Nodes = append(ret.Nodes, parseInnerLine(in, startPos)...)
-	}
-
-	// 1. find `inline preformatted chunks` and call parseInline for the remainder
-	// 2. find [links](/to_stuff) and call the remainder text
-	return ret
+type Parser struct {
+	b []byte
+	o int
 }
 
-func Parse(in []byte) *Document {
-	var (
-		curPos Pos
-		state  State
-		ret    = &Document{}
-		lines  = bytes.Split(in, []byte("\n"))
-	)
+func NewParser(b []byte) *Parser { return &Parser{b: b} }
 
-	if len(lines[len(lines)-1]) == 0 {
-		lines = lines[:len(lines)-1]
+func (p *Parser) copy() *Parser { return &Parser{p.b, p.o} }
+
+func (p *Parser) expect(prefix []byte) bool {
+	if p.peak(prefix) {
+		p.o += len(prefix)
+		return true
 	}
 
-	for _, line := range lines {
-		if state == code {
-			cfb := ret.Nodes[len(ret.Nodes)-1].(*CodeFenceBlock)
-			if offsets := codeFence.FindIndex(line); offsets != nil {
-				state = 0
-				// closing ```
-				cfb.end = curPos + Pos(offsets[1]+1)
-				ret.end = cfb.end
-			} else {
-				cfb.body += string(line) + "\n"
-			}
-		} else {
-			if offsets := codeFenceLang.FindSubmatchIndex(line); offsets != nil {
-				// opening ```
-				state = code
-				ret.Nodes = append(ret.Nodes, &CodeFenceBlock{
-					start: curPos + Pos(offsets[0]),
-					lang:  string(line[offsets[2]:offsets[3]]),
-				})
-			} else {
-				ret.Nodes = append(ret.Nodes, parseInline(append(line, byte('\n')), curPos))
-				ret.end = curPos + Pos(len(line)+1)
-			}
+	return false
+}
+
+func (p *Parser) peak(prefix []byte) bool { return bytes.HasPrefix(p.rest(), prefix) }
+
+func (p *Parser) end() bool { return p.o == len(p.b) }
+
+func (p *Parser) loadUntil(suffix []byte, found *[]byte) bool {
+	i := bytes.Index(p.rest(), suffix)
+	if i == -1 {
+		return false
+	}
+
+	*found = p.rest()[:i]
+	p.o += i + len(suffix)
+	return true
+}
+
+func (p *Parser) rest() []byte { return p.b[p.o:] }
+
+func (p *Parser) Parse(d *Document) bool {
+	*d = Document{}
+
+	for p.o != len(p.b) {
+		b := &CodeFenceBlock{}
+		if p.parseCodeFenceBlock(b) {
+			d.Nodes = append(d.Nodes, b)
+			continue
 		}
-		curPos += Pos(len(line) + 1 /* \n */)
-	}
 
-	if debug {
-		if len(in) != int(ret.end) {
-			panic(fmt.Sprintf("length of bytes (%d) doesn't match final position (%d)", len(in), int(ret.end)))
+		l := &List{}
+		if p.parseList(l) {
+			d.Nodes = append(d.Nodes, l)
+			continue
+		}
+
+		para := &Inline{}
+		if p.parseParagraph(para) {
+			d.Nodes = append(d.Nodes, para)
+			continue
 		}
 	}
 
-	return ret
+	return true
+}
+
+func (p *Parser) parseList(l *List) bool { return false }
+
+func (p *Parser) parseParagraph(para *Inline) bool {
+	*para = Inline{start: Pos(p.o)}
+
+	text := &Text{start: Pos(p.o), end: Pos(p.o)}
+
+	for {
+		codeSpan := &InlineCode{}
+		if p.parseCodeSpan(codeSpan) {
+			if text.end != text.start {
+				text.Text = string(p.b[int(text.start):int(text.end)])
+				para.Nodes = append(para.Nodes, text)
+			}
+			para.Nodes = append(para.Nodes, codeSpan)
+			text = &Text{start: Pos(p.o), end: Pos(p.o)}
+			continue
+		}
+
+		link := &Link{}
+		if p.parseLink(link) {
+			if text.end != text.start {
+				text.Text = string(p.b[int(text.start):int(text.end)])
+				para.Nodes = append(para.Nodes, text)
+			}
+			para.Nodes = append(para.Nodes, link)
+			text = &Text{start: Pos(p.o), end: Pos(p.o)}
+			continue
+		}
+
+		if p.end() {
+			break
+		}
+
+		if p.expect([]byte("\n\n")) {
+			text.end += 2
+			break
+		}
+
+		text.end++
+		p.o++
+	}
+
+	if text.end != text.start {
+		text.Text = string(p.b[int(text.start):int(text.end)])
+		para.Nodes = append(para.Nodes, text)
+	}
+
+	return true
+}
+
+func (p *Parser) parseLinkBody(inline *Inline) bool {
+	*inline = Inline{start: Pos(p.o)}
+
+	text := &Text{start: Pos(p.o), end: Pos(p.o)}
+
+	for {
+		codeSpan := &InlineCode{}
+		if p.parseCodeSpan(codeSpan) {
+			if text.end != text.start {
+				text.Text = string(p.b[int(text.start):int(text.end)])
+				inline.Nodes = append(inline.Nodes, text)
+			}
+			inline.Nodes = append(inline.Nodes, codeSpan)
+			text = &Text{start: Pos(p.o), end: Pos(p.o)}
+			continue
+		}
+
+		if p.peak([]byte("]")) {
+			if text.end != text.start {
+				text.Text = string(p.b[int(text.start):int(text.end)])
+				inline.Nodes = append(inline.Nodes, text)
+			}
+			break
+		}
+
+		if p.end() {
+			return false
+		}
+
+		text.end++
+		p.o++
+	}
+
+	return true
+}
+
+func (p *Parser) parseLink(link *Link) bool {
+	*link = Link{Body: &Inline{}}
+	n := p.copy()
+	if !n.expect([]byte("[")) {
+		return false
+	}
+	if !n.parseLinkBody(link.Body) {
+		return false
+	}
+	if !n.expect([]byte("](")) {
+		return false
+	}
+	url := []byte{}
+	if !n.loadUntil([]byte(")"), &url) {
+		return false
+	}
+	link.HRef = string(url)
+	p.o = n.o
+	return true
+}
+
+func (p *Parser) parseCodeSpan(codeSpan *InlineCode) bool {
+	in := p.rest()
+
+	if !p.expect([]byte("`")) {
+		return false
+	}
+
+	// find newline so we stop looking after we see it
+	nlI := bytes.IndexRune(in[1:], rune('\n'))
+	if nlI == -1 {
+		nlI = len(in)
+	}
+	// look within that byte slice
+	in = in[1:nlI]
+	*codeSpan = InlineCode{start: Pos(p.o)}
+	i := bytes.IndexRune(in[1:], rune('`'))
+	if i == -1 {
+		return false
+	}
+
+	p.o += 1 /* ` */ + i + 1 /* ` */
+	codeSpan.end = codeSpan.start + Pos(i)
+	codeSpan.Text = string(in[:i+1])
+
+	return true
+}
+
+// matches ```ruby, 0=match, 1=fence, 2=lang
+var codeFenceLang = regexp.MustCompile("^(~{3,}|`{3,})" + `(\S*)` + "\n")
+
+func (p *Parser) parseCodeFenceBlock(cfb *CodeFenceBlock) bool {
+	n := p.copy()
+
+	in := n.rest()
+	m := codeFenceLang.FindSubmatch(in)
+	if m == nil {
+		return false
+	}
+	*cfb = CodeFenceBlock{
+		fence: string(m[1]),
+		lang:  string(m[2]),
+	}
+
+	rein := "\n" + string(m[1][0]) + "{" + strconv.Itoa(len(m[1])) + ",}\n"
+	body := in[len(m[0]):]
+	re := regexp.MustCompile(rein)
+
+	offsets := re.FindIndex(body)
+
+	if offsets == nil {
+		cfb.body = string(body)
+		n.o += len(m[0]) + len(body)
+	} else {
+
+		cfb.body = string(body[:offsets[0]+1])
+		n.o += len(m[0]) + offsets[1]
+	}
+
+	p.o = n.o
+	return true
 }

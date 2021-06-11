@@ -2,7 +2,6 @@ package west
 
 import (
 	_ "embed"
-	"fmt"
 	"testing"
 
 	"github.com/frioux/leatherman/internal/testutil"
@@ -29,7 +28,7 @@ func TestAST(t *testing.T) {
 					end:   13,
 					Nodes: []Node{
 						&Text{start: 2, end: 4, Text: "a "},
-						&Link{start: 4, end: 10, Text: "b", HRef: "/c"},
+						&Link{start: 4, end: 10, Body: soloInline(&Text{Text: "b"}), HRef: "/c"},
 						&Text{start: 10, end: 12, Text: " d"},
 					},
 				},
@@ -69,7 +68,7 @@ func TestAST(t *testing.T) {
 							end:   32,
 							Nodes: []Node{
 								&Text{start: 30, end: 32, Text: "3 "},
-								&Link{start: 32, end: 38, Text: "4", HRef: "/5"},
+								&Link{start: 32, end: 38, Body: soloInline(&Text{Text: "4"}), HRef: "/5"},
 								&Text{start: 38, end: 40, Text: " 6"},
 							},
 						},
@@ -94,13 +93,9 @@ func TestParseBasic(t *testing.T) {
 		}
 		return nil
 	})
-	if string(_000) != string(d.Markdown()) {
-		t.Error("didn't roundtrip")
-		fmt.Printf("raw:\n~~~\n%s\n~~~\n", _000)
-		fmt.Printf("from ast:\n~~~\n%s\n~~~\n", d.Markdown())
-	}
-	if linkCount != 2 {
-		t.Error("expected link count of 2")
+	testutil.Equal(t, string(d.Markdown()), string(_000), "roundtrips")
+	if linkCount != 3 {
+		t.Error("expected link count of 3")
 	}
 }
 
@@ -110,14 +105,41 @@ func TestParseEarlyExit(t *testing.T) {
 	Walk(d, func(n Node) error {
 		runCount += 1
 		if l, ok := n.(*Link); ok {
-			if l.Text == "link" {
+			if l.HRef == "http://frew.co" {
 				return WalkBreak
 			}
 
-			if l.Text == "link2" {
+			if l.HRef == "http://afoolishmanifesto.com" {
 				t.Error("walk didn't break")
 			}
 		}
 		return nil
 	})
+}
+
+func TestParseCodeFenceBlock(t *testing.T) {
+	p := NewParser([]byte(`~~~
+this a test
+`))
+
+	c := &CodeFenceBlock{}
+	p.parseCodeFenceBlock(c)
+	if c.body != "this a test\n" {
+		t.Errorf("uhh: %q", c.body)
+	}
+
+	p = NewParser([]byte(`~~~
+this a test 2
+~~~
+rest
+`))
+
+	p.parseCodeFenceBlock(c)
+	if c.body != "this a test 2\n" {
+		t.Errorf("uhh: %q", c.body)
+	}
+
+	if string(p.rest()) != "rest\n" {
+		t.Errorf("why: %q", p.rest())
+	}
 }
