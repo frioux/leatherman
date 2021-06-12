@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+func makeBytes(n Node) []byte { return make([]byte, 0, int(n.End() - n.Start())) }
+
 type Pos int
 
 type Block interface {
@@ -26,7 +28,7 @@ type Document struct {
 }
 
 func (d *Document) Markdown() []byte {
-	ret := []byte{}
+	ret := makeBytes(d)
 
 	for _, d := range d.Nodes {
 		ret = append(ret, d.Markdown()...)
@@ -58,12 +60,12 @@ type Header struct {
 func (h *Header) Start() Pos { return h.start }
 func (h *Header) End() Pos   { return h.start }
 func (h *Header) Markdown() []byte {
-	ret := make([]byte, h.Level+1)
+	ret := makeBytes(h)
 	for i := 0; i < h.Level; i++ {
-		ret[i] = '#'
+		ret = append(ret, '#')
 	}
 
-	ret[h.Level] = ' '
+	ret = append(ret, ' ')
 	ret = append(ret, h.Inline.Markdown()...)
 	ret = append(ret, '\n')
 
@@ -97,7 +99,7 @@ func (i *Inline) Start() Pos       { return i.start }
 func (i *Inline) End() Pos         { return i.start }
 func (i *Inline) Children() []Node { return i.Nodes }
 func (i *Inline) Markdown() []byte {
-	ret := []byte{}
+	ret := makeBytes(i)
 
 	for _, i := range i.Nodes {
 		ret = append(ret, i.Markdown()...)
@@ -164,7 +166,7 @@ func (l *List) Children() []Node {
 
 }
 func (l *List) Markdown() []byte {
-	ret := []byte{}
+	ret := makeBytes(l)
 
 	for _, l := range l.ListItems {
 		ret = append(ret, l.Markdown()...)
@@ -228,7 +230,7 @@ func (r *TableRow) Start() Pos       { return r.start }
 func (r *TableRow) End() Pos         { return r.end }
 func (r *TableRow) Children() []Node { return r.Columns }
 func (r *TableRow) Markdown() []byte {
-	b := []byte{}
+	b := makeBytes(r)
 	for i, cell := range r.Columns {
 		b = append(b, cell.Markdown()...)
 		if i != len(r.Columns)-1 {
