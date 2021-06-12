@@ -256,21 +256,30 @@ func (p *Parser) parseTable(t *Table) bool {
 	*t = Table{start: Pos(p.o)}
 
 	for {
-		row := &TableRow{}
-		if !n.parseTableRow(row) {
-			return false
-		}
-
-		t.Rows = append(t.Rows, row)
-		t.end = Pos(n.o)
-
-		if n.expect([]byte("\n")) || n.end() {
-			if len(t.Rows) < 2 {
+		if t.Header == nil {
+			row := &TableRow{}
+			if !n.parseTableRow(row) {
 				return false
 			}
-			if len(t.Rows) > 1 {
-				break
+
+			t.Header = row
+		} else if t.Delimiter == nil {
+			row := &TableDelimiterRow{}
+			if !n.parseTableDelimiterRow(row) {
+				return false
 			}
+			t.Delimiter = row
+		} else {
+			row := &TableRow{}
+			if !n.parseTableRow(row) {
+				return false
+			}
+			t.Rows = append(t.Rows, row)
+		}
+		t.end = Pos(n.o)
+
+		if (n.expect([]byte("\n")) || n.end()) && t.Delimiter != nil {
+			break
 		}
 	}
 
@@ -307,6 +316,68 @@ func (p *Parser) parseTableRow(r *TableRow) bool {
 	}
 
 	p.o = n.o
+	return true
+}
+
+func (p *Parser) parseTableDelimiterRow(r *TableDelimiterRow) bool {
+	n := p.copy()
+
+	*r = TableDelimiterRow{start: Pos(p.o)}
+
+	for {
+		cell := &Text{}
+		if !n.parseTableDelimiterCell(cell) {
+			return false
+		}
+
+		r.Delimiters = append(r.Delimiters, cell)
+		r.end = Pos(n.o)
+
+		if n.expect([]byte("|")) {
+			continue
+		}
+
+		if n.expect([]byte("\n")) || n.end() {
+			if len(r.Delimiters) < 2 {
+				return false
+			}
+			if len(r.Delimiters) > 1 {
+				break
+			}
+		}
+	}
+
+	p.o = n.o
+	return true
+}
+
+var tableDelimiterCellMatcher = regexp.MustCompile(`^([\t ]*[:-]-+[:-][\t ]*)`)
+
+func (p *Parser) parseTableDelimiterCell(c *Text) bool {
+	*c = Text{start: Pos(p.o), end: Pos(p.o)}
+
+	for {
+		if p.peak([]byte("|")) || p.peak([]byte("\n")) || p.end() {
+			if c.end != c.start {
+				c.Text = string(p.b[int(c.start):int(c.end)])
+				// I should refactor this to find the text
+				// rather than verify it.
+				if tableDelimiterCellMatcher.MatchString(c.Text) {
+					break
+				} else {
+					return false
+				}
+			}
+		}
+
+		if p.end() {
+			return false
+		}
+
+		c.end++
+		p.o++
+	}
+
 	return true
 }
 

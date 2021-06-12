@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func makeBytes(n Node) []byte { return make([]byte, 0, int(n.End() - n.Start())) }
+func makeBytes(n Node) []byte { return make([]byte, 0, int(n.End()-n.Start())) }
 
 type Pos int
 
@@ -200,21 +200,49 @@ func (b *CodeFenceBlock) Markdown() []byte {
 	return []byte(b.fence + b.lang + "\n" + b.body + b.fence + "\n")
 }
 
+// Table is defined at
+// https://github.github.com/gfm/#tables-extension-
 type Table struct {
 	start, end Pos
 
-	Rows []Node
+	Header    *TableRow
+	Delimiter *TableDelimiterRow
+	Rows      []Node
 }
 
 func (t *Table) Start() Pos       { return t.start }
 func (t *Table) End() Pos         { return t.end }
 func (t *Table) Children() []Node { return t.Rows }
-func (r *Table) Markdown() []byte {
-	b := []byte{}
-	for i, row := range r.Rows {
+func (t *Table) Markdown() []byte {
+	b := makeBytes(t)
+	b = append(b, t.Header.Markdown()...)
+	b = append(b, '\n')
+	b = append(b, t.Delimiter.Markdown()...)
+	b = append(b, '\n')
+	for i, row := range t.Rows {
 		b = append(b, row.Markdown()...)
-		if i != len(r.Rows)-1 {
+		if i != len(t.Rows)-1 {
 			b = append(b, '\n')
+		}
+	}
+	return b
+}
+
+type TableDelimiterRow struct {
+	start, end Pos
+
+	Delimiters []Node
+}
+
+func (r *TableDelimiterRow) Start() Pos       { return r.start }
+func (r *TableDelimiterRow) End() Pos         { return r.end }
+func (r *TableDelimiterRow) Children() []Node { return r.Delimiters }
+func (r *TableDelimiterRow) Markdown() []byte {
+	b := makeBytes(r)
+	for i, cell := range r.Delimiters {
+		b = append(b, cell.Markdown()...)
+		if i != len(r.Delimiters)-1 {
+			b = append(b, '|')
 		}
 	}
 	return b
