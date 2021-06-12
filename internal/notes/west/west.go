@@ -186,8 +186,6 @@ func (l *ListItem) Markdown() []byte {
 	return append(append([]byte(l.Prefix), l.Inline.Markdown()...), '\n')
 }
 
-// TODO: CodeIndentBlock
-
 type CodeFenceBlock struct {
 	start, end Pos
 
@@ -198,6 +196,46 @@ func (b *CodeFenceBlock) Start() Pos { return b.start }
 func (b *CodeFenceBlock) End() Pos   { return b.end }
 func (b *CodeFenceBlock) Markdown() []byte {
 	return []byte(b.fence + b.lang + "\n" + b.body + b.fence + "\n")
+}
+
+type Table struct {
+	start, end Pos
+
+	Rows []Node
+}
+
+func (t *Table) Start() Pos       { return t.start }
+func (t *Table) End() Pos         { return t.end }
+func (t *Table) Children() []Node { return t.Rows }
+func (r *Table) Markdown() []byte {
+	b := []byte{}
+	for i, row := range r.Rows {
+		b = append(b, row.Markdown()...)
+		if i != len(r.Rows)-1 {
+			b = append(b, '\n')
+		}
+	}
+	return b
+}
+
+type TableRow struct {
+	start, end Pos
+
+	Columns []Node
+}
+
+func (r *TableRow) Start() Pos       { return r.start }
+func (r *TableRow) End() Pos         { return r.end }
+func (r *TableRow) Children() []Node { return r.Columns }
+func (r *TableRow) Markdown() []byte {
+	b := []byte{}
+	for i, cell := range r.Columns {
+		b = append(b, cell.Markdown()...)
+		if i != len(r.Columns)-1 {
+			b = append(b, '|')
+		}
+	}
+	return b
 }
 
 var (

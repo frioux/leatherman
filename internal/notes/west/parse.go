@@ -64,6 +64,12 @@ func (p *Parser) Parse(d *Document) bool {
 			continue
 		}
 
+		t := &Table{}
+		if p.parseTable(t) {
+			d.Nodes = append(d.Nodes, l)
+			continue
+		}
+
 		para := &Inline{}
 		if p.parseParagraph(para) {
 			d.Nodes = append(d.Nodes, para)
@@ -241,5 +247,101 @@ func (p *Parser) parseCodeFenceBlock(cfb *CodeFenceBlock) bool {
 	}
 
 	p.o = n.o
+	return true
+}
+
+func (p *Parser) parseTable(t *Table) bool {
+	n := p.copy()
+
+	*t = Table{start: Pos(p.o)}
+
+	for {
+		row := &TableRow{}
+		if !n.parseTableRow(row) {
+			return false
+		}
+
+		t.Rows = append(t.Rows, row)
+		t.end = Pos(n.o)
+
+		if n.expect([]byte("\n")) || n.end() {
+			if len(t.Rows) < 2 {
+				return false
+			}
+			if len(t.Rows) > 1 {
+				break
+			}
+		}
+	}
+
+	p.o = n.o
+	return true
+}
+
+func (p *Parser) parseTableRow(r *TableRow) bool {
+	n := p.copy()
+
+	*r = TableRow{start: Pos(p.o)}
+
+	for {
+		cell := &Inline{}
+		if !n.parseTableCell(cell) {
+			return false
+		}
+
+		r.Columns = append(r.Columns, cell)
+		r.end = Pos(n.o)
+
+		if n.expect([]byte("|")) {
+			continue
+		}
+
+		if n.expect([]byte("\n")) || n.end() {
+			if len(r.Columns) < 2 {
+				return false
+			}
+			if len(r.Columns) > 1 {
+				break
+			}
+		}
+	}
+
+	p.o = n.o
+	return true
+}
+
+func (p *Parser) parseTableCell(inline *Inline) bool {
+	*inline = Inline{start: Pos(p.o)}
+
+	text := &Text{start: Pos(p.o), end: Pos(p.o)}
+
+	for {
+		codeSpan := &InlineCode{}
+		if p.parseCodeSpan(codeSpan) {
+			if text.end != text.start {
+				text.Text = string(p.b[int(text.start):int(text.end)])
+				inline.Nodes = append(inline.Nodes, text)
+			}
+			inline.Nodes = append(inline.Nodes, codeSpan)
+			text = &Text{start: Pos(p.o), end: Pos(p.o)}
+			continue
+		}
+
+		if p.peak([]byte("|")) || p.peak([]byte("\n")) || p.end() {
+			if text.end != text.start {
+				text.Text = string(p.b[int(text.start):int(text.end)])
+				inline.Nodes = append(inline.Nodes, text)
+			}
+			break
+		}
+
+		if p.end() {
+			return false
+		}
+
+		text.end++
+		p.o++
+	}
+
 	return true
 }
