@@ -58,6 +58,12 @@ func (p *Parser) Parse(d *Document) bool {
 			continue
 		}
 
+		h := &Header{}
+		if p.parseHeader(h) {
+			d.Nodes = append(d.Nodes, h)
+			continue
+		}
+
 		l := &List{}
 		if p.parseList(l) {
 			d.Nodes = append(d.Nodes, l)
@@ -189,9 +195,15 @@ func (p *Parser) parseLink(link *Link) bool {
 }
 
 func (p *Parser) parseCodeSpan(codeSpan *InlineCode) bool {
-	in := p.rest()
+	n := p.copy()
 
-	if !p.expect([]byte("`")) {
+	in := n.rest()
+
+	if !n.expect([]byte("`")) {
+		return false
+	}
+
+	if len(n.rest()) == 0 {
 		return false
 	}
 
@@ -200,18 +212,24 @@ func (p *Parser) parseCodeSpan(codeSpan *InlineCode) bool {
 	if nlI == -1 {
 		nlI = len(in)
 	}
+
+	if nlI <= 1 {
+		return false
+	}
+
 	// look within that byte slice
 	in = in[1:nlI]
-	*codeSpan = InlineCode{start: Pos(p.o)}
+	*codeSpan = InlineCode{start: Pos(n.o)}
 	i := bytes.IndexRune(in[1:], rune('`'))
 	if i == -1 {
 		return false
 	}
 
-	p.o += 1 /* ` */ + i + 1 /* ` */
+	n.o += 1 /* ` */ + i + 1 /* ` */
 	codeSpan.end = codeSpan.start + Pos(i)
 	codeSpan.Text = string(in[:i+1])
 
+	p.o = n.o
 	return true
 }
 
@@ -241,8 +259,8 @@ func (p *Parser) parseCodeFenceBlock(cfb *CodeFenceBlock) bool {
 		cfb.body = string(body)
 		n.o += len(m[0]) + len(body)
 	} else {
-
 		cfb.body = string(body[:offsets[0]+1])
+		cfb.endfence = string(body[offsets[0]+1 : offsets[1]])
 		n.o += len(m[0]) + offsets[1]
 	}
 
@@ -414,5 +432,79 @@ func (p *Parser) parseTableCell(inline *Inline) bool {
 		p.o++
 	}
 
+	return true
+}
+
+func (p *Parser) parseHeader(header *Header) bool {
+	n := p.copy()
+
+	*header = Header{start: Pos(n.o), end: Pos(n.o)}
+
+	for {
+		if !n.expect([]byte("#")) {
+			if header.Level == 0 {
+				return false
+			} else {
+				break
+			}
+		}
+
+		header.Level++
+		header.end++
+	}
+
+	inline := &Inline{start: Pos(n.o), end: Pos(n.o)}
+	header.Inline = inline
+	text := &Text{start: Pos(n.o), end: Pos(n.o)}
+	inline.Nodes = append(inline.Nodes, text)
+
+	text = &Text{start: Pos(n.o), end: Pos(n.o)}
+	if !n.expect([]byte(" ")) {
+		return false
+	}
+	text.end++
+
+	for {
+		codeSpan := &InlineCode{}
+		if n.parseCodeSpan(codeSpan) {
+			if text.end != text.start {
+				text.Text = string(n.b[int(text.start):int(text.end)])
+				inline.Nodes = append(inline.Nodes, text)
+			}
+			inline.Nodes = append(inline.Nodes, codeSpan)
+			text = &Text{start: Pos(n.o), end: Pos(n.o)}
+			continue
+		}
+
+		link := &Link{}
+		if n.parseLink(link) {
+			if text.end != text.start {
+				text.Text = string(n.b[int(text.start):int(text.end)])
+				inline.Nodes = append(inline.Nodes, text)
+			}
+			inline.Nodes = append(inline.Nodes, link)
+			text = &Text{start: Pos(n.o), end: Pos(n.o)}
+			continue
+		}
+
+		if n.end() {
+			break
+		}
+
+		if n.expect([]byte("\n\n")) {
+			text.end += 2
+			break
+		}
+
+		text.end++
+		n.o++
+	}
+
+	if text.end != text.start {
+		text.Text = string(n.b[int(text.start):int(text.end)])
+		inline.Nodes = append(inline.Nodes, text)
+	}
+
+	p.o = n.o
 	return true
 }

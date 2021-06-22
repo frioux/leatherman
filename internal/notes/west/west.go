@@ -6,7 +6,16 @@ import (
 	"strconv"
 )
 
-func makeBytes(n Node) []byte { return make([]byte, 0, int(n.End()-n.Start())) }
+func makeBytes(n Node) []byte {
+	if n.End() < n.Start() {
+		if debug {
+			panic("impossible start/end")
+		} else {
+			return make([]byte, 0, 0)
+		}
+	}
+	return make([]byte, 0, int(n.End()-n.Start()))
+}
 
 type Pos int
 
@@ -47,7 +56,7 @@ func (d *Document) Markdown() []byte {
 
 func (d *Document) Children() []Node { return d.Nodes }
 func (d *Document) Start() Pos       { return d.start }
-func (d *Document) End() Pos         { return d.start }
+func (d *Document) End() Pos         { return d.end }
 
 type Header struct {
 	start, end Pos
@@ -58,16 +67,14 @@ type Header struct {
 }
 
 func (h *Header) Start() Pos { return h.start }
-func (h *Header) End() Pos   { return h.start }
+func (h *Header) End() Pos   { return h.end }
 func (h *Header) Markdown() []byte {
 	ret := makeBytes(h)
 	for i := 0; i < h.Level; i++ {
 		ret = append(ret, '#')
 	}
 
-	ret = append(ret, ' ')
 	ret = append(ret, h.Inline.Markdown()...)
-	ret = append(ret, '\n')
 
 	if debug {
 		got := len(ret)
@@ -96,7 +103,7 @@ type Inline struct {
 }
 
 func (i *Inline) Start() Pos       { return i.start }
-func (i *Inline) End() Pos         { return i.start }
+func (i *Inline) End() Pos         { return i.end }
 func (i *Inline) Children() []Node { return i.Nodes }
 func (i *Inline) Markdown() []byte {
 	ret := makeBytes(i)
@@ -191,13 +198,13 @@ func (l *ListItem) Markdown() []byte {
 type CodeFenceBlock struct {
 	start, end Pos
 
-	fence, lang, body string
+	fence, lang, body, endfence string
 }
 
 func (b *CodeFenceBlock) Start() Pos { return b.start }
 func (b *CodeFenceBlock) End() Pos   { return b.end }
 func (b *CodeFenceBlock) Markdown() []byte {
-	return []byte(b.fence + b.lang + "\n" + b.body + b.fence + "\n")
+	return []byte(b.fence + b.lang + "\n" + b.body + b.endfence)
 }
 
 // Table is defined at
