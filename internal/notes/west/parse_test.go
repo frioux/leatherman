@@ -194,14 +194,15 @@ func TestParseHeader(t *testing.T) {
 	testutil.Equal(t, string(h.Markdown()), in, "roundtrip")
 }
 
-func TestCrashers(t *testing.T) {
-	docs := []string{
-		0: "`",
-		1: "`\n",
-		2: "```\n",
-	}
+var crashers = []string{
+	0: "`",
+	1: "`\n",
+	2: "```\n",
+	// 3: "|\n---|---",
+}
 
-	for i, in := range docs {
+func TestCrashers(t *testing.T) {
+	for i, in := range crashers {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			p := NewParser([]byte(in))
 			d := &Document{}
