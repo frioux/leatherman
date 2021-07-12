@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/BurntSushi/xgb v0.0.0-20200324125942-20f126ea2843 // indirect
 	github.com/BurntSushi/xgbutil v0.0.0-20190907113008-ad855c713046
-	github.com/PuerkitoBio/goquery v1.7.0
+	github.com/PuerkitoBio/goquery v1.7.1
 	github.com/bwmarrin/discordgo v0.23.2
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
 	github.com/fsnotify/fsnotify v1.4.9
