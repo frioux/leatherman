@@ -42,14 +42,23 @@ func toJSON(r io.Reader, w io.Writer) error {
 	return nil
 }
 
-func toJSONFromFile(path string, w io.Writer) error {
+func toJSONFromFile(path string, w io.Writer) (err error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("os.Open: %w", err)
 	}
 	defer file.Close()
 
-	return toJSON(file, w)
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%s", r)
+		}
+	}()
+
+	if err := toJSON(file, w); err != nil {
+		return fmt.Errorf("%w (%s)", err, path)
+	}
+	return nil
 }
 
 func ToJSON(args []string, stdin io.Reader) error {
@@ -64,9 +73,8 @@ func ToJSON(args []string, stdin io.Reader) error {
 		}
 
 		for _, path := range matches {
-			err = toJSONFromFile(path, os.Stdout)
-			if err != nil {
-				return err
+			if err := toJSONFromFile(path, os.Stdout); err != nil {
+				fmt.Fprintln(os.Stderr, err)
 			}
 		}
 	}
