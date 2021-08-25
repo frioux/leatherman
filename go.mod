@@ -9,7 +9,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.7.1
 	github.com/bwmarrin/discordgo v0.23.2
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
-	github.com/fsnotify/fsnotify v1.5.0
+	github.com/fsnotify/fsnotify v1.5.1
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/google/go-cmp v0.5.6
 	github.com/hackebrot/turtle v0.1.1-0.20200616125707-1bb4c277aedd
