@@ -104,6 +104,7 @@ echo "---\nfoo: 1" | leatherman yaml2json
  * `prepend-hist`: Combines a history file and stdin. ([internal/tool/misc/prependhist/prepend-hist.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/prependhist/prepend-hist.md))
  * `sm-list`: Lists coffee from sweetmarias as JSON. ([internal/tool/misc/smlist/sm-list.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/smlist/sm-list.md))
  * `status`: Serves information about host machine. ([internal/tool/misc/status/status.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/status/status.md))
+ * `steamsrv`: Steamsrv renders steam screenshots and the steam log (what games you played and when) over http. ([internal/tool/misc/steamsrv/steamsrv.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/steamsrv/steamsrv.md))
  * `twilio`: Makes callbacks like twilio. ([internal/tool/misc/twilio/twilio.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/twilio/twilio.md))
  * `wuphf`: Sends notifications on lots (2) of platforms. ([internal/tool/misc/wuphf/wuphf.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/wuphf/wuphf.md))
 

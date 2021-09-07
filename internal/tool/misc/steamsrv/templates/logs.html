@@ -1,0 +1,7 @@
+{{template "zzheader.html" .}}
+<ul>
+{{range .Logs}}
+<li>{{.Date}} {{.Name}}</li>
+{{end}}
+</ul>
+{{template "zzfooter.html" .}}

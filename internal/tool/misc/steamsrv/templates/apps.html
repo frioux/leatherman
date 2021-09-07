@@ -1,0 +1,7 @@
+{{template "zzheader.html" .}}
+<ul>
+{{range $appid, $name := .Apps}}
+<li><a href="/?appid={{$appid}}">{{$name}}</a></li>
+{{end}}
+</ul>
+{{template "zzfooter.html" .}}

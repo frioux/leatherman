@@ -1,0 +1,12 @@
+{{template "zzheader.html" .}}
+<h1>{{.Name}} Screenshots</h1>
+
+<ul>
+{{range .Images}}
+<li>{{.Date}}: <a href="/files/{{.Name}}">
+{{- if ne .Thumbnail "" }}<img src="/files/{{.Thumbnail}}" \>{{- else -}}
+<img width="250" src="/files/{{.Name}}" \>
+{{- end -}}</a></li>
+{{end}}
+</ul>
+{{template "zzfooter.html" .}}

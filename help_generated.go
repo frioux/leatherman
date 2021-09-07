@@ -37,6 +37,7 @@ import "embed"
 //go:embed internal/tool/misc/prependhist/prepend-hist.md
 //go:embed internal/tool/misc/smlist/sm-list.md
 //go:embed internal/tool/misc/status/status.md
+//go:embed internal/tool/misc/steamsrv/steamsrv.md
 //go:embed internal/tool/misc/twilio/twilio.md
 //go:embed internal/tool/misc/wuphf/wuphf.md
 //go:embed internal/tool/notes/amygdala/amygdala.md
@@ -116,6 +117,8 @@ var helpPaths = map[string]string{
 	"sm-list": "internal/tool/misc/smlist/sm-list.md",
 
 	"status": "internal/tool/misc/status/status.md",
+
+	"steamsrv": "internal/tool/misc/steamsrv/steamsrv.md",
 
 	"twilio": "internal/tool/misc/twilio/twilio.md",
 
