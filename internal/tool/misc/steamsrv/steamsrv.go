@@ -4,14 +4,12 @@ import (
 	"bufio"
 	"context"
 	"embed"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"html/template"
 	"io"
 	"io/fs"
-	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -20,93 +18,16 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/frioux/leatherman/internal/lmhttp"
+	"github.com/frioux/leatherman/internal/steam"
 )
 
 //go:embed templates/*
 var templateFS embed.FS
 
 var templates = template.Must(template.New("tmpl").ParseFS(templateFS, "templates/*"))
-
-type appIDs struct {
-	mu  sync.Mutex
-	raw map[int]string
-
-	LastLoad time.Time
-}
-
-func (a *appIDs) Autoload() {
-	rnd := rand.New(rand.NewSource(time.Now().Unix()))
-	for {
-		if err := a.Load(context.Background()); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-
-		// reload some time between 0 and 24h from now
-		time.Sleep(time.Duration(rnd.Float32() * float32(time.Hour*24)))
-	}
-}
-
-func (a *appIDs) Load(ctx context.Context) error {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-
-	if time.Now().Sub(a.LastLoad) < time.Hour*24 {
-		return nil
-	}
-
-	if a.raw == nil {
-		a.raw = map[int]string{}
-	}
-
-	ctx, cancel := context.WithTimeout(ctx, time.Minute)
-	defer cancel()
-	resp, err := lmhttp.Get(ctx, "https://api.steampowered.com/ISteamApps/GetAppList/v2/")
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return errors.New("non-200 status")
-	}
-
-	var remoteData struct {
-		Applist struct {
-			Apps []struct {
-				AppID int
-				Name  string
-			}
-		}
-	}
-
-	d := json.NewDecoder(resp.Body)
-	if err := d.Decode(&remoteData); err != nil {
-		return err
-	}
-
-	for k := range a.raw {
-		delete(a.raw, k)
-	}
-
-	for _, app := range remoteData.Applist.Apps {
-		a.raw[app.AppID] = app.Name
-	}
-
-	a.LastLoad = time.Now()
-
-	return nil
-}
-
-func (a *appIDs) App(appid int) string {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-
-	return a.raw[appid]
-}
 
 func Serve(args []string, _ io.Reader) error {
 	var (
@@ -131,7 +52,7 @@ func Serve(args []string, _ io.Reader) error {
 		return errors.New("path-prefix is required")
 	}
 
-	a := &appIDs{}
+	a := &steam.AppIDs{}
 	if err := a.Load(context.Background()); err != nil {
 		return err
 	}
@@ -169,7 +90,7 @@ type steamAppState struct{ Name, Date, State string }
 //                                     date           appid                state
 var lineMatcher = regexp.MustCompile(`^\[(.*?)\] AppID (\d+) state changed : (.*)$`)
 
-func fileToSteamAppStates(a *appIDs, f fs.File) ([]steamAppState, error) {
+func fileToSteamAppStates(a *steam.AppIDs, f fs.File) ([]steamAppState, error) {
 	ret := []steamAppState{}
 	s := bufio.NewScanner(f)
 	for s.Scan() {
@@ -197,7 +118,7 @@ func fileToSteamAppStates(a *appIDs, f fs.File) ([]steamAppState, error) {
 	return ret, nil
 }
 
-func logHandler(logFS fs.FS, a *appIDs) http.Handler {
+func logHandler(logFS fs.FS, a *steam.AppIDs) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) error {
 		var data struct {
 			Logs  []steamAppState
@@ -248,7 +169,7 @@ func logHandler(logFS fs.FS, a *appIDs) http.Handler {
 	})
 }
 
-func screenshotHandler(a *appIDs, fss fs.FS) http.Handler {
+func screenshotHandler(a *steam.AppIDs, fss fs.FS) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) error {
 		filenames, err := fs.Glob(fss, "*/remote/*/screenshots/*.jpg")
 		if err != nil {
@@ -321,7 +242,7 @@ func screenshotHandler(a *appIDs, fss fs.FS) http.Handler {
 	})
 }
 
-func steamHandler(logFS, shotFS fs.FS, a *appIDs) http.Handler {
+func steamHandler(logFS, shotFS fs.FS, a *steam.AppIDs) http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/files/", lmhttp.TrimHandlerPrefix("/files", http.FileServer(http.FS(shotFS))))
 	mux.Handle("/", screenshotHandler(a, shotFS))
