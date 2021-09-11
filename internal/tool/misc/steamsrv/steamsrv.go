@@ -15,10 +15,8 @@ import (
 	"os"
 	"os/user"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/frioux/leatherman/internal/steam"
@@ -67,12 +65,6 @@ func Serve(args []string, _ io.Reader) error {
 
 	return s.Serve(listener)
 }
-
-// shotPattern decomposes steam screenshots filenames
-//                                     1             2                   3          4     5    6     7     8      9
-//                                     ?            appid               year      month  day   hour  min  sec     i
-//                                    760           319630              2021       04    15    21    05    01     1
-var shotPattern = regexp.MustCompile(`([^/]+)/remote/([^/]+)/screenshots/(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)_(\d+).jpg`)
 
 func mustAtoi(s string) int {
 	ret, err := strconv.Atoi(s)
@@ -171,67 +163,36 @@ func logHandler(logFS fs.FS, a *steam.AppIDs) http.Handler {
 
 func screenshotHandler(a *steam.AppIDs, fss fs.FS) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) error {
-		filenames, err := fs.Glob(fss, "*/remote/*/screenshots/*.jpg")
-		if err != nil {
-			return err
+		s := screenshots{fss: fss}
+		var appid int
+		if a := r.URL.Query().Get("appid"); a != "" {
+			appid = mustAtoi(a)
 		}
-		appid := r.URL.Query().Get("appid")
 
-		type Image struct {
-			Name, Thumbnail string
-
-			Date time.Time
-		}
 		var data struct {
 			Name, Title string
 
 			Apps   map[int]string
-			Images []Image
+			Images []screenshot
 		}
 		data.Apps = map[int]string{}
-
-		for _, filename := range filenames {
-			m := shotPattern.FindStringSubmatch(filename)
-			if len(m) == 0 {
-				fmt.Fprintf(os.Stderr, "path didn't match pattern: %s\n", filename)
-				continue
-			}
-
-			seenAppID := mustAtoi(m[2])
-			data.Apps[seenAppID] = a.App(seenAppID)
-			date := time.Date(
-				// year         month                       day
-				mustAtoi(m[3]), time.Month(mustAtoi(m[4])), mustAtoi(m[5]),
-				// hour         minute          second
-				mustAtoi(m[6]), mustAtoi(m[7]), mustAtoi(m[8]),
-				// ns timezone
-				0, time.Local)
-
-			if m[2] == appid {
-				thumbnail := fmt.Sprintf("%s/remote/%s/screenshots/thumbnails/%s%s%s%s%s%s_%s.jpg", m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9])
-
-				if f, err := fss.Open(thumbnail); err == nil {
-					f.Close()
-				} else {
-					thumbnail = ""
-				}
-				data.Images = append(data.Images, Image{
-					Name:      filename,
-					Thumbnail: thumbnail,
-					Date:      date,
-				})
-			}
+		var err error
+		data.Images, err = s.Screenshots(appid)
+		if err != nil {
+			return err
 		}
 
-		sort.Slice(data.Images, func(i, j int) bool { return data.Images[i].Date.Before(data.Images[j].Date) })
 		rw.Header().Add("Content-Type", "text/html")
-		if appid == "" {
+		if appid == 0 {
 			data.Title = "Steam Apps"
+			for _, image := range data.Images {
+				data.Apps[image.AppID] = a.App(image.AppID)
+			}
 			if err := templates.ExecuteTemplate(rw, "apps.html", data); err != nil {
 				return err
 			}
 		} else {
-			data.Name = a.App(mustAtoi(appid))
+			data.Name = a.App(appid)
 			data.Title = data.Name + " Screenshots"
 			if err := templates.ExecuteTemplate(rw, "shots.html", data); err != nil {
 				return err
