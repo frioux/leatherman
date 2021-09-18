@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"text/tabwriter"
 	"time"
+
+	"github.com/brandondube/tai"
 )
 
 func cmpDates(there, here time.Time) int8 {
@@ -23,11 +25,18 @@ func cmpDates(there, here time.Time) int8 {
 }
 
 func t(now time.Time, l string) string {
-	loc, err := time.LoadLocation(l)
-	if err != nil {
-		log.Fatal(err)
+	var thereNow time.Time
+	if l == "TAI" {
+		tt := tai.FromTime(now)
+		gt := tt.AsGregorian()
+		thereNow = time.Date(gt.Year, time.Month(gt.Month), gt.Day, gt.Hour, gt.Min, gt.Sec, 0, time.UTC)
+	} else {
+		loc, err := time.LoadLocation(l)
+		if err != nil {
+			log.Fatal(err)
+		}
+		thereNow = now.In(loc)
 	}
-	thereNow := now.In(loc)
 
 	relativeHere := time.Date(now.Year(), now.Month(), now.Day(),
 		now.Hour(), now.Minute(), now.Second(), now.Nanosecond(),
@@ -56,7 +65,7 @@ func t(now time.Time, l string) string {
 	}
 	// I can't figure out why I need two tabs at the end or why the final column
 	// isn't right aligned :(
-	return l + "\t" + day + "\t" + relativeThere.Format("15:04\t3:04 PM") + "\t\t" + offsetStr
+	return l + "\t" + day + "\t" + relativeThere.Format("15:04:05\t3:04:05 PM") + "\t\t" + offsetStr
 }
 
 func Run(args []string, _ io.Reader) error {
@@ -67,7 +76,7 @@ func Run(args []string, _ io.Reader) error {
 
 	now := time.Now().In(time.Local)
 
-	zones := []string{"Local", "America/Los_Angeles", "America/Chicago", "America/New_York", "Asia/Jerusalem", "UTC"}
+	zones := []string{"Local", "America/Los_Angeles", "America/Chicago", "America/New_York", "Asia/Jerusalem", "UTC", "TAI"}
 	if len(args) > 1 {
 		zones = args[1:]
 	}

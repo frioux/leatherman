@@ -33,6 +33,7 @@ require (
 
 require (
 	github.com/andybalholm/cascadia v1.2.0 // indirect
+	github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
