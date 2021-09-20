@@ -7,6 +7,7 @@ require (
 	github.com/BurntSushi/xgb v0.0.0-20200324125942-20f126ea2843 // indirect
 	github.com/BurntSushi/xgbutil v0.0.0-20190907113008-ad855c713046
 	github.com/PuerkitoBio/goquery v1.7.1
+	github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba
 	github.com/bwmarrin/discordgo v0.23.2
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
 	github.com/fsnotify/fsnotify v1.5.1
@@ -28,12 +29,11 @@ require (
 	golang.org/x/text v0.3.7
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
-	modernc.org/sqlite v1.13.0
+	modernc.org/sqlite v1.13.1
 )
 
 require (
 	github.com/andybalholm/cascadia v1.2.0 // indirect
-	github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
