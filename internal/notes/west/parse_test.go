@@ -190,7 +190,7 @@ func TestParseHeader(t *testing.T) {
 		return
 	}
 	testutil.Equal(t, h.Level, 3, "level")
-	testutil.Equal(t, len(h.Inline.Nodes), 6, "node length")
+	testutil.Equal(t, len(h.Inline.Nodes), 5, "node length")
 	testutil.Equal(t, string(h.Markdown()), in, "roundtrip")
 }
 

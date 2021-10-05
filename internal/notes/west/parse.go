@@ -89,86 +89,13 @@ func (p *Parser) Parse(d *Document) bool {
 func (p *Parser) parseList(l *List) bool { return false }
 
 func (p *Parser) parseParagraph(para *Inline) bool {
-	*para = Inline{start: Pos(p.o)}
-
-	text := &Text{start: Pos(p.o), end: Pos(p.o)}
-
-	for {
-		codeSpan := &InlineCode{}
-		if p.parseCodeSpan(codeSpan) {
-			if text.end != text.start {
-				text.Text = string(p.b[int(text.start):int(text.end)])
-				para.Nodes = append(para.Nodes, text)
-			}
-			para.Nodes = append(para.Nodes, codeSpan)
-			text = &Text{start: Pos(p.o), end: Pos(p.o)}
-			continue
-		}
-
-		link := &Link{}
-		if p.parseLink(link) {
-			if text.end != text.start {
-				text.Text = string(p.b[int(text.start):int(text.end)])
-				para.Nodes = append(para.Nodes, text)
-			}
-			para.Nodes = append(para.Nodes, link)
-			text = &Text{start: Pos(p.o), end: Pos(p.o)}
-			continue
-		}
-
-		if p.end() {
-			break
-		}
-
-		if p.expect([]byte("\n\n")) {
-			text.end += 2
-			break
-		}
-
-		text.end++
-		p.o++
-	}
-
-	if text.end != text.start {
-		text.Text = string(p.b[int(text.start):int(text.end)])
-		para.Nodes = append(para.Nodes, text)
-	}
-
+	p.parseInline(para, []string{"\n\n"})
+	p.inlineConsume(para, []string{"\n\n"})
 	return true
 }
 
 func (p *Parser) parseLinkBody(inline *Inline) bool {
-	*inline = Inline{start: Pos(p.o)}
-
-	text := &Text{start: Pos(p.o), end: Pos(p.o)}
-
-	for {
-		codeSpan := &InlineCode{}
-		if p.parseCodeSpan(codeSpan) {
-			if text.end != text.start {
-				text.Text = string(p.b[int(text.start):int(text.end)])
-				inline.Nodes = append(inline.Nodes, text)
-			}
-			inline.Nodes = append(inline.Nodes, codeSpan)
-			text = &Text{start: Pos(p.o), end: Pos(p.o)}
-			continue
-		}
-
-		if p.peak([]byte("]")) {
-			if text.end != text.start {
-				text.Text = string(p.b[int(text.start):int(text.end)])
-				inline.Nodes = append(inline.Nodes, text)
-			}
-			break
-		}
-
-		if p.end() {
-			return false
-		}
-
-		text.end++
-		p.o++
-	}
+	p.parseInline(inline, []string{"]"})
 
 	return true
 }
@@ -400,37 +327,7 @@ func (p *Parser) parseTableDelimiterCell(c *Text) bool {
 }
 
 func (p *Parser) parseTableCell(inline *Inline) bool {
-	*inline = Inline{start: Pos(p.o)}
-
-	text := &Text{start: Pos(p.o), end: Pos(p.o)}
-
-	for {
-		codeSpan := &InlineCode{}
-		if p.parseCodeSpan(codeSpan) {
-			if text.end != text.start {
-				text.Text = string(p.b[int(text.start):int(text.end)])
-				inline.Nodes = append(inline.Nodes, text)
-			}
-			inline.Nodes = append(inline.Nodes, codeSpan)
-			text = &Text{start: Pos(p.o), end: Pos(p.o)}
-			continue
-		}
-
-		if p.peak([]byte("|")) || p.peak([]byte("\n")) || p.end() {
-			if text.end != text.start {
-				text.Text = string(p.b[int(text.start):int(text.end)])
-				inline.Nodes = append(inline.Nodes, text)
-			}
-			break
-		}
-
-		if p.end() {
-			return false
-		}
-
-		text.end++
-		p.o++
-	}
+	p.parseInline(inline, []string{"|", "\n"})
 
 	return true
 }
@@ -453,58 +350,90 @@ func (p *Parser) parseHeader(header *Header) bool {
 		header.end++
 	}
 
-	inline := &Inline{start: Pos(n.o), end: Pos(n.o)}
-	header.Inline = inline
-	text := &Text{start: Pos(n.o), end: Pos(n.o)}
-	inline.Nodes = append(inline.Nodes, text)
-
-	text = &Text{start: Pos(n.o), end: Pos(n.o)}
-	if !n.expect([]byte(" ")) {
+	if !n.peak([]byte(" ")) {
 		return false
 	}
-	text.end++
 
+	inline := &Inline{}
+	header.Inline = inline
+	n.parseInline(inline, []string{"\n\n"})
+	n.inlineConsume(inline, []string{"\n\n"})
+
+	p.o = n.o
+	return true
+}
+
+func (p *Parser) parseInline(inline *Inline, terminators []string) {
+	*inline = Inline{start: Pos(p.o), end: Pos(p.o)}
+	text := &Text{start: Pos(p.o), end: Pos(p.o)}
+
+parseInlineLoop:
 	for {
 		codeSpan := &InlineCode{}
-		if n.parseCodeSpan(codeSpan) {
+		if p.parseCodeSpan(codeSpan) {
 			if text.end != text.start {
-				text.Text = string(n.b[int(text.start):int(text.end)])
+				text.Text = string(p.b[int(text.start):int(text.end)])
 				inline.Nodes = append(inline.Nodes, text)
 			}
 			inline.Nodes = append(inline.Nodes, codeSpan)
-			text = &Text{start: Pos(n.o), end: Pos(n.o)}
+			text = &Text{start: Pos(p.o), end: Pos(p.o)}
 			continue
 		}
 
 		link := &Link{}
-		if n.parseLink(link) {
+		if p.parseLink(link) {
 			if text.end != text.start {
-				text.Text = string(n.b[int(text.start):int(text.end)])
+				text.Text = string(p.b[int(text.start):int(text.end)])
 				inline.Nodes = append(inline.Nodes, text)
 			}
 			inline.Nodes = append(inline.Nodes, link)
-			text = &Text{start: Pos(n.o), end: Pos(n.o)}
+			text = &Text{start: Pos(p.o), end: Pos(p.o)}
 			continue
 		}
 
-		if n.end() {
+		if p.end() {
 			break
 		}
 
-		if n.expect([]byte("\n\n")) {
-			text.end += 2
-			break
+		for _, terminator := range terminators {
+			if p.peak([]byte(terminator)) {
+				break parseInlineLoop
+			}
 		}
 
 		text.end++
-		n.o++
+		p.o++
 	}
 
 	if text.end != text.start {
-		text.Text = string(n.b[int(text.start):int(text.end)])
+		text.Text = string(p.b[int(text.start):int(text.end)])
 		inline.Nodes = append(inline.Nodes, text)
 	}
+}
 
-	p.o = n.o
-	return true
+func (p *Parser) inlineConsume(inline *Inline, terminators []string) {
+	if p.end() {
+		return
+	}
+
+	for _, terminator := range terminators {
+		if p.expect([]byte(terminator)) {
+			var textNode *Text
+
+			if len(inline.Nodes) > 0 {
+				textNode, _ = inline.Nodes[len(inline.Nodes)-1].(*Text)
+			}
+
+			if textNode == nil {
+				textNode = &Text{start: Pos(p.o - len([]byte(terminator))), end: Pos(p.o)}
+				inline.Nodes = append(inline.Nodes, textNode)
+			} else {
+				textNode.end += Pos(len([]byte(terminator)))
+			}
+
+			textNode.Text = string(p.b[int(textNode.start):int(textNode.end)])
+
+			return
+		}
+	}
 }
