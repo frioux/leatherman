@@ -1,9 +1,11 @@
 package lmhttp
 
 import (
-	"fmt"
 	"net/http"
 	"sort"
+
+	"embed"
+	"html/template"
 )
 
 type ClearMux struct {
@@ -11,12 +13,20 @@ type ClearMux struct {
 	*http.ServeMux
 }
 
+//go:embed templates/*
+var templateFS embed.FS
+
+var templates = template.Must(template.New("tmpl").ParseFS(templateFS, "templates/*"))
+
 func NewClearMux() *ClearMux {
 	m := &ClearMux{ServeMux: http.NewServeMux()}
-	m.ServeMux.Handle("/", http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
-		for _, s := range m.endpoints {
-			fmt.Fprintf(rw, " * %s\n", s)
+	m.ServeMux.Handle("/", HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) error {
+		rw.Header().Add("Content-Type", "text/html")
+		if err := templates.ExecuteTemplate(rw, "list.html", m.endpoints); err != nil {
+			return err
 		}
+
+		return nil
 	}))
 
 	return m
