@@ -265,6 +265,20 @@ func TestParseListTextOnly(t *testing.T) {
 				{content: " Three", prefix: " *", level: 2},
 			},
 		},
+		{
+			name: "mixed_introducers",
+			markdown: `
+* One
+- Two
+* Three
+`,
+
+			items: []listTestItem{
+				{content: " One", prefix: "*", level: 1},
+				{content: " Two", prefix: "-", level: 1},
+				{content: " Three", prefix: "*", level: 1},
+			},
+		},
 	}
 
 	for _, test := range listTests {
