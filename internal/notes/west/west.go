@@ -186,6 +186,7 @@ type ListItem struct {
 	start, end Pos
 
 	Prefix string
+	Level  int
 	*Inline
 }
 
