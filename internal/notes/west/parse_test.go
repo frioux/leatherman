@@ -294,6 +294,32 @@ func TestParseListTextOnly(t *testing.T) {
 	}
 }
 
+func TestParseListEmbeddedMarkup(t *testing.T) {
+	markdown := strings.Trim(`
+* Foo [Example](https://example.com) Bar
+`, "\n")
+
+	p := NewParser([]byte(markdown))
+	l := &List{}
+	if !p.parseList(l) {
+		t.Error("shoulda parsed")
+		return
+	}
+
+	testutil.Equal(t, len(l.ListItems), 1, "item count")
+	item := l.ListItems[0]
+	testutil.Equal(t, len(item.Inline.Nodes), 3, "singleton item children count")
+
+	firstText := item.Inline.Nodes[0].(*Text)
+	onlyLink := item.Inline.Nodes[1].(*Link)
+	secondText := item.Inline.Nodes[2].(*Text)
+
+	testutil.Equal(t, firstText.Text, " Foo ", "first text chunk matches")
+	testutil.Equal(t, onlyLink.HRef, "https://example.com", "link target matches")
+	testutil.Equal(t, onlyLink.Body.Nodes[0].(*Text).Text, "Example", "link text matches")
+	testutil.Equal(t, secondText.Text, " Bar", "second text chunk matches")
+}
+
 var crashers = []string{
 	0: "`",
 	1: "`\n",
