@@ -2,6 +2,7 @@ package west
 
 import (
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/frioux/leatherman/internal/testutil"
@@ -192,6 +193,105 @@ func TestParseHeader(t *testing.T) {
 	testutil.Equal(t, h.Level, 3, "level")
 	testutil.Equal(t, len(h.Inline.Nodes), 5, "node length")
 	testutil.Equal(t, string(h.Markdown()), in, "roundtrip")
+}
+
+func TestParseListTextOnly(t *testing.T) {
+	type listTestItem struct {
+		level   int
+		prefix  string
+		content string
+	}
+
+	type listTest struct {
+		name     string
+		markdown string
+		items    []listTestItem
+	}
+
+	listTests := []listTest{
+		{
+			name: "asterisks",
+			markdown: `
+* asterisk 1
+* asterisk 2
+* asterisk 3
+`,
+
+			items: []listTestItem{
+				{content: " asterisk 1", prefix: "*", level: 1},
+				{content: " asterisk 2", prefix: "*", level: 1},
+				{content: " asterisk 3", prefix: "*", level: 1},
+			},
+		},
+		{
+			name: "minuses",
+			markdown: `
+- minus 1
+- minus 2
+- minus 3
+`,
+
+			items: []listTestItem{
+				{content: " minus 1", prefix: "-", level: 1},
+				{content: " minus 2", prefix: "-", level: 1},
+				{content: " minus 3", prefix: "-", level: 1},
+			},
+		},
+		{
+			name: "nested",
+			markdown: `
+* One
+  * Two
+    * Three
+`,
+
+			items: []listTestItem{
+				{content: " One", prefix: "*", level: 1},
+				{content: " Two", prefix: "  *", level: 2},
+				{content: " Three", prefix: "    *", level: 3},
+			},
+		},
+		{
+			name: "nested_not_strictly_increasing",
+			markdown: `
+* One
+  * Two
+ * Three
+`,
+
+			items: []listTestItem{
+				{content: " One", prefix: "*", level: 1},
+				{content: " Two", prefix: "  *", level: 2},
+				{content: " Three", prefix: " *", level: 2},
+			},
+		},
+	}
+
+	for _, test := range listTests {
+		t.Run(test.name, func(t *testing.T) {
+			inputMarkdown := strings.TrimPrefix(test.markdown, "\n")
+			p := NewParser([]byte(inputMarkdown))
+			l := &List{}
+			if !p.parseList(l) {
+				t.Error("shoulda parsed")
+				return
+			}
+
+			testutil.Equal(t, len(l.ListItems), len(test.items), "item count")
+
+			for i, expectedItem := range test.items {
+				gotItem := l.ListItems[i]
+
+				gotText := gotItem.Inline.Nodes[0].(*Text).Text
+
+				testutil.Equal(t, gotItem.Level, expectedItem.level, "level")
+				testutil.Equal(t, gotItem.Prefix, expectedItem.prefix, "prefix")
+				testutil.Equal(t, gotText, expectedItem.content, "content")
+			}
+
+			testutil.Equal(t, string(l.Markdown()), inputMarkdown, "roundtrip")
+		})
+	}
 }
 
 var crashers = []string{
