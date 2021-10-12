@@ -320,6 +320,48 @@ func TestParseListEmbeddedMarkup(t *testing.T) {
 	testutil.Equal(t, secondText.Text, " Bar", "second text chunk matches")
 }
 
+func TestListAmongParagraphs(t *testing.T) {
+	markdown := strings.Trim(`
+this is a test
+of some [link3](/url3) words
+
+* One
+* Two
+* Three
+
+This is some more text
+`, "\n")
+
+	p := NewParser([]byte(markdown))
+	doc := &Document{}
+	if !p.Parse(doc) {
+		t.Error("shoulda parsed")
+		return
+	}
+
+	testutil.Equal(t, len(doc.Nodes), 3, "three kids")
+
+	{
+		_, isParagraph := doc.Nodes[0].(*Inline)
+		if !isParagraph {
+			t.Error("expected first child to be a paragraph")
+		}
+	}
+
+	onlyList := doc.Nodes[1].(*List)
+	testutil.Equal(t, len(onlyList.ListItems), 3, "three list items")
+	testutil.Equal(t, onlyList.ListItems[0].Nodes[0].(*Text).Text, " One", "first list item")
+	testutil.Equal(t, onlyList.ListItems[1].Nodes[0].(*Text).Text, " Two", "second list item")
+	testutil.Equal(t, onlyList.ListItems[2].Nodes[0].(*Text).Text, " Three", "three list item")
+
+	{
+		_, isParagraph := doc.Nodes[2].(*Inline)
+		if !isParagraph {
+			t.Error("expected second child to be a paragraph")
+		}
+	}
+}
+
 var crashers = []string{
 	0: "`",
 	1: "`\n",
