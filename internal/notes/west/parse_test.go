@@ -195,13 +195,13 @@ func TestParseHeader(t *testing.T) {
 	testutil.Equal(t, string(h.Markdown()), in, "roundtrip")
 }
 
-func TestParseListTextOnly(t *testing.T) {
-	type listTestItem struct {
-		level   int
-		prefix  string
-		content string
-	}
+type listTestItem struct {
+	prefix   string
+	content  string
+	children []listTestItem
+}
 
+func TestParseListTextOnly(t *testing.T) {
 	type listTest struct {
 		name     string
 		markdown string
@@ -218,9 +218,9 @@ func TestParseListTextOnly(t *testing.T) {
 `,
 
 			items: []listTestItem{
-				{content: " asterisk 1", prefix: "*", level: 1},
-				{content: " asterisk 2", prefix: "*", level: 1},
-				{content: " asterisk 3", prefix: "*", level: 1},
+				{content: " asterisk 1", prefix: "*"},
+				{content: " asterisk 2", prefix: "*"},
+				{content: " asterisk 3", prefix: "*"},
 			},
 		},
 		{
@@ -232,9 +232,9 @@ func TestParseListTextOnly(t *testing.T) {
 `,
 
 			items: []listTestItem{
-				{content: " minus 1", prefix: "-", level: 1},
-				{content: " minus 2", prefix: "-", level: 1},
-				{content: " minus 3", prefix: "-", level: 1},
+				{content: " minus 1", prefix: "-"},
+				{content: " minus 2", prefix: "-"},
+				{content: " minus 3", prefix: "-"},
 			},
 		},
 		{
@@ -246,9 +246,19 @@ func TestParseListTextOnly(t *testing.T) {
 `,
 
 			items: []listTestItem{
-				{content: " One", prefix: "*", level: 1},
-				{content: " Two", prefix: "  *", level: 2},
-				{content: " Three", prefix: "    *", level: 3},
+				{
+					content: " One",
+					prefix:  "*",
+					children: []listTestItem{
+						{
+							content: " Two",
+							prefix:  "  *",
+							children: []listTestItem{
+								{content: " Three", prefix: "    *"},
+							},
+						},
+					},
+				},
 			},
 		},
 		{
@@ -260,9 +270,14 @@ func TestParseListTextOnly(t *testing.T) {
 `,
 
 			items: []listTestItem{
-				{content: " One", prefix: "*", level: 1},
-				{content: " Two", prefix: "  *", level: 2},
-				{content: " Three", prefix: " *", level: 2},
+				{
+					content: " One",
+					prefix:  "*",
+					children: []listTestItem{
+						{content: " Two", prefix: "  *"},
+						{content: " Three", prefix: " *"},
+					},
+				},
 			},
 		},
 		{
@@ -274,9 +289,9 @@ func TestParseListTextOnly(t *testing.T) {
 `,
 
 			items: []listTestItem{
-				{content: " One", prefix: "*", level: 1},
-				{content: " Two", prefix: "-", level: 1},
-				{content: " Three", prefix: "*", level: 1},
+				{content: " One", prefix: "*"},
+				{content: " Two", prefix: "-"},
+				{content: " Three", prefix: "*"},
 			},
 		},
 	}
@@ -291,20 +306,25 @@ func TestParseListTextOnly(t *testing.T) {
 				return
 			}
 
-			testutil.Equal(t, len(l.ListItems), len(test.items), "item count")
-
-			for i, expectedItem := range test.items {
-				gotItem := l.ListItems[i]
-
-				gotText := gotItem.Inline.Nodes[0].(*Text).Text
-
-				testutil.Equal(t, gotItem.Level, expectedItem.level, "level")
-				testutil.Equal(t, gotItem.Prefix, expectedItem.prefix, "prefix")
-				testutil.Equal(t, gotText, expectedItem.content, "content")
-			}
+			listsEqual(t, l.ListItems, test.items)
 
 			testutil.Equal(t, string(l.Markdown()), inputMarkdown, "roundtrip")
 		})
+	}
+}
+
+func listsEqual(t *testing.T, gotItems []*ListItem, expectedItems []listTestItem) {
+	testutil.Equal(t, len(gotItems), len(expectedItems), "item count")
+
+	for i, gotItem := range gotItems {
+		expectedItem := expectedItems[i]
+
+		gotText := gotItem.Inline.Nodes[0].(*Text).Text
+
+		testutil.Equal(t, gotItem.Prefix, expectedItem.prefix, "prefix matches")
+		testutil.Equal(t, gotText, expectedItem.content, "content matches")
+
+		listsEqual(t, gotItem.ListItems, expectedItem.children)
 	}
 }
 

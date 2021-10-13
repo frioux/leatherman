@@ -185,15 +185,22 @@ func (l *List) Markdown() []byte {
 type ListItem struct {
 	start, end Pos
 
-	Prefix string
-	Level  int
+	Prefix    string
+	Level     int
+	ListItems []*ListItem
 	*Inline
 }
 
 func (l *ListItem) Start() Pos { return l.start }
 func (l *ListItem) End() Pos   { return l.end }
 func (l *ListItem) Markdown() []byte {
-	return append(append([]byte(l.Prefix), l.Inline.Markdown()...), '\n')
+	ret := append(append([]byte(l.Prefix), l.Inline.Markdown()...), '\n')
+
+	for _, l := range l.ListItems {
+		ret = append(ret, l.Markdown()...)
+	}
+
+	return ret
 }
 
 type CodeFenceBlock struct {

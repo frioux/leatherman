@@ -86,10 +86,15 @@ func (p *Parser) Parse(d *Document) bool {
 	return true
 }
 
-func (p *Parser) parseListItem(item *ListItem, indents []int) (bool, []int) {
+type indentInfo struct {
+	indent int
+	item   *ListItem
+}
+
+func (p *Parser) parseListItem(item *ListItem, minimumIndent int) bool {
 	origParser := p
 
-	return func(p *Parser) (bool, []int) {
+	return func(p *Parser) bool {
 		indent := 0
 
 		for {
@@ -103,43 +108,39 @@ func (p *Parser) parseListItem(item *ListItem, indents []int) (bool, []int) {
 			}
 		}
 
-		// remove previous indent levels beyond the current one
-		trimIndex := len(indents)
-		for trimIndex > 0 && indents[trimIndex-1] > indent {
-			trimIndex--
+		if indent < minimumIndent {
+			return false
 		}
-
-		if trimIndex != len(indents) {
-			indents = indents[:trimIndex]
-		}
-
-		// append the current indent level, unless we already have the current indent in the slice
-		if len(indents) == 0 || indents[len(indents)-1] != indent {
-			indents = append(indents, indent)
-		}
-
-		level := len(indents)
 
 		// XXX ability to constrain introductory character if we're handling the
 		//     2nd - nth item
 		if !p.expect([]byte("*")) && !p.expect([]byte("-")) {
-			return false, nil
+			return false
 		}
 
 		*item = ListItem{
 			start:  Pos(origParser.o),
 			end:    Pos(p.o),
 			Prefix: string(p.b[origParser.o:p.o]),
-			Level:  level,
 			Inline: &Inline{},
 		}
 
 		p.parseInline(item.Inline, []string{"\n"})
+		p.expect([]byte("\n"))
 
-		item.end = Pos(p.o)
+		item.end = Pos(p.o) // XXX or does this include all of the descendant list items too?
+
+		for {
+			childItem := &ListItem{}
+			if !p.parseListItem(childItem, indent+1) {
+				break
+			}
+			item.ListItems = append(item.ListItems, childItem)
+		}
+
 		origParser.o = p.o
 
-		return true, indents
+		return true
 	}(p.copy())
 }
 
@@ -147,14 +148,9 @@ func (p *Parser) parseList(l *List) bool {
 	startPos := p.o
 	item := &ListItem{}
 
-	indents := make([]int, 0)
-
-	parsedListItem, indents := p.parseListItem(item, indents)
-
-	if !parsedListItem {
+	if !p.parseListItem(item, 0) {
 		return false
 	}
-	p.expect([]byte("\n"))
 
 	items := []*ListItem{
 		item,
@@ -162,12 +158,9 @@ func (p *Parser) parseList(l *List) bool {
 
 	for {
 		item := &ListItem{}
-		parsedListItem, indents = p.parseListItem(item, indents)
-		if !parsedListItem {
+		if !p.parseListItem(item, 0) {
 			break
 		}
-
-		p.expect([]byte("\n"))
 		items = append(items, item)
 	}
 
