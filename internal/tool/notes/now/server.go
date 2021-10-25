@@ -75,12 +75,14 @@ func handlerAddItem(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath st
 func handlerFavicon() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 		rw.Header().Add("Content-Type", "image/svg+xml")
+		rw.Header().Set("Cache-Control", "Cache-Control: public, max-age=604800, immutable")
 		fmt.Fprintln(rw, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">☕</text></svg>`)
 	})
 }
 
 func handlerList(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		rw.Header().Set("Cache-Control", "no-cache")
 		stmt, err := z.Preparex(`SELECT title, url FROM articles ORDER BY title`)
 		if err != nil {
 			return err
@@ -97,6 +99,7 @@ func handlerList(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown) http.Handler 
 
 func handlerQ(z *notes.Zine, mdwn goldmark.Markdown) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		rw.Header().Set("Cache-Control", "no-cache")
 		v := qVars{HTMLVars: &HTMLVars{Zine: z}}
 		q := req.URL.Query().Get("q")
 		if q == "" {
@@ -114,6 +117,7 @@ func handlerQ(z *notes.Zine, mdwn goldmark.Markdown) http.Handler {
 
 func handlerRoot(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		rw.Header().Set("Cache-Control", "no-cache")
 		if req.URL.Path == "/" {
 			b, err := fs.ReadFile(fss, nowPath)
 			if err != nil {
@@ -216,6 +220,7 @@ func handlerRoot(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath strin
 
 func handlerToggle(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath string) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		rw.Header().Set("Cache-Control", "no-cache")
 		if err := req.ParseForm(); err != nil {
 			return err
 		}
@@ -261,6 +266,7 @@ func handlerToggle(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath str
 
 func handlerUpdate(z *notes.Zine, fss fs.FS) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		rw.Header().Set("Cache-Control", "no-cache")
 		switch {
 		case req.Method == "GET":
 			f := req.URL.Query().Get("file")

@@ -178,6 +178,8 @@ var (
 
 func renderOrSelectPlayer(conn *dbus.Conn) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) error {
+		rw.Header().Set("Cache-Control", "no-cache")
+
 		// hack to ignore the duplicate request we get from fraidycat
 		if r.Header.Get("Accept") == "*/*" {
 			fmt.Println("saw derp accept, ignoring")

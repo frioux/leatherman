@@ -56,7 +56,8 @@ func Amygdala(args []string, _ io.Reader) error {
 	mux := http.NewServeMux()
 
 	mux.Handle("/version", http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
-		rw.Header().Set("content-type", "text/plain")
+		rw.Header().Set("Content-Type", "text/plain")
+		rw.Header().Set("Cache-Control", "no-cache")
 
 		bi, ok := debug.ReadBuildInfo()
 		if !ok {
@@ -88,6 +89,7 @@ func receiveSMS(cl *http.Client, tok, twilioAuthToken, twilioURL, myCell string)
 	}
 
 	return func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Cache-Control", "no-cache")
 		if err := r.ParseForm(); err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			io.WriteString(rw, "Couldn't Parse Form")

@@ -34,5 +34,6 @@ func (v *cacher) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		v.timeout = time.Now().Add(v.reloadEvery)
 	}
 
+	rw.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d, immutable", int(v.timeout.Sub(time.Now()).Seconds())))
 	v.value.render(rw)
 }

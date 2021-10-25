@@ -91,6 +91,7 @@ func allVersions(ctx context.Context) []option {
 
 func handlerSup(z *notes.Zine) http.Handler {
 	return lmhttp.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) error {
+		rw.Header().Set("Cache-Control", "no-cache")
 		ctx, cancel := context.WithTimeout(req.Context(), 2*time.Second)
 		defer cancel()
 
