@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.4.1
 	github.com/BurntSushi/xgb v0.0.0-20200324125942-20f126ea2843 // indirect
 	github.com/BurntSushi/xgbutil v0.0.0-20190907113008-ad855c713046
-	github.com/PuerkitoBio/goquery v1.7.1
+	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba
 	github.com/bwmarrin/discordgo v0.23.2
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
@@ -33,13 +33,13 @@ require (
 )
 
 require (
-	github.com/andybalholm/cascadia v1.2.0 // indirect
+	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	golang.org/x/mod v0.3.0 // indirect
-	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
+	golang.org/x/net v0.0.0-20210916014120-12bc252f5db8 // indirect
 	golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac // indirect
 	golang.org/x/tools v0.0.0-20201124115921-2c860bdd6e78 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
