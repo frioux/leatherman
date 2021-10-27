@@ -88,8 +88,8 @@ func doUpdate(url string) {
 	defer func() {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			mostRecentFailure = err
 		}
+		mostRecentFailure = err
 	}()
 
 	curp, err := os.Executable()
