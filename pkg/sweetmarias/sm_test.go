@@ -1,4 +1,4 @@
-package sweetmarias
+package sweetmarias_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/frioux/leatherman/internal/testutil"
+	"github.com/frioux/leatherman/pkg/sweetmarias"
 )
 
 func TestLoadCoffee(t *testing.T) {
@@ -28,12 +29,12 @@ func TestLoadCoffee(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	c, err := LoadCoffee(context.Background(), ts.URL)
+	c, err := sweetmarias.LoadCoffee(context.Background(), ts.URL)
 	if err != nil {
 		t.Fatalf("Failed to LoadCoffee: %s", err)
 	}
 
-	testutil.Equal(t, c, Coffee{
+	testutil.Equal(t, c, sweetmarias.Coffee{
 		Title:    "Papua New Guinea Honey Nebilyer Estate",
 		Overview: "Honey process seems to bring out fruited notes like cranberry, raisin, red grape, and underscored by molasses-like sweetness. This PNG boasts body, and with mild acidity, is great espresso too. City+ to Full City+. Good for espresso.",
 		Score:    86.6,

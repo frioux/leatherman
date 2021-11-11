@@ -1,14 +1,16 @@
-package twilio
+package twilio_test
 
 import (
 	"net/http"
 	"net/url"
 	"testing"
+
+	"github.com/frioux/leatherman/internal/twilio"
 )
 
 func TestCheckMAC(t *testing.T) {
 	// Example from https://www.twilio.com/docs/usage/security#notes
-	ok, err := CheckMAC([]byte("12345"), []byte("https://mycompany.com/myapp.php?foo=1&bar=2"), &http.Request{
+	ok, err := twilio.CheckMAC([]byte("12345"), []byte("https://mycompany.com/myapp.php?foo=1&bar=2"), &http.Request{
 		PostForm: url.Values(map[string][]string{
 			"CallSid": {"CA1234567890ABCDE"},
 			"Caller":  {"+12349013030"},

@@ -1,9 +1,10 @@
-package notes
+package notes_test
 
 import (
 	"strings"
 	"testing"
 
+	"github.com/frioux/leatherman/internal/notes"
 	"github.com/frioux/leatherman/internal/testutil"
 )
 
@@ -19,12 +20,12 @@ func TestReadArticle(t *testing.T) {
 
 goes here`
 
-	a, err := ReadArticle(strings.NewReader(str))
+	a, err := notes.ReadArticle(strings.NewReader(str))
 
 	if err != nil {
 		t.Fatalf("couldn't readMetadata: %s", err)
 	}
-	testutil.Equal(t, a, Article{
+	testutil.Equal(t, a, notes.Article{
 		Title:       "frew",
 		Tags:        []string{"foo", "bar"},
 		Extra:       map[string]string{"foo": "bar"},
@@ -57,12 +58,12 @@ function bar()
 
 end
 ` + "```\n"
-	a, err := ReadArticle(strings.NewReader(str))
+	a, err := notes.ReadArticle(strings.NewReader(str))
 
 	if err != nil {
 		t.Fatalf("couldn't readMetadata: %s", err)
 	}
-	testutil.Equal(t, a, Article{
+	testutil.Equal(t, a, notes.Article{
 		Title:       "frew",
 		Tags:        []string{"foo", "bar"},
 		Extra:       map[string]string{"foo": "bar"},
@@ -85,12 +86,12 @@ end
 	}, "basic")
 }
 
-var A Article
+var A notes.Article
 
 func BenchmarkReadArticle(b *testing.B) {
-	var a Article
+	var a notes.Article
 	for i := 0; i < b.N; i++ {
-		a, _ = ReadArticle(strings.NewReader(`
+		a, _ = notes.ReadArticle(strings.NewReader(`
 		{
 			"title": "frew",
 			"tags": ["foo", "bar"],

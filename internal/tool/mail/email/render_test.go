@@ -1,6 +1,10 @@
-package email
+package email_test
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/frioux/leatherman/internal/tool/mail/email"
+)
 
 func ExampleRender() {
 	r := strings.NewReader(`foo
@@ -8,7 +12,7 @@ bar
 baz
 Date: Wed, 18 Jul 2019 16:00:00 +0000`)
 
-	Render(nil, r)
+	email.Render(nil, r)
 	// Output:
 	// foo
 	// bar

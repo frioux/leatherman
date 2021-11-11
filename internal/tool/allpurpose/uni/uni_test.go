@@ -1,12 +1,14 @@
-package uni
+package uni_test
 
 import (
 	"fmt"
 	"os"
+
+	"github.com/frioux/leatherman/internal/tool/allpurpose/uni"
 )
 
 func ExampleDescribe() {
-	err := Describe([]string{"uni", "⢾"}, nil)
+	err := uni.Describe([]string{"uni", "⢾"}, nil)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't Describe: %s\n", err)
 		os.Exit(1)

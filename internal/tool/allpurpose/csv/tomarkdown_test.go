@@ -1,10 +1,14 @@
-package csv
+package csv_test
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/frioux/leatherman/internal/tool/allpurpose/csv"
+)
 
 func ExampleToMarkdown() {
 	r := strings.NewReader("foo,bar,baz\n1,2,3\n3,2,1")
-	ToMarkdown(nil, r)
+	csv.ToMarkdown(nil, r)
 	// Output:
 	// foo | bar | baz
 	//  --- | --- | ---

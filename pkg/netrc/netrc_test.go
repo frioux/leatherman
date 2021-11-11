@@ -1,15 +1,16 @@
-package netrc
+package netrc_test
 
 import (
 	"testing"
 
 	"github.com/frioux/leatherman/internal/testutil"
+	"github.com/frioux/leatherman/pkg/netrc"
 )
 
 func TestLogin(t *testing.T) {
 	t.Parallel()
 
-	f, err := Parse("./testdata/login.netrc")
+	f, err := netrc.Parse("./testdata/login.netrc")
 	if err != nil {
 		t.Errorf("Parse failed: %s", err)
 		return
@@ -26,7 +27,7 @@ func TestLogin(t *testing.T) {
 func TestSampleMulti(t *testing.T) {
 	t.Parallel()
 
-	f, err := Parse("./testdata/sample_multi.netrc")
+	f, err := netrc.Parse("./testdata/sample_multi.netrc")
 	if err != nil {
 		t.Errorf("Parse failed: %s", err)
 		return
@@ -42,7 +43,7 @@ func TestSampleMulti(t *testing.T) {
 func TestSampleMultiWithDefault(t *testing.T) {
 	t.Parallel()
 
-	f, err := Parse("./testdata/sample_multi_with_default.netrc")
+	f, err := netrc.Parse("./testdata/sample_multi_with_default.netrc")
 	if err != nil {
 		t.Errorf("Parse failed: %s", err)
 		return
@@ -59,7 +60,7 @@ func TestSampleMultiWithDefault(t *testing.T) {
 func TestNewlineless(t *testing.T) {
 	t.Parallel()
 
-	f, err := Parse("./testdata/newlineless.netrc")
+	f, err := netrc.Parse("./testdata/newlineless.netrc")
 	if err != nil {
 		t.Errorf("Parse failed: %s", err)
 		return
@@ -73,7 +74,7 @@ func TestNewlineless(t *testing.T) {
 func TestBadDefaultOrder(t *testing.T) {
 	t.Parallel()
 
-	f, err := Parse("./testdata/bad_default_order.netrc")
+	f, err := netrc.Parse("./testdata/bad_default_order.netrc")
 	if err != nil {
 		t.Errorf("Parse failed: %s", err)
 		return
@@ -90,7 +91,7 @@ func TestBadDefaultOrder(t *testing.T) {
 func TestDefaultOnly(t *testing.T) {
 	t.Parallel()
 
-	f, err := Parse("./testdata/default_only.netrc")
+	f, err := netrc.Parse("./testdata/default_only.netrc")
 	if err != nil {
 		t.Errorf("Parse failed: %s", err)
 		return
@@ -104,7 +105,7 @@ func TestDefaultOnly(t *testing.T) {
 func TestGood(t *testing.T) {
 	t.Parallel()
 
-	f, err := Parse("./testdata/good.netrc")
+	f, err := netrc.Parse("./testdata/good.netrc")
 	if err != nil {
 		t.Errorf("Parse failed: %s", err)
 		return
@@ -119,7 +120,7 @@ func TestGood(t *testing.T) {
 func TestPassword(t *testing.T) {
 	t.Parallel()
 
-	f, err := Parse("./testdata/password.netrc")
+	f, err := netrc.Parse("./testdata/password.netrc")
 	if err != nil {
 		t.Errorf("Parse failed: %s", err)
 		return
@@ -132,7 +133,7 @@ func TestPassword(t *testing.T) {
 func TestPermissive(t *testing.T) {
 	t.Parallel()
 
-	f, err := Parse("./testdata/permissive.netrc")
+	f, err := netrc.Parse("./testdata/permissive.netrc")
 	if err != nil {
 		t.Errorf("Parse failed: %s", err)
 		return

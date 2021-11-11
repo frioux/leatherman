@@ -1,4 +1,4 @@
-package middleware
+package middleware_test
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/frioux/leatherman/internal/middleware"
 	"github.com/frioux/leatherman/internal/testutil"
 )
 
@@ -21,7 +22,7 @@ func TestLog(t *testing.T) {
 		w.WriteHeader(404)
 	}
 	rr := httptest.NewRecorder()
-	handler := Adapt(inner, Log(buf))
+	handler := middleware.Adapt(inner, middleware.Log(buf))
 
 	handler.ServeHTTP(rr, req)
 

@@ -1,13 +1,14 @@
-package shellquote
+package shellquote_test
 
 import (
 	"testing"
 
 	"github.com/frioux/leatherman/internal/testutil"
+	"github.com/frioux/leatherman/pkg/shellquote"
 )
 
 func test(t *testing.T, in []string, expected string) {
-	ret, err := Quote(in)
+	ret, err := shellquote.Quote(in)
 	if err != nil {
 		t.Errorf("Quote errored: %s", err)
 		return
@@ -35,8 +36,8 @@ func TestShellQuote(t *testing.T) {
 	test(t, []string{"foo=bar", "command"}, `'foo=bar' command`)
 	test(t, []string{"foo=bar", "baz=quux", "command"}, `'foo=bar' 'baz=quux' command`)
 
-	_, err := Quote([]string{"\x00"})
-	if err != ErrNull {
+	_, err := shellquote.Quote([]string{"\x00"})
+	if err != shellquote.ErrNull {
 		t.Errorf("err should be ErrNull; was %s", err)
 	}
 }
