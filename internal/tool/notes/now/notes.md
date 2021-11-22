@@ -20,6 +20,41 @@ LM_NOTES_PATH=/some/directory notes -listen :8080
 When notes are loaded from dropbox, you must also set `LM_DROPBOX_TOKEN` to a
 Dropbox token, and the PATH should not include a `/` prefix.
 
+### systemd.service
+
+The following is a working systemd unit you can use to set up a service:
+
+```
+[Unit]
+Description=Notes Server, port 5000
+
+[Service]
+Environment=LM_NOTES_PATH=notes/content/posts LM_DROPBOX_TOKEN=yyy 'LM_GH_TOKEN=Bearer xxx'
+ExecStart=/home/pi/leatherman notes -listen 0:5000
+Restart=always
+StartLimitBurst=0
+
+[Install]
+WantedBy=default.target
+```
+
+You can put it at either `/etc/systemd/system/notes.service` or
+`~/.config/systemd/user/notes.service`.
+
+Then do one of these:
+
+```bash
+$ systemctl --user daemon-reload
+$ systemctl --user enable notes
+$ systemctl --user start notes
+```
+
+```bash
+$ systemctl daemon-reload
+$ systemctl enable notes
+$ systemctl start notes
+```
+
 ## Note Format
 
 This is what a note looks like, called something like `funny.md`:

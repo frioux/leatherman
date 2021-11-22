@@ -6,6 +6,41 @@ The following env vars should be set:
  * LM_BOT_LUA_PATH should be set to the location of lua to process emoji data within dropbox.
  * LM_DISCORD_TOKEN should be set for this to actually function.
 
+### systemd.service
+
+The following is a working systemd unit you can use to set up a service:
+
+```
+[Unit]
+Description=Auto-emote Discord Bot
+
+[Service]
+Environment=LM_DISCORD_TOKEN=zzz LM_BOT_LUA_PATH=/private-dotfiles/automoji.lua LM_DROPBOX_TOKEN=yyy 'LM_GH_TOKEN=Bearer xxx'
+ExecStart=/home/pi/leatherman auto-emote
+Restart=always
+StartLimitBurst=0
+
+[Install]
+WantedBy=default.target
+```
+
+You can put it at either `/etc/systemd/system/auto-emote.service` or
+`~/.config/systemd/user/auto-emote.service`.
+
+Then do one of these:
+
+```bash
+$ systemctl --user daemon-reload
+$ systemctl --user enable auto-emote
+$ systemctl --user start auto-emote
+```
+
+```bash
+$ systemctl daemon-reload
+$ systemctl enable auto-emote
+$ systemctl start auto-emote
+```
+
 Here's an example of lua code that works for this:
 
 ```lua
