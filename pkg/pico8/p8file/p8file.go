@@ -79,6 +79,10 @@ func (c Cart) SpriteAt(i uint8) *image.Paletted {
 }
 
 func (c Cart) MapImage() *image.Paletted {
+	spriteAt := make([]*image.Paletted, 256)
+	for i := range spriteAt {
+		spriteAt[i] = c.SpriteAt(uint8(i))
+	}
 	p := image.NewPaletted(image.Rect(0, 0, 128*8, 64*8), palette)
 
 	for i, v := range c.Map {
@@ -86,7 +90,7 @@ func (c Cart) MapImage() *image.Paletted {
 		x := 8 * raw_x
 		y := 8 * ((i - raw_x) / 128)
 
-		draw.Draw(p, image.Rect(x, y, x+8, y+8), c.SpriteAt(uint8(v)), image.Point{}, draw.Over)
+		draw.Draw(p, image.Rect(x, y, x+8, y+8), spriteAt[v], image.Point{}, draw.Over)
 	}
 
 	return p
