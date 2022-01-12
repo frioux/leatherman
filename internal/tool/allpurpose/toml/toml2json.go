@@ -17,7 +17,11 @@ func ToJSON(_ []string, stdin io.Reader) error {
 	}
 	var ret interface{}
 	if err := parser.Unmarshal(buf.Bytes(), &ret); err != nil {
-		return fmt.Errorf("toml.Unmarshal: %w", err)
+		if terr, ok := err.(parser.ParseError); ok {
+			return fmt.Errorf("toml.Unmarshal: %s", terr.ErrorWithPosition())
+		} else {
+			return fmt.Errorf("toml.Unmarshal: %w", err)
+		}
 	}
 
 	e := json.NewEncoder(os.Stdout)
