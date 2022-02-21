@@ -23,7 +23,7 @@ require (
 	github.com/pierrec/lz4/v3 v3.3.4
 	github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3
 	github.com/ulikunitz/xz v0.5.10
-	github.com/yuin/goldmark v1.4.6
+	github.com/yuin/goldmark v1.4.7
 	github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
 	golang.org/x/text v0.3.7
