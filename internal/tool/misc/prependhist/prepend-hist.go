@@ -16,7 +16,7 @@ func Run(args []string, stdin io.Reader) error {
 	}
 
 	file, err := os.Open(args[1])
-	if err != nil {
+	if err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("Couldn't open history file: %w", err)
 	}
 	fi, err := os.Stat(args[1])
