@@ -402,11 +402,11 @@ func Parse(r io.Reader) (Cart, error) {
 				state = parsingMusic
 				continue
 			default:
-			b, err := hex.DecodeString(strings.ReplaceAll(l, " ", ""))
-			if err != nil {
-				return Cart{}, fmt.Errorf("parsing __music__ section: %w", err)
-			}
-			cart.Music = append(cart.Music, b...)
+				b, err := hex.DecodeString(strings.ReplaceAll(l, " ", ""))
+				if err != nil {
+					return Cart{}, fmt.Errorf("parsing __music__ section: %w", err)
+				}
+				cart.Music = append(cart.Music, b...)
 			}
 		}
 	}
