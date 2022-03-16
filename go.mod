@@ -1,6 +1,6 @@
 module github.com/frioux/leatherman
 
-// +heroku goVersion go1.16
+// +heroku goVersion go1.18
 
 require (
 	github.com/BurntSushi/toml v1.0.0
@@ -54,4 +54,4 @@ require (
 	modernc.org/token v1.0.0 // indirect
 )
 
-go 1.17
+go 1.18
