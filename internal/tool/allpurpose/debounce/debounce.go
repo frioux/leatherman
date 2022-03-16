@@ -26,7 +26,7 @@ func Run(args []string, stdin io.Reader) error {
 	}
 
 	if h || help {
-		fmt.Println("\n" +
+		fmt.Print("\n" +
 			" debounce          [--leadingEdge] [--lockoutTime 2s]\n" +
 			"                   [-h|--help]\n" +
 			"\n" +
@@ -46,7 +46,7 @@ func Run(args []string, stdin io.Reader) error {
 			"save\n" +
 			"\n" +
 			" inotifywait -mr -e modify,move . | debounce | xargs -i{} make test\n" +
-			"",
+			"\n",
 		)
 		return nil
 	}
