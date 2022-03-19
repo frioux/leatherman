@@ -17,9 +17,9 @@ jobs:
     strategy:
         matrix:
           cur:
-            - {GOOS: linux, GOARCH: amd64, outfile: leatherman.xz}
-            - {GOOS: linux, GOARCH: arm, outfile: leatherman.arm.xz}
-            - {GOOS: darwin, GOARCH: amd64, outfile: leatherman.mac.xz}
+            - {CGO_ENABLED: 1, GOOS: linux, GOARCH: amd64, outfile: leatherman.xz}
+            - {CGO_ENABLED: 1, GOOS: linux, GOARCH: arm, outfile: leatherman.arm.xz}
+            - {CGO_ENABLED: 1, GOOS: darwin, GOARCH: amd64, outfile: leatherman.mac.xz}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -45,6 +45,7 @@ jobs:
           go-version: '^1.18'
       - run: go build -o leatherman.exe
         env:
+          CGO_ENABLED: 0
           GOOS: windows
           GOARCH: amd64
       - run: zip leatherman-windows.zip leatherman.exe
