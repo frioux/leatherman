@@ -98,6 +98,7 @@ echo "---\nfoo: 1" | leatherman yaml2json
 
  * `backlight`: Modifies screen brightness. ([internal/tool/misc/backlight/backlight.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/backlight/backlight.md))
  * `draw`: Draws images with lua. ([internal/tool/misc/img/draw.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/img/draw.md))
+ * `export-bamboo-celebrations`: Exports company org chart as JSON. ([internal/tool/misc/bamboo/export-bamboo-celebrations.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/bamboo/export-bamboo-celebrations.md))
  * `export-bamboohr`: Exports company directory as JSON. ([internal/tool/misc/bamboo/export-bamboohr.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/bamboo/export-bamboohr.md))
  * `export-bamboohr-tree`: Exports company org chart as JSON. ([internal/tool/misc/bamboo/export-bamboohr-tree.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/bamboo/export-bamboohr-tree.md))
  * `media-remote`: `media-remote` control media players on Linux. ([internal/tool/misc/desktop/media-remote.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/desktop/media-remote.md))

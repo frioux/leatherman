@@ -13,6 +13,8 @@ import (
 type client struct {
 	authURL, dirURL, treeURL string
 
+	celebURLPrefix string
+
 	user, password string
 
 	b *browser.Browser
@@ -23,6 +25,7 @@ func newClient(user, password string) client {
 		authURL: "https://ziprecruiter1.bamboohr.com/login.php",
 		dirURL:  "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info",
 		treeURL: "https://ziprecruiter1.bamboohr.com/employees/orgchart.php?pin",
+		celebURLPrefix: "https://ziprecruiter1.bamboohr.com/widget/celebrations/", // 2022-01-01/2022-01-31
 
 		user:     user,
 		password: password,
@@ -84,4 +87,16 @@ func (c *client) tree(w io.Writer) error {
 
 	_, err := w.Write([]byte(s.Text()))
 	return err
+}
+
+func (c *client) celebrations(start, end string, w io.Writer) error {
+	if err := c.b.Open(c.celebURLPrefix + start + "/" + end); err != nil {
+		return fmt.Errorf("export-bamboohr-celebrations: %w", err)
+	}
+
+	if _, err := c.b.Download(w); err != nil {
+		return fmt.Errorf("export-bamboo-celebrations: %w", err)
+	}
+
+	return nil
 }
