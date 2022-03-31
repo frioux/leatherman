@@ -20,7 +20,7 @@ to pull the latest binary at install time and run the `explode` tool.
 Here's a copy pasteable script to install the leatherman on OSX or Linux:
 
 ``` bash
-OS=$([ $(uname -s) = "Darwin" ] && echo "-osx")
+OS=$([ $(uname -s) = "Darwin" ] && echo ".mac")
 LMURL="$(curl -s https://api.github.com/repos/frioux/leatherman/releases/latest |
    grep browser_download_url |
    cut -d '"' -f 4 |
