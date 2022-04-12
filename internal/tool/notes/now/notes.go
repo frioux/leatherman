@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"os"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 
 	"github.com/frioux/leatherman/internal/dropbox"
 	"github.com/frioux/leatherman/internal/lmfs"

@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 const Schema = `
@@ -37,7 +37,7 @@ func NewDB(name string) (*DB, error) {
 		name = "notes"
 	}
 
-	dbh, err = sqlx.Open("sqlite3", "file:"+name+"?mode=memory&_sync=OFF&_journal=OFF&_vacuum=0&cache=shared")
+	dbh, err = sqlx.Open("sqlite", "file:"+name+"?mode=memory&_sync=OFF&_journal=OFF&_vacuum=0&cache=shared")
 	if err != nil {
 		return nil, err
 	}
