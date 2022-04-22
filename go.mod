@@ -10,7 +10,7 @@ require (
 	github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba
 	github.com/bwmarrin/discordgo v0.25.0
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
-	github.com/fsnotify/fsnotify v1.5.2
+	github.com/fsnotify/fsnotify v1.5.3
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/google/go-cmp v0.5.7
 	github.com/hackebrot/turtle v0.1.1-0.20200616125707-1bb4c277aedd
