@@ -14,5 +14,5 @@ func ExportCelebrations([]string, io.Reader) error {
 	}
 
 	year := fmt.Sprintf("%d", time.Now().Year())
-	return c.celebrations(year + "-01-01", year + "-12-31", os.Stdout)
+	return c.celebrations(year+"-01-01", year+"-12-31", os.Stdout)
 }

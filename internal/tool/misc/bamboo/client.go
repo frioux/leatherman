@@ -22,9 +22,9 @@ type client struct {
 
 func newClient(user, password string) client {
 	return client{
-		authURL: "https://ziprecruiter1.bamboohr.com/login.php",
-		dirURL:  "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info",
-		treeURL: "https://ziprecruiter1.bamboohr.com/employees/orgchart.php?pin",
+		authURL:        "https://ziprecruiter1.bamboohr.com/login.php",
+		dirURL:         "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info",
+		treeURL:        "https://ziprecruiter1.bamboohr.com/employees/orgchart.php?pin",
 		celebURLPrefix: "https://ziprecruiter1.bamboohr.com/widget/celebrations/", // 2022-01-01/2022-01-31
 
 		user:     user,
