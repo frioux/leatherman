@@ -39,6 +39,7 @@ func Status(args []string, _ io.Reader) error {
 	mux.Handle("/steambox", &cacher{reloadEvery: time.Second, value: &steambox{}, mu: &sync.Mutex{}})
 	mux.Handle("/x11title", &cacher{reloadEvery: 0, value: &x11title{}, mu: &sync.Mutex{}})
 	mux.Handle("/x11shot", &cacher{value: &x11shot{}, mu: &sync.Mutex{}})
+	mux.Handle("/favicon.ico", faviconHandler())
 
 	s := &sound{}
 	soundCacher := &cacher{reloadEvery: time.Second, value: s, mu: &sync.Mutex{}}
@@ -63,6 +64,7 @@ func Status(args []string, _ io.Reader) error {
 	if err != nil {
 		return fmt.Errorf("net.Listen: %w", err)
 	}
+	fmt.Fprintln(os.Stderr, "status listening on", listener.Addr())
 
 	srv := http.Server{Handler: logReqs(mux)}
 
