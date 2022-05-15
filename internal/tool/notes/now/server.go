@@ -16,6 +16,7 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 	lua "github.com/yuin/gopher-lua"
 
+	"github.com/frioux/leatherman/internal/lmfav"
 	"github.com/frioux/leatherman/internal/lmfs"
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/frioux/leatherman/internal/lmlua"
@@ -69,14 +70,6 @@ func handlerAddItem(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath st
 		}
 
 		return tpl.ExecuteTemplate(rw, "simple.html", v)
-	})
-}
-
-func handlerFavicon() http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
-		rw.Header().Add("Content-Type", "image/svg+xml")
-		rw.Header().Set("Cache-Control", "Cache-Control: public, max-age=604800, immutable")
-		fmt.Fprintln(rw, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">☕</text></svg>`)
 	})
 }
 
@@ -342,7 +335,7 @@ func server(fss fs.FS, z *notes.Zine, generation *chan bool) (http.Handler, erro
 
 	const nowPath = "now.md"
 
-	mux.Handle("/favicon", handlerFavicon())
+	mux.Handle("/favicon", lmfav.Emoji('☕'))
 
 	mux.Handle("/version/", selfupdate.Handler)
 

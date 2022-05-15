@@ -1,4 +1,5 @@
-package status
+// lmfav provides http.Handlers for generating favicons.
+package lmfav
 
 import (
 	"crypto/sha256"
@@ -164,7 +165,9 @@ var algos = [...]func(_ *image.NRGBA, _, _, _, _ color.NRGBA){
 	6: fourSquare,
 }
 
-func faviconHandler() http.Handler {
+// Flag procedurally generates a 16x16 flag based on the Host of the request.
+// Host can be overridden by passing a host in the query parameters.
+func Flag() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		host := r.URL.Query().Get("host")
 		if host == "" {
@@ -186,5 +189,13 @@ func faviconHandler() http.Handler {
 		if err := png.Encode(rw, pic); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
+	})
+}
+
+// Emoji generates a favicon of the passed rune using SVG.
+func Emoji(favicon rune) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
+		rw.Header().Add("Content-Type", "image/svg+xml")
+		fmt.Fprintf(rw, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">%c</text></svg>`, favicon)
 	})
 }

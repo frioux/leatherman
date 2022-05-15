@@ -6,7 +6,7 @@ use autodie;
 open my $fh, '>', 'pal.go';
 
 print $fh <<'GO';
-package status
+package lmfav
 
 import "image/color"
 

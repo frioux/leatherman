@@ -18,6 +18,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/frioux/leatherman/internal/lmfav"
 	"github.com/frioux/leatherman/internal/lmhttp"
 	"github.com/frioux/leatherman/internal/steam"
 )
@@ -208,14 +209,8 @@ func steamHandler(logFS, shotFS fs.FS, a *steam.AppIDs) http.Handler {
 	mux.Handle("/files/", lmhttp.TrimHandlerPrefix("/files", http.FileServer(http.FS(shotFS))))
 	mux.Handle("/", screenshotHandler(a, shotFS))
 	mux.Handle("/log/", logHandler(logFS, a))
-	mux.Handle("/favicon/", faviconHandler('🎮'))
+	mux.Handle("/favicon/", lmfav.Emoji('🎮'))
 
 	return mux
 }
 
-func faviconHandler(favicon rune) http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
-		rw.Header().Add("Content-Type", "image/svg+xml")
-		fmt.Fprintf(rw, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">%c</text></svg>`, favicon)
-	})
-}

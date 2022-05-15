@@ -1,4 +1,4 @@
-package status
+package lmfav
 
 import "image/color"
 
