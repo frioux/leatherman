@@ -14,115 +14,111 @@ import (
 //go:generate ./genpal
 var palettes [][]color.NRGBA
 
+const size = 128
+
 func twoHoriz(pic *image.NRGBA, a, b, _, _ color.NRGBA) {
-	for x := 0; x < 16; x++ {
-		for y := 0; y < 8; y++ {
+	for x := 0; x < size; x++ {
+		for y := 0; y < size/2; y++ {
 			pic.SetNRGBA(x, y, a)
 		}
 	}
-	for x := 0; x < 16; x++ {
-		for y := 8; y < 16; y++ {
+	for x := 0; x < size; x++ {
+		for y := size/2; y < size; y++ {
 			pic.SetNRGBA(x, y, b)
 		}
 	}
 }
 
 func threeHoriz(pic *image.NRGBA, a, b, c, _ color.NRGBA) {
-	for x := 0; x < 16; x++ {
-		for y := 0; y < 5; y++ {
+	for x := 0; x < size; x++ {
+		for y := 0; y < size/3; y++ {
 			pic.SetNRGBA(x, y, a)
 		}
 	}
-	for x := 0; x < 16; x++ {
-		for y := 5; y < 10; y++ {
+	for x := 0; x < size; x++ {
+		for y := size/3; y < 2*(size/3); y++ {
 			pic.SetNRGBA(x, y, b)
 		}
 	}
-	for x := 0; x < 16; x++ {
-		for y := 10; y < 15; y++ {
+	for x := 0; x < size; x++ {
+		for y := 2*(size/3); y < 3*(size/3); y++ {
 			pic.SetNRGBA(x, y, c)
 		}
-	}
-	for x := 0; x < 16; x++ {
-		pic.SetNRGBA(x, 16, color.NRGBA{0, 0, 0, 0})
 	}
 }
 
 func fourHoriz(pic *image.NRGBA, a, b, c, d color.NRGBA) {
-	for x := 0; x < 16; x++ {
-		for y := 0; y < 4; y++ {
+	for x := 0; x < size; x++ {
+		for y := 0; y < size/4; y++ {
 			pic.SetNRGBA(x, y, a)
 		}
 	}
-	for x := 0; x < 16; x++ {
-		for y := 4; y < 8; y++ {
+	for x := 0; x < size; x++ {
+		for y := size/4; y < size/2; y++ {
 			pic.SetNRGBA(x, y, b)
 		}
 	}
-	for x := 0; x < 16; x++ {
-		for y := 8; y < 12; y++ {
+	for x := 0; x < size; x++ {
+		for y := size/2; y < 3*size/4; y++ {
 			pic.SetNRGBA(x, y, c)
 		}
 	}
-	for x := 0; x < 16; x++ {
-		for y := 12; y < 16; y++ {
+	for x := 0; x < size; x++ {
+		for y := 3*size/4; y < size; y++ {
 			pic.SetNRGBA(x, y, d)
 		}
 	}
 }
 
 func twoVert(pic *image.NRGBA, a, b, _, _ color.NRGBA) {
-	for x := 0; x < 8; x++ {
-		for y := 0; y < 16; y++ {
+	for x := 0; x < size/2; x++ {
+		for y := 0; y < size; y++ {
 			pic.SetNRGBA(x, y, a)
 		}
 	}
-	for x := 8; x < 16; x++ {
-		for y := 0; y < 16; y++ {
+	for x := size/2; x < size; x++ {
+		for y := 0; y < size; y++ {
 			pic.SetNRGBA(x, y, b)
 		}
 	}
 }
 
 func threeVert(pic *image.NRGBA, a, b, c, _ color.NRGBA) {
-	for x := 0; x < 5; x++ {
-		for y := 0; y < 16; y++ {
+	for x := 0; x < size/3; x++ {
+		for y := 0; y < size; y++ {
 			pic.SetNRGBA(x, y, a)
 		}
 	}
-	for x := 5; x < 10; x++ {
-		for y := 0; y < 16; y++ {
+	for x := size/3; x < 2*(size/3); x++ {
+		for y := 0; y < size; y++ {
 			pic.SetNRGBA(x, y, b)
 		}
 	}
-	for x := 10; x < 15; x++ {
-		for y := 0; y < 16; y++ {
+	for x := 2*(size/3); x < 3*(size/3); x++ {
+		for y := 0; y < size; y++ {
 			pic.SetNRGBA(x, y, c)
 		}
-	}
-	for y := 0; y < 16; y++ {
-		pic.SetNRGBA(16, y, color.NRGBA{0, 0, 0, 0})
 	}
 }
 
 func fourVert(pic *image.NRGBA, a, b, c, d color.NRGBA) {
-	for x := 0; x < 4; x++ {
-		for y := 0; y < 16; y++ {
+	for x := 0; x < size/4; x++ {
+		for y := 0; y < size; y++ {
 			pic.SetNRGBA(x, y, a)
 		}
 	}
-	for x := 4; x < 8; x++ {
-		for y := 0; y < 16; y++ {
+	for x := size/4; x < size/2; x++ {
+		for y := 0; y < size; y++ {
 			pic.SetNRGBA(x, y, b)
 		}
 	}
-	for x := 8; x < 12; x++ {
-		for y := 0; y < 16; y++ {
+	for x := size/2; x < 3*size/4; x++ {
+		for y := 0; y < size; y++ {
 			pic.SetNRGBA(x, y, c)
 		}
 	}
-	for x := 12; x < 16; x++ {
-		for y := 0; y < 16; y++ {
+	for x := 3*size/4; x < size; x++ {
+		for y := 0; y < size; y++ {
 			pic.SetNRGBA(x, y, d)
 		}
 	}
@@ -130,26 +126,26 @@ func fourVert(pic *image.NRGBA, a, b, c, d color.NRGBA) {
 
 func fourSquare(pic *image.NRGBA, a, b, c, d color.NRGBA) {
 	// top left
-	for x := 0; x < 8; x++ {
-		for y := 0; y < 8; y++ {
+	for x := 0; x < size/2; x++ {
+		for y := 0; y < size/2; y++ {
 			pic.SetNRGBA(x, y, a)
 		}
 	}
 	// bottom left
-	for x := 0; x < 8; x++ {
-		for y := 8; y < 16; y++ {
+	for x := 0; x < size/2; x++ {
+		for y := size/2; y < size; y++ {
 			pic.SetNRGBA(x, y, b)
 		}
 	}
 	// top right
-	for x := 8; x < 16; x++ {
-		for y := 0; y < 8; y++ {
+	for x := size/2; x < size; x++ {
+		for y := 0; y < size/2; y++ {
 			pic.SetNRGBA(x, y, c)
 		}
 	}
 	// bottom right
-	for x := 8; x < 16; x++ {
-		for y := 8; y < 16; y++ {
+	for x := size/2; x < size; x++ {
+		for y := size/2; y < size; y++ {
 			pic.SetNRGBA(x, y, d)
 		}
 	}
@@ -165,7 +161,7 @@ var algos = [...]func(_ *image.NRGBA, _, _, _, _ color.NRGBA){
 	6: fourSquare,
 }
 
-// Flag procedurally generates a 16x16 flag based on the Host of the request.
+// Flag procedurally generates a size x size flag based on the Host of the request.
 // Host can be overridden by passing a host in the query parameters.
 func Flag() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
@@ -175,7 +171,7 @@ func Flag() http.Handler {
 		}
 		sum := sha256.Sum256([]byte(host))
 
-		pic := image.NewNRGBA(image.Rect(0, 0, 16, 16))
+		pic := image.NewNRGBA(image.Rect(0, 0, size, size))
 		pal := palettes[int(sum[1])%len(palettes)]
 		algos[int(sum[0])%len(algos)](
 			pic,
