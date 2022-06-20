@@ -61,7 +61,7 @@ func handlerAddItem(z *notes.Zine, fss fs.FS, mdwn goldmark.Markdown, nowPath st
 
 		b, err = parseNow(bytes.NewReader(b), time.Now())
 		if err != nil {
-			return err
+			return fmt.Errorf("parseNow (file: %s), %w", nowPath, err)
 		}
 
 		v := &HTMLVars{Zine: z, Title: "now"}

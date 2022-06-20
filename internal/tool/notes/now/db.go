@@ -64,7 +64,7 @@ func syncEventsToDB(fss fs.FS, z *notes.Zine, events []fsnotify.Event) (err erro
 
 			articles[i].Article, err = notes.ReadArticle(bytes.NewReader(b))
 			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintln(os.Stderr, err, "filename:", e.Name)
 				return
 			}
 		}()
@@ -189,7 +189,7 @@ func populateDB(f fs.FS, z *notes.Zine, tx sqlx.Preparer) error {
 
 			articles[i], err = notes.ReadArticle(bytes.NewReader(b))
 			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintln(os.Stderr, err, "filename:", name)
 				return
 			}
 			articles[i].Filename = name
