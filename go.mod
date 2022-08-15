@@ -19,7 +19,7 @@ require (
 	github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f
 	github.com/icza/mighty v0.0.0-20180919140131-cfd07d671de6 // indirect
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/mattn/go-isatty v0.0.14
+	github.com/mattn/go-isatty v0.0.16
 	github.com/pierrec/lz4/v3 v3.3.5
 	github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3
 	github.com/ulikunitz/xz v0.5.10
@@ -40,7 +40,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	golang.org/x/mod v0.3.0 // indirect
 	golang.org/x/net v0.0.0-20210916014120-12bc252f5db8 // indirect
-	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
+	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
 	golang.org/x/tools v0.0.0-20201124115921-2c860bdd6e78 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	lukechampine.com/uint128 v1.1.1 // indirect
