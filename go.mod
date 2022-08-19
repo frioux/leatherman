@@ -8,7 +8,7 @@ require (
 	github.com/BurntSushi/xgbutil v0.0.0-20190907113008-ad855c713046
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba
-	github.com/bwmarrin/discordgo v0.25.0
+	github.com/bwmarrin/discordgo v0.26.0
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/godbus/dbus v4.1.0+incompatible
