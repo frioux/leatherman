@@ -10,7 +10,7 @@ require (
 	github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba
 	github.com/bwmarrin/discordgo v0.26.1
 	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
-	github.com/fsnotify/fsnotify v1.5.4
+	github.com/fsnotify/fsnotify v1.6.0
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/google/go-cmp v0.5.9
 	github.com/hackebrot/turtle v0.1.1-0.20200616125707-1bb4c277aedd
@@ -40,7 +40,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
-	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
+	golang.org/x/sys v0.0.0-20220908164124-27713097b956 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	lukechampine.com/uint128 v1.1.1 // indirect
 	modernc.org/cc/v3 v3.38.1 // indirect
