@@ -1,5 +1,9 @@
 on: [push]
 
+permissions:
+  contents: write
+  pull-request: write
+
 jobs:
   test:
     runs-on: ubuntu-20.04
@@ -52,6 +56,25 @@ jobs:
         with:
           name: leatherman-windows.zip
           path: leatherman-windows.zip
+
+  dependabot:
+    runs-on: ubuntu-latest
+    # Only run this job for dependabot PRs
+    if: ${{ github.actor == 'dependabot[bot]' }}
+
+    # Only run if the required checks pass
+    needs: [test, build, build-windows]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Auto-merge Dependabot PRs
+        # Find the PR number based on the current branch name, and squash merge based on this number
+        run: 'PR_NUM="$(gh pr list | grep $(git branch --show-current) | cut -f1)"; gh pr merge --auto --squash $PR_NUM'
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
 
   release:
     needs: [test, build, build-windows]
