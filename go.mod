@@ -29,7 +29,7 @@ require (
 	golang.org/x/text v0.4.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
-	modernc.org/sqlite v1.19.5
+	modernc.org/sqlite v1.20.0
 )
 
 require (
