@@ -126,7 +126,7 @@ Here's a list of places to look when you need to add functionality:
 It's always wise to run `go test ./...` before pushing any changes.  After
 that, using `brainstem` to verify changes without needing the full stack
 is useful.  If you want more, you can run the main app (`amygdala`) and poke at
-it with `cmd/twilio`.  There's no dropbox mock yet so you'll need to actually
+it with `leatherman twilio`.  There's no dropbox mock yet so you'll need to actually
 use the real dropbox token, but other than that you should be able to develop
 almost 100% locally.
 
