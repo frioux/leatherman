@@ -19,8 +19,8 @@ github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
 github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba h1:zwpI3zXPgj6bGdyswiQLuK9luHcZ6FuUCU1WKcTk5vo=
 github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba/go.mod h1:Zx9tLMhTfJhSns4czs9WIs8wPR5oT2OuJNDhGR/GHgw=
-github.com/bwmarrin/discordgo v0.26.1 h1:AIrM+g3cl+iYBr4yBxCBp9tD9jR3K7upEjl0d89FRkE=
-github.com/bwmarrin/discordgo v0.26.1/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
+github.com/bwmarrin/discordgo v0.27.0 h1:4ZK9KN+rGIxZ0fdGTmgdCcliQeW8Zhu6MnlFI92nf0Q=
+github.com/bwmarrin/discordgo v0.27.0/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
