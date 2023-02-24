@@ -24,7 +24,7 @@ require (
 	github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3
 	github.com/ulikunitz/xz v0.5.11
 	github.com/yuin/goldmark v1.5.4
-	github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da
+	github.com/yuin/gopher-lua v1.1.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/text v0.7.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
