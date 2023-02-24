@@ -13,7 +13,7 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/google/go-cmp v0.5.9
-	github.com/hackebrot/turtle v0.1.1-0.20200616125707-1bb4c277aedd
+	github.com/hackebrot/turtle v0.2.0
 	github.com/headzoo/surf v1.0.1-0.20180909134844-a4a8c16c01dc
 	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
 	github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f

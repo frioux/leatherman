@@ -78,8 +78,8 @@ github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgf
 github.com/grpc-ecosystem/grpc-gateway v1.9.0/go.mod h1:vNeuVxBJEsws4ogUvrchl83t/GYV9WGTSLVdBhOQFDY=
 github.com/hackebrot/go-repr v0.1.0 h1:28FyOiVx+rHPqEj/nqUbxqs2ocz2hfM9gP01kAeJJoA=
 github.com/hackebrot/go-repr v0.1.0/go.mod h1:5nbEBC4Y57U1dVAlQGF4lQdqAJZAwu7cszx8HtEq8XM=
-github.com/hackebrot/turtle v0.1.1-0.20200616125707-1bb4c277aedd h1:3Yz4T15BmWV4zoLtY1CYfjBv3098pirDTrwRsespZy4=
-github.com/hackebrot/turtle v0.1.1-0.20200616125707-1bb4c277aedd/go.mod h1:iKsNJuPrVlNAttQofuZ05H4sdR4m5SAAAPGuWsLwqEE=
+github.com/hackebrot/turtle v0.2.0 h1:A9UI5rOu4qNZlF+fN7GVwQIWLOyO+caqa+suaYDtNIs=
+github.com/hackebrot/turtle v0.2.0/go.mod h1:iKsNJuPrVlNAttQofuZ05H4sdR4m5SAAAPGuWsLwqEE=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
 github.com/headzoo/surf v1.0.1-0.20180909134844-a4a8c16c01dc h1:xmXRlxaMHvNeB+EZ6HmWeLSifHbxQvZO/K1x9ICWOR0=
 github.com/headzoo/surf v1.0.1-0.20180909134844-a4a8c16c01dc/go.mod h1:/bct0m/iMNEqpn520y01yoaWxsAEigGFPnvyR1ewR5M=
