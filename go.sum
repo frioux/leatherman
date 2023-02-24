@@ -37,8 +37,8 @@ github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/frankban/quicktest v1.4.0 h1:rCSCih1FnSWJEel/eub9wclBSqpF2F/PuvxUWGWnbO8=
 github.com/frankban/quicktest v1.4.0/go.mod h1:36zfPVQyHxymz4cH7wlDmVwDrJuljRB60qkgn7rorfQ=
-github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f h1:vPrzBLZB9NBFMoydArwYLJMLJjv9YBwjORlyyVp+n2o=
-github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f/go.mod h1:YG995++5o4pY+dtMfaYY/sWBn/Qhj5rYQ7QaCnyTc+8=
+github.com/frioux/yaml v2.1.0+incompatible h1:uMDpe9aW7gHhbbU4aMEnJ7U3Bu1CLBjWRd+CBFsGOXc=
+github.com/frioux/yaml v2.1.0+incompatible/go.mod h1:rv2ELdweNaRsyDC/SdDCFcM4hMROpstVp0vUUyhGJXo=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=
 github.com/fsnotify/fsnotify v1.6.0/go.mod h1:sl3t1tCWJFWoRz9R8WJCbQihKKwmorjAbSClcnxKAGw=
