@@ -17,8 +17,8 @@ github.com/andybalholm/cascadia v1.3.1/go.mod h1:R4bJ1UQfqADjvDa4P6HZHLh/3OxWWEq
 github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6/go.mod h1:grANhF5doyWs3UAsr3K4I6qtAmlQcZDesFNEHPZAzj8=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
-github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba h1:zwpI3zXPgj6bGdyswiQLuK9luHcZ6FuUCU1WKcTk5vo=
-github.com/brandondube/tai v0.0.0-20210908012928-fc9102ee0eba/go.mod h1:Zx9tLMhTfJhSns4czs9WIs8wPR5oT2OuJNDhGR/GHgw=
+github.com/brandondube/tai v0.1.0 h1:psVhcG48XNq1LtQtvz6C5+6JU+n1UFjE9XeYLLDJ/cs=
+github.com/brandondube/tai v0.1.0/go.mod h1:Zx9tLMhTfJhSns4czs9WIs8wPR5oT2OuJNDhGR/GHgw=
 github.com/bwmarrin/discordgo v0.27.0 h1:4ZK9KN+rGIxZ0fdGTmgdCcliQeW8Zhu6MnlFI92nf0Q=
 github.com/bwmarrin/discordgo v0.27.0/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
