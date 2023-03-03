@@ -1,102 +1,51 @@
 package bamboo
 
 import (
-	"errors"
-	"fmt"
+	"context"
 	"io"
+	"errors"
+	"net/http"
 
 	"github.com/frioux/leatherman/internal/lmhttp"
-	"github.com/headzoo/surf"
-	"github.com/headzoo/surf/browser"
 )
 
 type client struct {
-	authURL, dirURL, treeURL string
+	apiKey string
 
-	celebURLPrefix string
-
-	user, password string
-
-	b *browser.Browser
+	companyDomain string
 }
 
-func newClient(user, password string) client {
+func newClient(apiKey, companyDomain string) client {
 	return client{
-		authURL:        "https://ziprecruiter1.bamboohr.com/login.php",
-		dirURL:         "https://ziprecruiter1.bamboohr.com/employee_directory/ajax/get_directory_info",
-		treeURL:        "https://ziprecruiter1.bamboohr.com/employees/orgchart.php?pin",
-		celebURLPrefix: "https://ziprecruiter1.bamboohr.com/widget/celebrations/", // 2022-01-01/2022-01-31
-
-		user:     user,
-		password: password,
+		apiKey: apiKey,
+		companyDomain: companyDomain,
 	}
 }
 
-func (c *client) auth() error {
-	ua := surf.NewBrowser()
-	ua.SetUserAgent(lmhttp.UserAgent)
-	err := ua.Open(c.authURL)
-	if err != nil {
-		return fmt.Errorf("auth: %w", err)
-	}
-
-	fm, err := ua.Form("form")
-	if err != nil {
-		return fmt.Errorf("auth: %s", err)
-	}
-
-	err = fm.Input("username", c.user)
-	if err != nil {
-		return fmt.Errorf("fm.Input: %w", err)
-	}
-	err = fm.Input("password", c.password)
-	if err != nil {
-		return fmt.Errorf("fm.Input: %w", err)
-	}
-
-	err = fm.Submit()
-	if err != nil {
-		return fmt.Errorf("auth: %w", err)
-	}
-	c.b = ua
-
-	return nil
+func (c *client) prefix() string {
+	return "https://api.bamboohr.com/api/gateway.php/" + c.companyDomain
 }
 
 func (c *client) directory(w io.Writer) error {
-	if err := c.b.Open(c.dirURL); err != nil {
+	req, err := lmhttp.NewRequest(context.Background(), "GET", c.prefix() + "/v1/employees/directory", nil)
+	if err != nil {
 		return err
 	}
 
-	if _, err := c.b.Download(w); err != nil {
+	req.SetBasicAuth(c.apiKey, "x")
+	req.Header.Add("Accept", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 
-	return nil
-}
-
-func (c *client) tree(w io.Writer) error {
-	if err := c.b.Open(c.treeURL); err != nil {
-		return fmt.Errorf("export-bamboohr-tree: %w", err)
+	if res.StatusCode > 299 {
+		return errors.New(res.Status)
 	}
 
-	s := c.b.Find("#orgchart__data_json")
-	if s.Length() == 0 {
-		return errors.New("export-bamboohr-tree: couldn't find json")
-	}
+	_, err = io.Copy(w, res.Body)
 
-	_, err := w.Write([]byte(s.Text()))
 	return err
-}
-
-func (c *client) celebrations(start, end string, w io.Writer) error {
-	if err := c.b.Open(c.celebURLPrefix + start + "/" + end); err != nil {
-		return fmt.Errorf("export-bamboohr-celebrations: %w", err)
-	}
-
-	if _, err := c.b.Download(w); err != nil {
-		return fmt.Errorf("export-bamboo-celebrations: %w", err)
-	}
-
-	return nil
 }

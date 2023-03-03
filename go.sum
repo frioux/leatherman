@@ -78,10 +78,6 @@ github.com/hackebrot/go-repr v0.1.0/go.mod h1:5nbEBC4Y57U1dVAlQGF4lQdqAJZAwu7csz
 github.com/hackebrot/turtle v0.2.0 h1:A9UI5rOu4qNZlF+fN7GVwQIWLOyO+caqa+suaYDtNIs=
 github.com/hackebrot/turtle v0.2.0/go.mod h1:iKsNJuPrVlNAttQofuZ05H4sdR4m5SAAAPGuWsLwqEE=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
-github.com/headzoo/surf v1.0.1 h1:wk3+LT8gjnCxEwfBJl6MhaNg154En5KjgmgzAG9uMS0=
-github.com/headzoo/surf v1.0.1/go.mod h1:/bct0m/iMNEqpn520y01yoaWxsAEigGFPnvyR1ewR5M=
-github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca h1:utFgFwgxaqx5OthzE3DSGrtOq7rox5r2sxZ2wbfTuK0=
-github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca/go.mod h1:8926sG02TCOX4RFRzIMFIzRw4xuc/TwO2gtN7teMJZ4=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f h1:EEBVjzvzsiUwgWio/3WB2kYx7DtC3QVJKuK6XejFghE=
 github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f/go.mod h1:mxjJy4NhAIQcnIf3X9PQBSjLMy+cKlTMgXsSNmyOtMA=

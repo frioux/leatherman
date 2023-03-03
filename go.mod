@@ -14,8 +14,6 @@ require (
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/google/go-cmp v0.5.9
 	github.com/hackebrot/turtle v0.2.0
-	github.com/headzoo/surf v1.0.1
-	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
 	github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f
 	github.com/icza/mighty v0.0.0-20180919140131-cfd07d671de6 // indirect
 	github.com/jmoiron/sqlx v1.3.5
