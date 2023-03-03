@@ -1,7 +1,5 @@
 module github.com/frioux/leatherman
 
-// +heroku goVersion go1.18
-
 require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/BurntSushi/xgb v0.0.0-20200324125942-20f126ea2843 // indirect
