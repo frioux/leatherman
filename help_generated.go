@@ -36,7 +36,6 @@ import "embed"
 //go:embed internal/tool/misc/bamboo/export-bamboohr-tree.md
 //go:embed internal/tool/misc/desktop/media-remote.md
 //go:embed internal/tool/misc/prependhist/prepend-hist.md
-//go:embed internal/tool/misc/smlist/sm-list.md
 //go:embed internal/tool/misc/status/status.md
 //go:embed internal/tool/misc/steamsrv/steamsrv.md
 //go:embed internal/tool/misc/twilio/twilio.md
@@ -116,8 +115,6 @@ var helpPaths = map[string]string{
 	"media-remote": "internal/tool/misc/desktop/media-remote.md",
 
 	"prepend-hist": "internal/tool/misc/prependhist/prepend-hist.md",
-
-	"sm-list": "internal/tool/misc/smlist/sm-list.md",
 
 	"status": "internal/tool/misc/status/status.md",
 

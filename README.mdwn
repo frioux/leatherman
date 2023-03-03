@@ -20,7 +20,7 @@ to pull the latest binary at install time and run the `explode` tool.
 Here's a copy pasteable script to install the leatherman on OSX or Linux:
 
 ``` bash
-OS=$([ $(uname -s) = "Darwin" ] && echo ".mac")
+OS=$([ $(uname -s) = "Darwin" ] && echo "-osx")
 LMURL="$(curl -s https://api.github.com/repos/frioux/leatherman/releases/latest |
    grep browser_download_url |
    cut -d '"' -f 4 |
@@ -103,7 +103,6 @@ echo "---\nfoo: 1" | leatherman yaml2json
  * `export-bamboohr-tree`: Exports company org chart as JSON. ([internal/tool/misc/bamboo/export-bamboohr-tree.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/bamboo/export-bamboohr-tree.md))
  * `media-remote`: `media-remote` control media players on Linux. ([internal/tool/misc/desktop/media-remote.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/desktop/media-remote.md))
  * `prepend-hist`: Combines a history file and stdin. ([internal/tool/misc/prependhist/prepend-hist.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/prependhist/prepend-hist.md))
- * `sm-list`: Lists coffee from sweetmarias as JSON. ([internal/tool/misc/smlist/sm-list.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/smlist/sm-list.md))
  * `status`: Serves information about host machine. ([internal/tool/misc/status/status.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/status/status.md))
  * `steamsrv`: Steamsrv renders steam screenshots and the steam log (what games you played and when) over http. ([internal/tool/misc/steamsrv/steamsrv.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/steamsrv/steamsrv.md))
  * `twilio`: Makes callbacks like twilio. ([internal/tool/misc/twilio/twilio.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/twilio/twilio.md))

@@ -29,7 +29,6 @@ import (
 	"github.com/frioux/leatherman/internal/tool/misc/desktop"
 	"github.com/frioux/leatherman/internal/tool/misc/img"
 	"github.com/frioux/leatherman/internal/tool/misc/prependhist"
-	"github.com/frioux/leatherman/internal/tool/misc/smlist"
 	"github.com/frioux/leatherman/internal/tool/misc/status"
 	"github.com/frioux/leatherman/internal/tool/misc/steamsrv"
 	"github.com/frioux/leatherman/internal/tool/misc/twilio"
@@ -76,7 +75,6 @@ func init() {
 		"slack-deaddrop":             slack.Deaddrop,
 		"slack-open":                 slack.Open,
 		"slack-status":               slack.Status,
-		"sm-list":                    smlist.Run,
 		"srv":                        srv.Serve,
 		"status":                     status.Status,
 		"steamsrv":                   steamsrv.Serve,
