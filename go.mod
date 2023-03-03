@@ -7,7 +7,6 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/brandondube/tai v0.1.0
 	github.com/bwmarrin/discordgo v0.27.0
-	github.com/frioux/yaml v0.0.0-20191009230429-1d79e1a4120f
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/google/go-cmp v0.5.9
@@ -24,9 +23,10 @@ require (
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/text v0.7.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
 	modernc.org/sqlite v1.21.0
 )
+
+require gopkg.in/yaml.v3 v3.0.1
 
 require (
 	github.com/andybalholm/cascadia v1.3.1 // indirect

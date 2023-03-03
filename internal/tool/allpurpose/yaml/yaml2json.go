@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/frioux/yaml"
+	yaml "gopkg.in/yaml.v3"
 )
 
 func ToJSON(_ []string, stdin io.Reader) error {
