@@ -25,10 +25,6 @@ import "embed"
 //go:embed internal/tool/chat/slack/slack-open.md
 //go:embed internal/tool/chat/slack/slack-status.md
 //go:embed internal/tool/leatherman/update/update.md
-//go:embed internal/tool/mail/email/addrs.md
-//go:embed internal/tool/mail/email/addrspec-to-tabs.md
-//go:embed internal/tool/mail/email/email2json.md
-//go:embed internal/tool/mail/email/render-mail.md
 //go:embed internal/tool/misc/backlight/backlight.md
 //go:embed internal/tool/misc/img/draw.md
 //go:embed internal/tool/misc/bamboo/export-bamboohr.md
@@ -91,14 +87,6 @@ var helpPaths = map[string]string{
 	"slack-status": "internal/tool/chat/slack/slack-status.md",
 
 	"update": "internal/tool/leatherman/update/update.md",
-
-	"addrs": "internal/tool/mail/email/addrs.md",
-
-	"addrspec-to-tabs": "internal/tool/mail/email/addrspec-to-tabs.md",
-
-	"email2json": "internal/tool/mail/email/email2json.md",
-
-	"render-mail": "internal/tool/mail/email/render-mail.md",
 
 	"backlight": "internal/tool/misc/backlight/backlight.md",
 

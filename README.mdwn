@@ -87,13 +87,6 @@ echo "---\nfoo: 1" | leatherman yaml2json
 
  * `update`: Installs new version of leatherman if one exists. ([internal/tool/leatherman/update/update.md](https://github.com/frioux/leatherman/blob/main/internal/tool/leatherman/update/update.md))
 
-### mail
-
- * `addrs`: Sorts addresses on stdin based on recency. ([internal/tool/mail/email/addrs.md](https://github.com/frioux/leatherman/blob/main/internal/tool/mail/email/addrs.md))
- * `addrspec-to-tabs`: Converts email addresses from the standard format on stdin to the mutt address book format on stdout. ([internal/tool/mail/email/addrspec-to-tabs.md](https://github.com/frioux/leatherman/blob/main/internal/tool/mail/email/addrspec-to-tabs.md))
- * `email2json`: Converts email to JSON. ([internal/tool/mail/email/email2json.md](https://github.com/frioux/leatherman/blob/main/internal/tool/mail/email/email2json.md))
- * `render-mail`: Render email with a Local-Date included, if Date is not already in local time. ([internal/tool/mail/email/render-mail.md](https://github.com/frioux/leatherman/blob/main/internal/tool/mail/email/render-mail.md))
-
 ### misc
 
  * `backlight`: Modifies screen brightness. ([internal/tool/misc/backlight/backlight.md](https://github.com/frioux/leatherman/blob/main/internal/tool/misc/backlight/backlight.md))
