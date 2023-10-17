@@ -14,7 +14,7 @@ require (
 	github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f
 	github.com/icza/mighty v0.0.0-20180919140131-cfd07d671de6 // indirect
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/mattn/go-isatty v0.0.19
+	github.com/mattn/go-isatty v0.0.20
 	github.com/pierrec/lz4/v3 v3.3.5
 	github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3
 	github.com/ulikunitz/xz v0.5.11
