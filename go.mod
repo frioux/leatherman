@@ -7,7 +7,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/brandondube/tai v0.1.0
 	github.com/bwmarrin/discordgo v0.27.1
-	github.com/fsnotify/fsnotify v1.6.0
+	github.com/fsnotify/fsnotify v1.7.0
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/hackebrot/turtle v0.2.0
