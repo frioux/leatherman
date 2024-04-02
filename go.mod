@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/xgbutil v0.0.0-20190907113008-ad855c713046
 	github.com/PuerkitoBio/goquery v1.9.1
 	github.com/brandondube/tai v0.1.0
-	github.com/bwmarrin/discordgo v0.27.1
+	github.com/bwmarrin/discordgo v0.28.1
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/google/go-cmp v0.6.0
