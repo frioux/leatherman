@@ -9,7 +9,7 @@ require (
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/godbus/dbus v4.1.0+incompatible
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/hackebrot/turtle v0.2.0
 	github.com/icza/backscanner v0.0.0-20180226082541-a77511ef4f0f
 	github.com/icza/mighty v0.0.0-20180919140131-cfd07d671de6 // indirect
