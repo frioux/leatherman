@@ -19,11 +19,20 @@ to pull the latest binary at install time and run the `explode` tool.
 Here's a copy pasteable script to install the leatherman on OSX or Linux:
 
 ``` bash
-OS=$([ $(uname -s) = "Darwin" ] && echo "-osx")
+SUFFIX=""
+if [ "$(uname -s)" = "Darwin" ]; then
+  if [ "$(uname -m)" = "arm64" ]; then
+    SUFFIX=".mac-arm64"
+  else
+    SUFFIX=".mac"
+  fi
+elif [ "$(uname -m)" = "armv7l" ]; then
+  SUFFIX=".arm"
+fi
 LMURL="$(curl -s https://api.github.com/repos/frioux/leatherman/releases/latest |
    grep browser_download_url |
    cut -d '"' -f 4 |
-   grep -F leatherman${OS}.xz )"
+   grep -F leatherman${SUFFIX}.xz )"
 mkdir -p ~/bin
 curl -sL "$LMURL" > ~/bin/leatherman.xz
 xz -d -f ~/bin/leatherman.xz

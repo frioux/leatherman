@@ -24,6 +24,7 @@ jobs:
             - {GOOS: linux, GOARCH: amd64, outfile: leatherman.xz}
             - {GOOS: linux, GOARCH: arm, outfile: leatherman.arm.xz}
             - {GOOS: darwin, GOARCH: amd64, outfile: leatherman.mac.xz}
+            - {GOOS: darwin, GOARCH: arm64, outfile: leatherman.mac-arm64.xz}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -100,7 +101,7 @@ jobs:
     needs: [release]
     strategy:
         matrix:
-          file: ['leatherman.xz', 'leatherman-windows.zip', 'leatherman.arm.xz', 'leatherman.mac.xz']
+          file: ['leatherman.xz', 'leatherman-windows.zip', 'leatherman.arm.xz', 'leatherman.mac.xz', 'leatherman.mac-arm64.xz']
 
     runs-on: ubuntu-20.04
     steps:

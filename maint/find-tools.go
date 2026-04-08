@@ -8,6 +8,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
 	"os/exec"
 	"regexp"
@@ -38,45 +41,42 @@ func run() error {
 		var c struct {
 			ImportPath string
 
-			Dir     string
-			GoFiles []string
+			Dir            string
+			GoFiles        []string
+			IgnoredGoFiles []string
 		}
 		if err := json.Unmarshal(s.Bytes(), &c); err != nil {
 			return err
 		}
 		dir := c.Dir
 
-		for _, file := range c.GoFiles {
+		allFiles := append(c.GoFiles, c.IgnoredGoFiles...)
+		for _, file := range allFiles {
 			path := dir + "/" + file
 			if !toolMatch.MatchString(path) {
 				continue
 			}
-			cmd := exec.Command("goblin", "-file", path)
-			cmd.Stderr = os.Stderr
-			o, err := cmd.Output()
+			mdPath := strings.TrimSuffix(path, ".go") + ".md"
+			if _, err := os.Stat(mdPath); err != nil {
+				continue
+			}
+			fset := token.NewFileSet()
+			f, err := parser.ParseFile(fset, path, nil, 0)
 			if err != nil {
 				return err
 			}
-			var g struct {
-				PackageName struct {
-					Value string
-				} `json:"package-name"`
-				Declarations []struct {
-					Type string
-					Name struct {
-						Value string
-					}
-				}
-			}
-			if err := json.Unmarshal(o, &g); err != nil {
-				return err
-			}
 
-			for _, decl := range g.Declarations {
-				if decl.Type != "function" {
+			pkgName := f.Name.Name
+
+			for _, decl := range f.Decls {
+				fn, ok := decl.(*ast.FuncDecl)
+				if !ok {
 					continue
 				}
-				if strings.ToUpper(decl.Name.Value[:1]) != decl.Name.Value[:1] {
+				if fn.Recv != nil {
+					continue
+				}
+				if !fn.Name.IsExported() {
 					continue
 				}
 
@@ -90,7 +90,7 @@ func run() error {
 					Package string `json:"package"`
 					Path    string `json:"path"`
 				}{
-					decl.Name.Value, c.ImportPath, g.PackageName.Value, path,
+					fn.Name.Name, c.ImportPath, pkgName, path,
 				}
 
 				if err := e.Encode(out); err != nil {
