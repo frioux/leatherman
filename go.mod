@@ -17,7 +17,7 @@ require (
 	github.com/mattn/go-isatty v0.0.23
 	github.com/pierrec/lz4/v3 v3.3.5
 	github.com/tailscale/hujson v0.0.0-20190930033718-5098e564d9b3
-	github.com/ulikunitz/xz v0.5.15
+	github.com/ulikunitz/xz v0.5.16
 	github.com/yuin/goldmark v1.8.4
 	github.com/yuin/gopher-lua v1.1.2
 	golang.org/x/crypto v0.52.0 // indirect
