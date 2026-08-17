@@ -21,7 +21,7 @@ require (
 	github.com/yuin/goldmark v1.8.5
 	github.com/yuin/gopher-lua v1.1.2
 	golang.org/x/crypto v0.52.0 // indirect
-	golang.org/x/text v0.40.0
+	golang.org/x/text v0.41.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	modernc.org/sqlite v1.56.0
 )
